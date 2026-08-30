@@ -1,0 +1,23 @@
+---
+import type { PortalProject } from '../../types/portal';
+
+interface Props {
+  projects: PortalProject[];
+}
+
+const { projects } = Astro.props;
+---
+
+<section id="project-shelf" aria-labelledby="project-shelf-title" class="mt-8">
+  <p class="text-xs font-black tracking-[0.16em] text-[#0369a1]">PROJECT SHELF</p>
+  <h2 id="project-shelf-title" class="mt-1 text-2xl font-black text-[#075985] dark:text-[#bae6fd]">项目书架</h2>
+  <ul class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+    {projects.map((project) => (
+      <li class="min-w-0 border-3 border-[#0284c7] bg-white p-4 shadow-[4px_4px_0_0_#0284c7] dark:bg-slate-800">
+        <h3 class="text-lg font-black text-[#075985] dark:text-[#bae6fd]"><a href={project.href} class="underline decoration-2 underline-offset-4">{project.title}</a></h3>
+        <p class="mt-2 text-sm font-bold leading-6 text-slate-700 dark:text-slate-200">{project.summary}</p>
+        <p class="mt-3 text-xs font-black text-[#0369a1]">{project.status} · 更新至 {project.updated}</p>
+      </li>
+    ))}
+  </ul>
+</section>

@@ -1,0 +1,49 @@
+---
+import type { HomeModel } from '../../utils/homeModel';
+import ActivityStream from './ActivityStream.astro';
+import EnvironmentPreview from './EnvironmentPreview.astro';
+import ExploreDock from './ExploreDock.svelte';
+import FocusPanel from './FocusPanel.astro';
+import HomeHero from './HomeHero.astro';
+import KnowledgeMap from './KnowledgeMap.astro';
+import ProjectShelf from './ProjectShelf.astro';
+import StartHereGrid from './StartHereGrid.astro';
+
+interface Props {
+  model: HomeModel;
+}
+
+const { model } = Astro.props;
+---
+
+<main aria-label="个人门户首页" class="mx-auto w-full max-w-6xl px-3 py-6 sm:px-6 sm:py-10">
+  <HomeHero identity={model.identity} lastUpdated={model.lastUpdated} />
+  <StartHereGrid paths={model.startHere} />
+  <KnowledgeMap topics={model.topics} />
+  <FocusPanel focus={model.focus} />
+  <ProjectShelf projects={model.projects} />
+  <ActivityStream entries={model.recent} />
+  {model.posts.length > 0 ? (
+    <section aria-labelledby="recent-posts-title" class="mt-8">
+      <h2 id="recent-posts-title" class="text-2xl font-black text-[#075985] dark:text-[#bae6fd]">最近文章</h2>
+      <slot name="recent-posts">
+        <ul class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+          {model.posts.slice(0, 4).map((post) => (
+            <li class="min-w-0 border-3 border-[#0284c7] bg-white p-4 shadow-[4px_4px_0_0_#0284c7] dark:bg-slate-800">
+              <a href={post.href} class="font-black text-[#075985] underline decoration-2 underline-offset-4 dark:text-[#bae6fd]">{post.title}</a>
+              <p class="mt-2 text-sm font-bold leading-6 text-slate-700 dark:text-slate-200">{post.description}</p>
+            </li>
+          ))}
+        </ul>
+      </slot>
+    </section>
+  ) : (
+    <section aria-labelledby="posts-policy-title" class="mt-8 border-2 border-dashed border-[#0284c7] bg-white p-4 dark:bg-slate-800">
+      <h2 id="posts-policy-title" class="text-lg font-black text-[#075985] dark:text-[#bae6fd]">文章集合</h2>
+      <p class="mt-2 text-sm font-bold leading-6 text-slate-700 dark:text-slate-200">暂时没有公开文章；可先查看文章集合与发布说明。</p>
+      <a href="/posts" class="mt-3 inline-block min-h-[44px] border-2 border-[#0284c7] px-4 py-2 text-sm font-black text-[#075985] shadow-[3px_3px_0_0_#0284c7] dark:text-[#bae6fd]">查看文章集合</a>
+    </section>
+  )}
+  <ExploreDock entries={model.exploreEntries} client:load />
+  <EnvironmentPreview items={model.environment} />
+</main>

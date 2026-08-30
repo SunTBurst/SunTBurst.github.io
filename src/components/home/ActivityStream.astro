@@ -1,0 +1,27 @@
+---
+import type { PortalIndexEntry } from '../../types/portal';
+
+interface Props {
+  entries: PortalIndexEntry[];
+}
+
+const { entries } = Astro.props;
+---
+
+<section id="recent-activity" aria-labelledby="recent-activity-title" class="mt-8 border-3 border-[#7c3aed] bg-[#f5f3ff] p-5 shadow-[4px_4px_0_0_#7c3aed] dark:bg-violet-950/40">
+  <p class="text-xs font-black tracking-[0.16em] text-violet-700 dark:text-violet-300">RECENT ACTIVITY</p>
+  <h2 id="recent-activity-title" class="mt-1 text-2xl font-black text-violet-900 dark:text-violet-100">最近活动</h2>
+  {entries.length > 0 ? (
+    <ol class="mt-4 space-y-3">
+      {entries.map((entry) => (
+        <li class="border-l-4 border-violet-700 pl-3 text-sm">
+          <a href={entry.href} class="font-black text-violet-900 underline decoration-2 underline-offset-4 dark:text-violet-100">{entry.title}</a>
+          <p class="mt-1 font-bold text-slate-700 dark:text-slate-200">{entry.description}</p>
+          <p class="mt-1 text-xs font-black text-violet-700 dark:text-violet-300">{entry.updatedAt.slice(0, 10)}</p>
+        </li>
+      ))}
+    </ol>
+  ) : (
+    <p class="mt-4 text-sm font-bold leading-6 text-slate-700 dark:text-slate-200">公开内容准备好后，最近活动会在这里按更新时间出现；现在可以先从上面的入口开始。</p>
+  )}
+</section>
