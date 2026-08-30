@@ -47,6 +47,7 @@ export const portalTools: PortalToolItem[] = [
   { title: 'RSS 订阅', description: '用你熟悉的阅读器跟踪公开更新。', href: '/rss.xml', state: 'ready' },
   { title: '利雅得天气', description: '点击后才读取实时天气，不获取设备定位。', href: '/weather', state: 'ready' },
   { title: '随机画片', description: '从本站自有的授权画片中随机换一张，不连接图片热链。', href: '/random-image', state: 'ready' },
+  { title: 'GitHub 公开活动', description: '查看构建时生成的公开仓库和活动快照，浏览时不请求 GitHub API。', href: '/github', state: 'ready' },
   { title: 'AI 导览', description: '查看公开问答的范围、引用和隐私边界。', href: '/ai', state: 'preview' },
   { title: '访问统计', description: '查看匿名化、访客同意和启用条件。', href: '/stats', state: 'preview' },
   { title: '服务状态', description: '查看公开状态摘要与故障降级原则。', href: '/status', state: 'preview' },

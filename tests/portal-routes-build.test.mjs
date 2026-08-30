@@ -33,6 +33,7 @@ const fixedRoutes = [
   '/favorites',
   '/weather',
   '/random-image',
+  '/github',
   '/ai',
   '/music',
   '/stats',
@@ -91,7 +92,7 @@ test('production build emits every fixed and indexed public HTML route with hone
   const readyLabHrefs = Array.from(labHtml.matchAll(/<a\b(?=[^>]*data-lab-tool="ready")(?=[^>]*href="([^"]+)")[^>]*>/g), (match) => match[1]);
   assert.deepEqual(
     readyLabHrefs,
-    ['/search', '/explore', '/favorites', '/calendar', '/timeline', '/rss.xml', '/weather', '/random-image'],
+    ['/search', '/explore', '/favorites', '/calendar', '/timeline', '/rss.xml', '/weather', '/random-image', '/github'],
     'expected the lab to explain every tool counted as available on the homepage',
   );
 
@@ -109,6 +110,12 @@ test('production build emits every fixed and indexed public HTML route with hone
   assert.match(randomImageHtml, /换一张/);
   assert.match(randomImageHtml, /本站自有使用权/);
   assert.doesNotMatch(randomImageHtml, /https?:\/\/(?:picsum|images\.unsplash|source\.unsplash)/i, 'expected no unknown image hotlink');
+
+  const githubHtml = readRoute('/github');
+  assert.match(githubHtml, /data-public-profile-source="github"/);
+  assert.match(githubHtml, /数据快照/);
+  assert.match(githubHtml, /SunTBurst\.github\.io/);
+  assert.doesNotMatch(githubHtml, /api\.github\.com|GITHUB_TOKEN|github_pat_|must-not-leak/i);
   const previewLabHrefs = Array.from(labHtml.matchAll(/<a\b(?=[^>]*data-lab-tool="preview")(?=[^>]*href="([^"]+)")[^>]*>/g), (match) => match[1]);
   assert.deepEqual(
     previewLabHrefs,

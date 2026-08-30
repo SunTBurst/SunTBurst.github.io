@@ -1,0 +1,83 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { isPublicProfileSnapshotStale } from '../utils/publicProfiles';
+import { loadPublicProfileSnapshot } from '../utils/publicProfilesData';
+
+const { snapshot, origin } = await loadPublicProfileSnapshot();
+const stale = isPublicProfileSnapshotStale(snapshot);
+const displayDate = new Intl.DateTimeFormat('zh-CN', {
+  timeZone: 'Asia/Riyadh',
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+  hour12: false,
+}).format(new Date(snapshot.generatedAt));
+---
+
+<Layout title="GitHub 公开活动" description="构建期生成的 SunTBurst GitHub 公开资料快照" hidePageBanner>
+  <div class="mx-auto grid max-w-5xl gap-6" data-public-profile-source="github" data-snapshot-origin={origin} data-snapshot-stale={String(stale)}>
+    <section class="border-4 border-[#0284c7] bg-white p-5 shadow-[7px_7px_0_0_#f59e0b] dark:bg-slate-800 sm:p-8">
+      <div class="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+        <div class="max-w-2xl">
+          <p class="text-xs font-black tracking-[0.16em] text-[#0369a1]">BUILD-TIME PUBLIC SNAPSHOT</p>
+          <h1 class="mt-1 text-3xl font-black text-[#075985] dark:text-[#bae6fd]">GitHub 公开活动</h1>
+          <p class="mt-3 font-bold leading-7 text-slate-700 dark:text-slate-200">这里展示构建时读取并脱敏后的公开资料。浏览页面不会请求 GitHub API；只有点击仓库或活动链接时才会离开本站。</p>
+        </div>
+        <a href={snapshot.profile.htmlUrl} class="inline-flex min-h-[48px] shrink-0 items-center border-3 border-[#075985] bg-[#fde68a] px-5 py-2 font-black text-[#075985] shadow-[4px_4px_0_0_#075985] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#0ea5e9]/40">访问 GitHub 主页 →</a>
+      </div>
+
+      <div class="mt-6 grid gap-3 sm:grid-cols-3">
+        <div class="border-3 border-[#075985] bg-sky-50 p-4 dark:bg-sky-950/30">
+          <p class="text-xs font-black text-[#075985] dark:text-[#bae6fd]">公开身份</p>
+          <p class="mt-2 text-2xl font-black">@{snapshot.profile.login}</p>
+        </div>
+        <div class="border-3 border-emerald-700 bg-emerald-50 p-4 dark:bg-emerald-950/30">
+          <p class="text-xs font-black text-emerald-800 dark:text-emerald-200">公开仓库</p>
+          <p class="mt-2 text-2xl font-black">{snapshot.profile.publicRepositories ?? '待刷新'}</p>
+        </div>
+        <div class="border-3 border-violet-700 bg-violet-50 p-4 dark:bg-violet-950/30">
+          <p class="text-xs font-black text-violet-800 dark:text-violet-200">关注者</p>
+          <p class="mt-2 text-2xl font-black">{snapshot.profile.followers ?? '待刷新'}</p>
+        </div>
+      </div>
+
+      <div class:list={['mt-4 border-2 p-3 text-sm font-bold leading-6', stale ? 'border-amber-700 bg-amber-50 text-amber-900 dark:bg-amber-950/30 dark:text-amber-100' : 'border-emerald-700 bg-emerald-50 text-emerald-900 dark:bg-emerald-950/30 dark:text-emerald-100']}>
+        数据快照：{displayDate}（利雅得时间） · {origin === 'build-cache' ? '本次部署已刷新' : '使用仓库备用快照'}{stale ? ' · 数据可能已经过期，以 GitHub 页面为准。' : ''}
+      </div>
+    </section>
+
+    <section class="border-4 border-emerald-700 bg-emerald-50 p-5 shadow-[7px_7px_0_0_#047857] dark:bg-emerald-950/30 sm:p-8">
+      <p class="text-xs font-black tracking-[0.16em] text-emerald-700 dark:text-emerald-300">PUBLIC REPOSITORIES</p>
+      <h2 class="mt-1 text-2xl font-black text-emerald-900 dark:text-emerald-100">最近更新的公开仓库</h2>
+      {snapshot.repositories.length > 0 ? (
+        <ul class="mt-5 grid gap-4 sm:grid-cols-2">
+          {snapshot.repositories.map((repository) => (
+            <li class="border-3 border-emerald-700 bg-white p-4 dark:bg-slate-800">
+              <a href={repository.htmlUrl} class="inline-flex min-h-[44px] max-w-full items-center break-all px-2 font-black text-emerald-900 underline decoration-2 underline-offset-4 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-500/40 dark:text-emerald-100">{repository.name}</a>
+              <p class="mt-2 text-sm font-bold leading-6 text-slate-700 dark:text-slate-200">{repository.description}</p>
+              <p class="mt-3 text-xs font-black text-emerald-700 dark:text-emerald-300">{repository.language ?? '语言待识别'} · ★ {repository.stars} · Fork {repository.forks}{repository.isFork ? ' · 派生仓库' : ''}</p>
+              <p class="mt-1 text-xs font-bold text-slate-500 dark:text-slate-400">更新：{repository.updatedAt.slice(0, 10)}</p>
+            </li>
+          ))}
+        </ul>
+      ) : <p class="mt-4 font-bold">当前快照没有可展示的公开仓库，请直接访问 GitHub 主页核对。</p>}
+    </section>
+
+    <section class="border-4 border-violet-700 bg-violet-50 p-5 shadow-[7px_7px_0_0_#7c3aed] dark:bg-violet-950/30 sm:p-8">
+      <p class="text-xs font-black tracking-[0.16em] text-violet-700 dark:text-violet-300">PUBLIC ACTIVITY</p>
+      <h2 class="mt-1 text-2xl font-black text-violet-900 dark:text-violet-100">最近公开活动</h2>
+      {snapshot.activity.length > 0 ? (
+        <ol class="mt-5 grid gap-3">
+          {snapshot.activity.map((activity) => (
+            <li class="border-l-4 border-violet-700 bg-white p-4 dark:bg-slate-800">
+              <a href={activity.htmlUrl} class="inline-flex min-h-[44px] max-w-full items-center break-all px-2 font-black text-violet-900 underline decoration-2 underline-offset-4 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-violet-500/40 dark:text-violet-100">{activity.summary}</a>
+              <p class="mt-1 text-xs font-black text-violet-700 dark:text-violet-300">{activity.occurredAt.slice(0, 10)} · {activity.type}</p>
+            </li>
+          ))}
+        </ol>
+      ) : <p class="mt-4 font-bold">当前快照没有公开活动，不会用空数据伪造动态。</p>}
+    </section>
+  </div>
+</Layout>

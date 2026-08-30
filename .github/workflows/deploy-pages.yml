@@ -40,6 +40,11 @@ jobs:
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 
+      - name: Refresh public GitHub snapshot
+        run: pnpm profile:refresh
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
       - name: Build static site
         run: pnpm build
         env:
