@@ -80,15 +80,15 @@ npx --yes pnpm@9.15.4 build
 准备公开发布时，再手工完成以下步骤：
 
 1. 在 GitHub 新建一个公开仓库，名称必须是 `<你的用户名>.github.io`，不要勾选自动创建 README。
-2. 在本项目根目录添加远程仓库并推送 `main`：
+2. 打开新仓库的 `Settings` → `Pages`，将发布来源选择为 `GitHub Actions`。
+3. 在本项目根目录添加远程仓库并推送 `main`：
 
    ```powershell
    git remote add origin https://github.com/<你的用户名>/<你的用户名>.github.io.git
    git push -u origin main
    ```
 
-3. 打开仓库的 `Settings` → `Pages`，将发布来源选择为 `GitHub Actions`。
-4. 打开仓库的 `Actions` 页面，等待 `Deploy to GitHub Pages` 工作流完成。完成后访问 `https://<你的用户名>.github.io`。
+4. 打开仓库的 `Actions` 页面，等待 `Deploy to GitHub Pages` 工作流完成。若首次工作流因 Pages 尚未启用而失败，打开该工作流，点击 `Run workflow`，选择 `main` 后重新运行。完成后访问 `https://<你的用户名>.github.io`。
 
 本地准备阶段不会替你创建 GitHub 仓库、推送代码或发布网站。
 

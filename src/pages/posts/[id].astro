@@ -23,7 +23,7 @@ const { post } = Astro.props;
 // Render original collection Markdown using Astro compiler
 import { render } from 'astro:content';
 const rawPosts = await getPublishedPosts();
-const articleEntry = rawPosts.find(p => (p.slug || p.id) === post.slug);
+const articleEntry = rawPosts.find(p => p.id === post.id);
 if (!articleEntry) {
   return Astro.redirect('/404');
 }

@@ -2,13 +2,21 @@
 import { getProcessedPosts } from '../../../../utils/postsFetcher';
 
 export async function getStaticPaths() {
+  const postsPerPage = 10;
   const allPosts = await getProcessedPosts();
-  const categoriesSet = new Set(allPosts.map(p => p.category).filter(Boolean));
+  const categoryCounts = new Map<string, number>();
+
+  for (const post of allPosts) {
+    if (!post.category) continue;
+    categoryCounts.set(post.category, (categoryCounts.get(post.category) || 0) + 1);
+  }
+
   const paths = [];
-  for (const cat of categoriesSet) {
-    for (let p = 1; p <= 15; p++) {
+  for (const [categoryName, postCount] of categoryCounts) {
+    const totalPages = Math.ceil(postCount / postsPerPage);
+    for (let page = 1; page <= totalPages; page++) {
       paths.push({
-        params: { categoryName: cat, page: String(p) }
+        params: { categoryName, page: String(page) }
       });
     }
   }

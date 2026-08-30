@@ -1,6 +1,12 @@
 ---
+import { getProcessedPosts } from '../../utils/postsFetcher';
+
 export async function getStaticPaths() {
-  return Array.from({ length: 25 }).map((_, i) => ({
+  const postsPerPage = 10;
+  const allPosts = await getProcessedPosts();
+  const totalPages = Math.max(1, Math.ceil(allPosts.length / postsPerPage));
+
+  return Array.from({ length: totalPages }).map((_, i) => ({
     params: { page: String(i + 1) }
   }));
 }

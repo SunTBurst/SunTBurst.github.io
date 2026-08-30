@@ -1,6 +1,7 @@
 import { seoConfig } from '../config/seo';
 import { getPublishedPosts, getPublishedTalks } from './contentCollections';
 import { siteDateTime } from './dateFormat';
+import { normalizeEntrySlug } from './slugify';
 import { renderTalkContent, type TalkImage } from './talkContent';
 
 export interface PostItem {
@@ -60,19 +61,7 @@ export async function getProcessedPosts(): Promise<PostItem[]> {
 
     const parsedDate = siteDateTime(data.published);
 
-    let customSlug = post.slug || post.id;
-    if (data.slug && typeof data.slug === 'string' && data.slug.trim() !== '') {
-      customSlug = data.slug.trim();
-    }
-    
-    // Normalize pre-encoded slugs from frontmatter (e.g. from imported Wordpress data)
-    if (customSlug.includes('%')) {
-      try {
-        customSlug = decodeURIComponent(customSlug);
-      } catch (e) {
-        // Fallback to original if not a valid encoding
-      }
-    }
+    const customSlug = normalizeEntrySlug(post);
 
     // 1) frontmatter 里显式声明的封面图
     // 2) 正文里第一张 Markdown/HTML 图片（![](...)、<img src=...>）
@@ -135,19 +124,7 @@ export async function getProcessedTalks(): Promise<TalkItem[]> {
     
     const parsedDate = siteDateTime(data.published);
 
-    let customSlug = talk.slug || talk.id;
-    if (data.slug && typeof data.slug === 'string' && data.slug.trim() !== '') {
-      customSlug = data.slug.trim();
-    }
-
-    // Normalize pre-encoded slugs from frontmatter
-    if (customSlug.includes('%')) {
-      try {
-        customSlug = decodeURIComponent(customSlug);
-      } catch (e) {
-        // Fallback
-      }
-    }
+    const customSlug = normalizeEntrySlug(talk);
 
     const renderedContent = renderTalkContent(talk.body || '');
 

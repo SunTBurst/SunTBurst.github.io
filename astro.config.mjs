@@ -9,6 +9,12 @@ import rehypeKatex from 'rehype-katex';
 import { remarkAdmonitions } from './src/plugins/remark-admonitions.mjs';
 import { rehypeShiftHeadings } from './src/plugins/rehype-shift-headings.mjs';
 
+try {
+  process.loadEnvFile();
+} catch (error) {
+  if (error?.code !== 'ENOENT') throw error;
+}
+
 // https://astro.build/config
 export default defineConfig({
   site: process.env.PUBLIC_SITE_URL || 'https://example.github.io',
