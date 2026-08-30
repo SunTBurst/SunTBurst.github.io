@@ -1,0 +1,22 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Cache Debug" description="缓存调试面板">
+  <div class="max-w-2xl mx-auto py-12">
+    <h1 class="text-3xl font-black text-[#0284c7] mb-6">⚡ Cache Debug</h1>
+    <p class="text-slate-600 dark:text-slate-400 mb-8">右下角缓存统计面板已全站启用。返回其他页面时面板保持可见。</p>
+    <div class="bg-white dark:bg-slate-800 border-4 border-[#0284c7] rounded-sm p-6 shadow-[6px_6px_0px_0px_#0284c7]">
+      <h2 class="text-lg font-bold text-[#0284c7] mb-4">说明</h2>
+      <ul class="text-sm text-slate-600 dark:text-slate-400 space-y-2">
+        <li>• <strong>cached</strong>：已预加载并缓存的文章数量</li>
+        <li>• <strong>queued</strong>：等待预加载的文章数量</li>
+        <li>• <strong>loading</strong>：正在加载的文章数量</li>
+        <li>• <strong>HIT/MISS</strong>：点击文章时是否命中缓存</li>
+      </ul>
+      <div class="mt-4 flex gap-2">
+        <a href="/" class="px-4 py-2 bg-[#0284c7] text-white font-black text-sm rounded-sm hover:bg-[#0ea5e9] transition-colors">← 返回首页</a>
+      </div>
+    </div>
+  </div>
+</Layout>

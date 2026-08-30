@@ -1,0 +1,16 @@
+# Dependencies and Astro build output
+node_modules/
+dist/
+.astro/
+
+# Local environment files and tool caches
+.env
+.env.*
+!.env.example
+*.log
+
+# Editor and operating-system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
