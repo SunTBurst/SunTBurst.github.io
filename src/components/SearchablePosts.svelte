@@ -1,5 +1,4 @@
 <script lang="ts">
-  import PageViews from './PageViews.svelte';
   import { afterUpdate, onMount } from 'svelte';
   import { flip } from 'svelte/animate';
   import { fade } from 'svelte/transition';
@@ -29,7 +28,7 @@
   // Keep client bandwidth predictable: at most two article HTML requests run together.
   const MAX_PREFETCH_REQUESTS = 6;
   const PREFETCH_ROOT_MARGIN = '800px';
-  const CACHE_NAME = 'xuhome-article-cache-v1';
+  const CACHE_NAME = 'blog-article-cache-v1';
   const CACHE_TTL = 30 * 60 * 1000; // 30 分钟
   const prefetchedUrls = new Set<string>();
   const queuedUrls = new Set<string>();
@@ -481,7 +480,6 @@
             
             <div class="mt-2 md:mt-3.5 flex flex-wrap items-center gap-2 shrink-0">
               <span class="text-xs md:text-sm font-extrabold text-slate-500 dark:text-slate-400 shrink-0">{post.date}</span>
-              <PageViews path={post.slug} />
               {#if post.category}
                 <a 
                   href={`/category/${post.category}`}

@@ -1,7 +1,6 @@
 ---
 import CalendarWidget from './CalendarWidget.svelte';
 import SidebarTags from './SidebarTags.astro';
-import AuthorCard from './AuthorCard.astro';
 
 interface CalendarPost {
   slug: string;
@@ -16,16 +15,12 @@ export interface Props {
   activeTag?: string | null;
   showCalendar?: boolean;
   showTags?: boolean;
-  showAuthor?: boolean;
   postsDataUrl?: string;
 }
 
-const { posts = [], tags, activeTag = null, showCalendar = true, showTags = true, showAuthor = true, postsDataUrl = '' } = Astro.props;
+const { posts = [], tags, activeTag = null, showCalendar = true, showTags = true, postsDataUrl = '' } = Astro.props;
 ---
 
-{
-  showAuthor && <AuthorCard />
-}
 {
   showCalendar && <CalendarWidget posts={posts} dataUrl={postsDataUrl} client:idle />
 }

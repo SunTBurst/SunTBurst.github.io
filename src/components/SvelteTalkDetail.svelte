@@ -1,25 +1,12 @@
 <script lang="ts">
   import type { TalkItem } from '../utils/postsFetcher';
   import SvelteLightbox from './SvelteLightbox.svelte';
-  import TalkShareModal from './TalkShareModal.svelte';
-  import PageViews from './PageViews.svelte';
 
   export let talk: TalkItem;
 
   let isLightboxOpen = false;
   let lightboxImages: string[] = [];
   let lightboxInitialIndex = 0;
-  let showShare = false;
-
-  function openShare() {
-    showShare = true;
-    document.body.style.overflow = 'hidden';
-  }
-
-  function closeShare() {
-    showShare = false;
-    document.body.style.overflow = '';
-  }
 
   function formatMarkdown(text: string): string {
     if (!text) return "";
@@ -65,22 +52,16 @@
   >
     <!-- Avatar & Meta Header -->
     <div class="flex gap-4 items-center mb-4 select-none">
-      <div class="rounded-sm bg-[#0ea5e9] border-3 border-[#0284c7] shadow-[4px_4px_0px_0px_#0284c7] flex-shrink-0 flex items-center justify-center transform -rotate-3 overflow-hidden w-12 h-12">
-         <img src="https://upxuu.com/images/me.jpg" alt="UpXuu" class="w-full h-full object-cover" />
-      </div>
+      <div class="rounded-sm bg-[#0ea5e9] border-3 border-[#0284c7] shadow-[4px_4px_0px_0px_#0284c7] flex-shrink-0 flex items-center justify-center transform -rotate-3 w-12 h-12 font-black text-white">B</div>
       <div>
          <div class="font-black text-[#0284c7] tracking-wide flex items-center gap-2 text-lg">
-            UpXuu
+            博客
             {#if talk.mood}
               <span class="text-xs ml-1" title="心情">{talk.mood}</span>
             {/if}
-            <span class="text-[10px] bg-[#fde68a] border-2 border-[#0284c7] px-1.5 py-0.5 shadow-[1px_1px_0px_0px_#0284c7] tracking-wider uppercase font-bold transform skew-x-12 ml-1">
-               逐光而上
-            </span>
          </div>
          <div class="flex items-center gap-2 mt-1 leading-none">
             <span class="text-xs text-slate-500 font-mono font-bold">{talk.date}</span>
-            <PageViews path={`/talk/${talk.slug}`} />
          </div>
       </div>
     </div>
@@ -144,9 +125,6 @@
     </div>
   </div>
 
-  <!-- Waline comments placeholder -->
-  <div id="waline-placeholder"></div>
-
   <div class="mt-8 text-center flex justify-center pb-12 select-none">
       <a href="/talks" class="px-6 py-3 border-4 border-[#0284c7] text-[#0284c7] bg-white dark:bg-slate-700 font-black hover:bg-[#0284c7] hover:text-white transition-all cursor-pointer rounded-sm shadow-[6px_6px_0px_0px_#0284c7] uppercase tracking-widest text-sm flex items-center justify-center hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none">
         返回列表 / Back to Talks
@@ -154,29 +132,6 @@
   </div>
 </div>
 
-<!-- Floating share trigger (bottom-right) -->
-<button
-  on:click={openShare}
-  class="fixed bottom-[5.5rem] right-6 z-[2000] w-12 h-12 rounded-sm border-3 sm:border-4 border-[#0284c7] bg-[#fde68a] dark:bg-amber-700/50 text-[#0284c7] flex items-center justify-center cursor-pointer shadow-[4px_4px_0px_0px_#0284c7] hover:-translate-y-1 hover:shadow-[6px_6px_0px_0px_#0284c7] active:translate-y-0 active:shadow-none transition-all duration-150"
-  aria-label="分享"
->
-  <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-    <path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-  </svg>
-</button>
-
-{#if showShare}
-  {@const images = extractImages(talk.content)}
-  {@const textOnly = getContentWithoutImages(talk.content)}
-  <TalkShareModal
-    talkTitle={talk.title || '日常动态'}
-    talkContent={textOnly}
-    talkUrl={`${window.location.origin}/talk/${talk.slug}`}
-    talkImage={images[0] || ''}
-    show={true}
-    on:close={closeShare}
-  />
-{/if}
 
 {#if isLightboxOpen}
   <SvelteLightbox images={lightboxImages} initialIndex={lightboxInitialIndex} onClose={() => isLightboxOpen = false} />

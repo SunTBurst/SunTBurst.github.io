@@ -1,8 +1,6 @@
 <script lang="ts">
   import type { TalkItem } from '../utils/postsFetcher';
   import SvelteLightbox from './SvelteLightbox.svelte';
-  import TalkShareModal from './TalkShareModal.svelte';
-  import PageViews from './PageViews.svelte';
   import { onMount, afterUpdate, tick } from 'svelte';
 
   export let talks: TalkItem[] = [];
@@ -10,8 +8,6 @@
 
   let selectedTag: string | null = null;
   let visibleCount = talksPerPage;
-  let shareTalk: TalkItem | null = null;
-  let showShareModal = false;
 
   // Lightbox state
   let isLightboxOpen = false;
@@ -56,18 +52,6 @@
 
   function getContentWithoutImages(content: string): string {
     return content.replace(/!\[.*?\]\((.*?)\)/g, '').trim();
-  }
-
-  function openShare(talk: TalkItem, e: Event) {
-    e.stopPropagation();
-    shareTalk = talk;
-    showShareModal = true;
-    document.body.style.overflow = 'hidden';
-  }
-
-  function closeShare() {
-    showShareModal = false;
-    document.body.style.overflow = '';
   }
 
   function openLightbox(imagesList: string[], index: number, e: Event) {
@@ -194,33 +178,18 @@
         style="animation-delay: {0.2 + (i % 12) * 0.05}s"
         on:click={() => window.location.href = `/talk/${talk.slug}`}
       >
-        <!-- Share Button -->
-        <button
-          on:click={(e) => openShare(talk, e)}
-          class="absolute top-4 right-4 p-1.5 sm:p-2 border-2 border-[#0284c7] text-xs font-black rounded-sm transition-all cursor-pointer z-10 flex items-center justify-center gap-1 shadow-[2px_2px_0px_0px_#0284c7] h-8 sm:h-9 bg-[rgba(250,248,245,0.55)] dark:bg-slate-700 text-[#0284c7] hover:bg-[#fde68a] hover:-translate-y-0.5 active:translate-y-0 active:shadow-none"
-          title="分享 / Share"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 stroke-[3]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M8.684 10.742l4.137-2.11M8.684 13.258l4.137 2.11M17 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2-1.343-2-3-2zm0-8c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2-1.343-2-3-2zm-10 4c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2-1.343-2-3-2z" />
-          </svg>
-          <span class="text-[10px] hidden sm:inline font-bold">分享</span>
-        </button>
-
         <!-- Avatar & Meta Header -->
         <div class="flex gap-4 items-center mb-4 select-none">
-          <div class="rounded-sm bg-[#0ea5e9] border-3 border-[#0284c7] shadow-[4px_4px_0px_0px_#0284c7] flex-shrink-0 flex items-center justify-center transform -rotate-3 overflow-hidden w-10 h-10">
-             <img src="https://upxuu.com/images/me.jpg" alt="UpXuu" class="w-full h-full object-cover" />
-          </div>
+          <div class="rounded-sm bg-[#0ea5e9] border-3 border-[#0284c7] shadow-[4px_4px_0px_0px_#0284c7] flex-shrink-0 flex items-center justify-center transform -rotate-3 w-10 h-10 font-black text-white">B</div>
           <div>
              <div class="font-black text-[#0284c7] tracking-wide flex items-center gap-2 text-sm leading-none">
-                UpXuu
+                博客
                 {#if talk.mood}
                   <span class="text-xs ml-1" title="心情">{talk.mood}</span>
                 {/if}
              </div>
              <div class="flex items-center gap-2 mt-1 leading-none">
                 <span class="text-[10px] sm:text-xs text-slate-500 font-mono font-bold">{talk.date}</span>
-                <PageViews path={`/talk/${talk.slug}`} />
              </div>
           </div>
         </div>
@@ -289,17 +258,4 @@
 
 {#if isLightboxOpen}
   <SvelteLightbox images={lightboxImages} initialIndex={lightboxInitialIndex} onClose={() => isLightboxOpen = false} />
-{/if}
-
-{#if showShareModal && shareTalk}
-  {@const images = extractImages(shareTalk.content)}
-  {@const textOnly = getContentWithoutImages(shareTalk.content)}
-  <TalkShareModal
-    talkTitle={shareTalk.title || '日常动态'}
-    talkContent={textOnly}
-    talkUrl={`${window.location.origin}/talk/${shareTalk.slug}`}
-    talkImage={images[0]?.src || ''}
-    bind:show={showShareModal}
-    on:close={closeShare}
-  />
 {/if}

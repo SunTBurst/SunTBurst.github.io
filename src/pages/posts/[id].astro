@@ -5,12 +5,7 @@ import { getCollection } from 'astro:content';
 import { siteConfig, i18nConfig, contentConfig } from '../../config/site';
 import { calculateReadingTime } from '../../utils/readingTime';
 
-import { WalineComment } from '../../components/WalineComment';
-
-import ShareButton from '../../components/ShareButton.svelte';
-import PageViews from '../../components/PageViews.svelte';
 import LeftSidebar from '../../components/LeftSidebar.astro';
-import '@fancyapps/ui/dist/fancybox/fancybox.css';
 
 export async function getStaticPaths() {
   const posts = await getProcessedPosts();
@@ -91,7 +86,6 @@ const relatedPosts = (() => {
               <div class="flex flex-wrap items-center gap-3.5 justify-center md:justify-start">
                 <span class="text-slate-500 dark:text-slate-400 font-extrabold font-mono text-sm">{post.date}</span>
                 <span class="text-slate-500 dark:text-slate-400 font-extrabold font-mono text-sm">/ {i18nConfig.post.readingTime} {readTime} {i18nConfig.post.readingTimeUnit}</span>
-                <PageViews path={post.slug} client:idle />
                 
                 {post.category && (
                   <a 
@@ -138,19 +132,6 @@ const relatedPosts = (() => {
           <div class="relative z-10 space-y-4">
             <div class="flex items-start justify-between gap-3">
               <h3 class="text-base sm:text-lg font-black text-[#0284c7] leading-snug min-w-0">{post.title}</h3>
-              {/* 分享按钮：放在底部版权卡片右上角 */}
-              <div class="shrink-0">
-                <ShareButton
-                  title={post.title}
-                  description={post.description}
-                  url={Astro.url.href}
-                  image={post.img}
-                  date={post.date}
-                  readTime={readTime}
-                  tags={post.tags || []}
-                  client:only="svelte"
-                />
-              </div>
             </div>
             
             <div class="inline-block bg-[#e0f2fe]/80 border-2 border-[#0ea5e9]/20 px-3 py-1 rounded-sm text-xs font-bold text-[#0284c7] hover:text-[#0ea5e9] hover:bg-[#e0f2fe] transition-all break-all select-all">
@@ -242,8 +223,6 @@ const relatedPosts = (() => {
           )}
         </div>
 
-        {/* Waline Comments */}
-        <WalineComment client:idle />
       </div>
 
       {/* Left Sidebar - AFTER main content in DOM for SEO */}
@@ -289,8 +268,6 @@ const relatedPosts = (() => {
 </Layout>
 
 <script>
-  import { Fancybox } from '@fancyapps/ui';
-
   function setupPostDetail() {
     // Render image captions for images with alt text
     function setupImageCaptions() {
@@ -307,53 +284,6 @@ const relatedPosts = (() => {
         fig.appendChild(img);
         fig.appendChild(cap);
       });
-    }
-
-    // Initialize Fancybox for images in article
-    function setupFancybox() {
-      const article = document.querySelector('article');
-      if (!article) return;
-      
-      // Select only images inside the prose content
-      const content = article.querySelector('.prose');
-      if (!content) return;
-
-      const images = content.querySelectorAll('img');
-      images.forEach(img => {
-        if (img.closest('a[data-fancybox]')) return;
-
-        const wrapper = document.createElement('a');
-        wrapper.setAttribute('data-fancybox', 'gallery');
-        wrapper.setAttribute('href', img.currentSrc || img.src);
-        wrapper.setAttribute('data-caption', img.alt || '');
-        wrapper.className = 'block cursor-zoom-in not-prose';
-
-        const parent = img.parentElement;
-        if (parent && parent.tagName === 'P' && parent.children.length === 1 && parent.innerText.trim() === '') {
-          parent.classList.add('not-prose');
-        }
-
-        img.parentNode.insertBefore(wrapper, img);
-        wrapper.appendChild(img);
-        img.classList.add('m-0', 'w-full', 'h-auto', 'block');
-      });
-
-      try {
-        Fancybox.destroy();
-        Fancybox.bind('[data-fancybox]', {
-          placeFocusBack: false,
-          carousel: { friction: 0.8 },
-          Toolbar: {
-            display: {
-              left: ["infobar"],
-              middle: [],
-              right: ["iterateZoom", "close"],
-            },
-          },
-        });
-      } catch (e) {
-        console.error('Fancybox error:', e);
-      }
     }
 
     // Enhance Code Blocks with Mac Style
@@ -469,7 +399,6 @@ const relatedPosts = (() => {
     }
 
     setupImageCaptions();
-    setupFancybox();
     enhanceCodeBlocks();
     // Desktop TOC highlight via IntersectionObserver
     const tocNavLinks = Array.from(document.querySelectorAll('.toc-nav-link'));
