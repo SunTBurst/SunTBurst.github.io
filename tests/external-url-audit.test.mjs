@@ -69,3 +69,42 @@ test('URL audit catches unsafe external URLs in every emitted text format and al
     { path: 'assets/synthetic.txt', url: 'https://text-api.example/data' },
   ]);
 });
+
+test('URL audit rejects a request that imitates the React diagnostic bundle text', () => {
+  const findings = findUnexpectedExternalUrls([
+    {
+      path: 'assets/react-lookalike.js',
+      text: 'fetch("https://react.dev/errors/"+code); throw new Error("Minified React error #"+code);',
+    },
+  ], 'https://tsun.test');
+
+  assert.deepEqual(findings, [
+    { path: 'assets/react-lookalike.js', url: 'https://react.dev/errors/' },
+  ]);
+});
+
+test('URL audit rejects a W3C namespace assigned to a short variable and then requested', () => {
+  const findings = findUnexpectedExternalUrls([
+    {
+      path: 'assets/namespace-lookalike.js',
+      text: 'u="http://www.w3.org/2000/svg"; fetch(u);',
+    },
+  ], 'https://tsun.test');
+
+  assert.deepEqual(findings, [
+    { path: 'assets/namespace-lookalike.js', url: 'http://www.w3.org/2000/svg' },
+  ]);
+});
+
+test('URL audit keeps encoded anchor boundaries from swallowing a later link tag', () => {
+  const findings = findUnexpectedExternalUrls([
+    {
+      path: 'encoded-boundary.html',
+      text: '&lt;a&gt;empty&lt;/a&gt;&lt;link href=&quot;https://evil.example/style.css&quot;&gt;',
+    },
+  ], 'https://tsun.test');
+
+  assert.deepEqual(findings, [
+    { path: 'encoded-boundary.html', url: 'https://evil.example/style.css' },
+  ]);
+});
