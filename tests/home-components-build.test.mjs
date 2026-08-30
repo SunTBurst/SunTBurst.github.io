@@ -10,6 +10,9 @@ const astroCli = path.join(projectRoot, 'node_modules', 'astro', 'bin', 'astro.m
 const harnessSource = path.join(projectRoot, 'src', 'pages', '__portal-home-test.astro');
 const harnessRoute = path.join(projectRoot, 'src', 'pages', '[...portalHomeTest].astro');
 const harnessOutput = path.join(projectRoot, 'dist', '__portal-home-test');
+const touchHarnessSource = path.join(projectRoot, 'src', 'pages', '__portal-home-touch-target-test.astro');
+const touchHarnessRoute = path.join(projectRoot, 'src', 'pages', '[...portalHomeTouchTargetTest].astro');
+const touchHarnessOutput = path.join(projectRoot, 'dist', '__portal-home-touch-target-test');
 const sectionIds = [
   'identity',
   'start-here',
@@ -20,6 +23,18 @@ const sectionIds = [
   'random-explore',
   'environment',
 ];
+
+function assertTouchTarget(html, marker, expectedCount) {
+  const targets = [...html.matchAll(new RegExp(`<a\\b(?=[^>]*\\bdata-touch-target=(?:"${marker}"|${marker}))[^>]*>`, 'g'))].map((match) => match[0]);
+  assert.equal(targets.length, expectedCount, `expected ${expectedCount} emitted ${marker} touch target(s)`);
+  for (const target of targets) {
+    assert.match(target, /class="[^"]*inline-flex[^"]*"/, `expected ${marker} to have an inline touch container`);
+    assert.match(target, /class="[^"]*min-h-\[44px\][^"]*"/, `expected ${marker} to be at least 44px tall`);
+    assert.match(target, /class="[^"]*px-[^"]*"/, `expected ${marker} to retain horizontal hit-area padding`);
+    assert.match(target, /class="[^"]*focus-visible:ring-4[^"]*"/, `expected ${marker} to preserve a visible keyboard focus ring`);
+    assert.match(target, /class="[^"]*motion-reduce:transition-none[^"]*"/, `expected ${marker} to disable link animation for reduced motion`);
+  }
+}
 
 test('PortalHome builds a meaningful zero-content portal without external runtime dependencies', () => {
   assert.equal(existsSync(harnessSource), false, 'expected the dedicated homepage harness route to be absent before the test');
@@ -94,5 +109,76 @@ export function getStaticPaths() {
     rmSync(harnessSource, { force: true });
     rmSync(harnessRoute, { force: true });
     rmSync(harnessOutput, { recursive: true, force: true });
+  }
+});
+
+test('PortalHome emits full-size touch targets for every editorial content link', () => {
+  assert.equal(existsSync(touchHarnessSource), false, 'expected the touch-target harness source to be absent before the test');
+  assert.equal(existsSync(touchHarnessRoute), false, 'expected the touch-target harness router to be absent before the test');
+
+  try {
+    writeFileSync(
+      touchHarnessSource,
+      `---
+import PortalHome from '../components/home/PortalHome.astro';
+import { buildHomeModel } from '../utils/homeModel';
+
+const post = {
+  id: 'post:touch-target',
+  kind: 'post',
+  title: '触达测试文章',
+  description: '用于验证真实构建产物中的内容链接触达范围。',
+  href: '/posts/touch-target',
+  updatedAt: '2026-08-31',
+  topics: [],
+};
+const model = buildHomeModel({ posts: [post], talks: [], knowledge: [], projects: [], updates: [] });
+---
+
+<PortalHome model={model} />
+`,
+      'utf8',
+    );
+    writeFileSync(
+      touchHarnessRoute,
+      `---
+import PortalHomeTouchTargetTestPage from './__portal-home-touch-target-test.astro';
+
+export function getStaticPaths() {
+  return [{ params: { portalHomeTouchTargetTest: '__portal-home-touch-target-test' } }];
+}
+---
+
+<PortalHomeTouchTargetTestPage />
+`,
+      'utf8',
+    );
+
+    const result = spawnSync(process.execPath, [astroCli, 'build'], {
+      cwd: projectRoot,
+      encoding: 'utf8',
+      env: {
+        ...process.env,
+        ASTRO_TELEMETRY_DISABLED: '1',
+        NO_COLOR: '1',
+        PUBLIC_SITE_URL: 'https://tsun.test',
+      },
+    });
+    const output = `${result.stdout}\n${result.stderr}`;
+    assert.equal(result.status, 0, `expected touch-target harness build to succeed:\n${output}`);
+
+    const htmlPath = path.join(touchHarnessOutput, 'index.html');
+    assert.ok(existsSync(htmlPath), 'expected the dedicated touch-target homepage output');
+    const html = readFileSync(htmlPath, 'utf8');
+    assertTouchTarget(html, 'start-current', 3);
+    assertTouchTarget(html, 'start-next', 3);
+    assertTouchTarget(html, 'project-primary', 1);
+    assertTouchTarget(html, 'activity-entry', 1);
+    assertTouchTarget(html, 'random-entry', 1);
+    assertTouchTarget(html, 'recent-post', 1);
+  } finally {
+    rmSync(touchHarnessSource, { force: true });
+    rmSync(touchHarnessRoute, { force: true });
+    rmSync(touchHarnessOutput, { recursive: true, force: true });
   }
 });
