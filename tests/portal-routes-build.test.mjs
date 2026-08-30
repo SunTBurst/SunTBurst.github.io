@@ -78,6 +78,13 @@ test('production build emits every fixed and indexed public HTML route with hone
     assert.match(html, /data-state="preview"/, `expected ${feature} to remain an honest preview`);
   }
 
+  const searchHtml = readRoute('/search');
+  assert.match(searchHtml, /id="portal-search-keyboard-help"/, 'expected visible keyboard guidance for real result-link focus');
+  assert.match(searchHtml, /<input\b(?=[^>]*id="portal-search")(?=[^>]*aria-describedby="portal-search-keyboard-help")[^>]*>/, 'expected search input to expose its keyboard guidance');
+  const resultLinks = Array.from(searchHtml.matchAll(/<a\b(?=[^>]*data-search-result)(?=[^>]*id="portal-search-result-\d+")(?=[^>]*href="\/(?!\/)[^"]+")[^>]*>/g), ([link]) => link);
+  assert.ok(resultLinks.length > 0, 'expected focusable ordinary links with stable result identities');
+  assert.ok(resultLinks.every((link) => /min-h-\[44px\]/.test(link)), 'expected every search result link to keep a 44px target');
+
   for (const unknownRoute of ['/knowledge/not-published/', '/projects/not-published/', '/topics/not-configured/']) {
     assert.equal(existsSync(hrefToHtmlPath(unknownRoute)), false, `expected unknown route ${unknownRoute} not to be generated`);
   }

@@ -8,15 +8,14 @@
 </div>
 
 <script>
+  import { activatePortalTool } from '../utils/portalToolActivation';
   import { persistThemePreference } from '../utils/themePreference';
 
   document.querySelector<HTMLAnchorElement>('[data-portal-tool="search"]')?.addEventListener('click', (event) => {
-    event.preventDefault();
-    window.dispatchEvent(new CustomEvent('portal:open-search'));
+    activatePortalTool(event, 'portal:open-search', (portalEvent) => window.dispatchEvent(portalEvent));
   });
   document.querySelector<HTMLAnchorElement>('[data-portal-tool="random"]')?.addEventListener('click', (event) => {
-    event.preventDefault();
-    window.dispatchEvent(new CustomEvent('portal:random-explore'));
+    activatePortalTool(event, 'portal:random-explore', (portalEvent) => window.dispatchEvent(portalEvent));
   });
 
   const themeButton = document.querySelector<HTMLButtonElement>('[data-portal-tool="theme"]');

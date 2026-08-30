@@ -85,12 +85,16 @@ const socialImage = image ? new URL(image, Astro.site ?? siteConfig.url) : new U
         if (state.__portalToolConsumersInstalled) return;
         state.__portalToolConsumersInstalled = true;
 
-        window.addEventListener('portal:open-search', () => {
+        window.addEventListener('portal:open-search', (event) => {
+          event.preventDefault();
           if (window.location.pathname !== '/search' && window.location.pathname !== '/search/') {
             window.location.assign('/search');
           }
         });
-        window.addEventListener('portal:random-explore', () => window.location.assign('/explore'));
+        window.addEventListener('portal:random-explore', (event) => {
+          event.preventDefault();
+          window.location.assign('/explore');
+        });
       }
 
       installPortalToolConsumers();
