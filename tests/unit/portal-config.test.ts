@@ -14,3 +14,17 @@ test('portal config never uses invented numeric claims', () => {
   const serialized = JSON.stringify(portalConfig);
   assert.doesNotMatch(serialized, /(?:访问|在线|用户|文章)[^\n]{0,12}\d+/);
 });
+
+test('portal config rejects protocol-relative exploration paths', () => {
+  const invalidHrefConfig = {
+    ...portalConfig,
+    startHere: [{ ...portalConfig.startHere[0], href: '//example.com' as const }, ...portalConfig.startHere.slice(1)],
+  };
+  const invalidNextHrefConfig = {
+    ...portalConfig,
+    startHere: [{ ...portalConfig.startHere[0], nextHref: '//subdomain.upxuu.com' as const }, ...portalConfig.startHere.slice(1)],
+  };
+
+  assert.deepEqual(validatePortalConfig(invalidHrefConfig), ['invalid local path: 认识这个空间']);
+  assert.deepEqual(validatePortalConfig(invalidNextHrefConfig), ['invalid local path: 认识这个空间']);
+});
