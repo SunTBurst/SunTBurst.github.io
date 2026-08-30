@@ -28,7 +28,7 @@ function readTextArtifacts(directory) {
   });
 }
 
-test('production build emits the local TSun blog without upstream services', () => {
+test('production build emits the local SunTBurst portal with network-free feature previews', () => {
   rmSync(distDir, { recursive: true, force: true });
 
   const result = spawnSync(process.execPath, [astroCli, 'build'], {
@@ -46,20 +46,13 @@ test('production build emits the local TSun blog without upstream services', () 
   assert.equal(result.status, 0, `expected production build to succeed:\n${output}`);
 
   const home = readDist('index.html');
-  assert.match(home, /TSun 的博客/, 'expected the built homepage to carry the TSun identity');
+  assert.match(home, /SunTBurst 个人门户/, 'expected the built homepage to carry the SunTBurst identity');
   assert.match(home, /https:\/\/tsun\.test\//, 'expected PUBLIC_SITE_URL to control generated absolute URLs');
-  const mobileCalendarStart = home.indexOf('id="mobile-calendar-dialog"');
-  const mobileCalendarEnd = home.indexOf('</dialog>', mobileCalendarStart);
-  assert.notEqual(mobileCalendarStart, -1, 'expected the mobile calendar dialog on the homepage');
-  assert.notEqual(mobileCalendarEnd, -1, 'expected the mobile calendar dialog to close');
-  assert.match(
-    home.slice(mobileCalendarStart, mobileCalendarEnd),
-    /hello-world/,
-    'expected the mobile calendar to receive the build-time local post data',
-  );
+  assert.match(home, /id="identity"/, 'expected the portal identity section');
+  assert.match(home, /id="environment"/, 'expected the honest environment preview section');
 
   const welcomePost = readDist('posts/hello-world/index.html');
-  assert.match(welcomePost, /欢迎来到 TSun 的博客/, 'expected the original local welcome post route');
+  assert.match(welcomePost, /欢迎来到 SunTBurst 个人门户/, 'expected the local welcome post route under the product identity');
 
   const firstTalk = readDist('talk/first-note/index.html');
   assert.match(firstTalk, /先从一条简短的记录开始/, 'expected the original local talk route');
@@ -67,7 +60,14 @@ test('production build emits the local TSun blog without upstream services', () 
 
   readDist('about/index.html');
   readDist('friends/index.html');
+  readDist('tags/index.html');
+  for (const feature of ['ai', 'music', 'stats', 'status', 'subscribe']) {
+    const preview = readDist(`${feature}/index.html`);
+    assert.match(preview, new RegExp(`data-feature="${feature}"`), `expected ${feature} preview identity`);
+    assert.match(preview, /data-state="preview"/, `expected ${feature} preview state`);
+  }
   const builtOutput = readTextArtifacts(distDir).join('\n');
+  assert.doesNotMatch(builtOutput, /\bTSun\b/, 'expected SunTBurst to remain the only current public product identity');
   assert.doesNotMatch(
     builtOutput,
     /upxuu|waline|umami|clarity|blogapi|randomImage|weatherApi|serverURL|vercel|cloudflare/i,
@@ -96,7 +96,7 @@ test('production build emits the local TSun blog without upstream services', () 
     'expected every built text artifact to contain no unknown external runtime URLs',
   );
 
-  for (const disabledRoute of ['ai', 'api', 'comments', 'music', 'server-status', 'statistics', 'status']) {
+  for (const disabledRoute of ['api', 'comments', 'server-status', 'statistics']) {
     assert.equal(existsSync(path.join(distDir, disabledRoute)), false, `expected disabled route /${disabledRoute} not to be emitted`);
   }
 });

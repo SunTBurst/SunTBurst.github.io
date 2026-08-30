@@ -1,9 +1,9 @@
-const siteUrl = import.meta.env.PUBLIC_SITE_URL || 'https://example.github.io';
+const siteUrl = import.meta.env.PUBLIC_SITE_URL || 'https://suntburst.github.io';
 
 export const siteConfig = {
-  title: 'TSun 的博客',
-  subtitle: '记录学习、思考与日常',
-  author: 'TSun',
+  title: 'SunTBurst 个人门户',
+  subtitle: '把学习、实践与知识连接成一张长期生长的地图',
+  author: 'SunTBurst',
   url: siteUrl,
   avatar: '/images/avatar.svg',
   timeZone: 'Asia/Riyadh',
@@ -11,8 +11,11 @@ export const siteConfig = {
 
 export const navigation = [
   { href: '/', label: '首页' },
+  { href: '/posts', label: '文章' },
+  { href: '/knowledge', label: '知识' },
+  { href: '/projects', label: '项目' },
+  { href: '/now', label: '动态' },
   { href: '/talks', label: '说说' },
-  { href: '/posts', label: '归档' },
   { href: '/tags', label: '标签' },
   { href: '/about', label: '关于' },
   { href: '/friends', label: '友链' },

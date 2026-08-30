@@ -1,75 +1,32 @@
 ---
+import PortalHome from '../components/home/PortalHome.astro';
 import Layout from '../layouts/Layout.astro';
-import { getProcessedPosts } from '../utils/postsFetcher';
-import HorizontalCategories from '../components/HorizontalCategories.astro';
-import LeftSidebar from '../components/LeftSidebar.astro';
-import PostsTimelineWidget from '../components/PostsTimelineWidget.svelte';
-import SearchablePosts from '../components/SearchablePosts.svelte';
-import { i18nConfig } from '../config/site';
+import type { PortalProject } from '../types/portal';
+import { buildHomeModel } from '../utils/homeModel';
+import { getPublishedProjects } from '../utils/portalCollections';
+import { buildPortalIndex } from '../utils/portalIndex';
+import { normalizeEntrySlug } from '../utils/slugify';
 
-const allPosts = await getProcessedPosts();
-
-// Process category counts
-const catMap: Record<string, number> = {};
-const tagMap: Record<string, number> = {};
-
-allPosts.forEach(post => {
-  if (post.category) {
-    catMap[post.category] = (catMap[post.category] || 0) + 1;
-  }
-  if (post.tags) {
-    post.tags.forEach(tag => {
-      tagMap[tag] = (tagMap[tag] || 0) + 1;
-    });
-  }
+const portalIndex = await buildPortalIndex();
+const publishedProjects = await getPublishedProjects();
+const projects: PortalProject[] = publishedProjects.map((entry) => ({
+  slug: normalizeEntrySlug(entry),
+  title: entry.data.title,
+  summary: entry.data.summary,
+  status: entry.data.status,
+  href: `/projects/${encodeURIComponent(normalizeEntrySlug(entry))}/`,
+  updated: entry.data.updated.toISOString().slice(0, 10),
+}));
+const byKind = (kind: 'post' | 'talk' | 'knowledge' | 'update') => portalIndex.filter((entry) => entry.kind === kind);
+const model = buildHomeModel({
+  posts: byKind('post'),
+  talks: byKind('talk'),
+  knowledge: byKind('knowledge'),
+  projects,
+  updates: byKind('update'),
 });
-
-const categories = Object.entries(catMap)
-  .map(([name, count]) => ({ name, count }))
-  .sort((a, b) => b.count - a.count);
-  
-const tags = Object.entries(tagMap)
-  .map(([name, count]) => ({ name, count }))
-  .sort((a, b) => b.count - a.count);
-
-const postListData = allPosts.map(p => ({ id: p.id, slug: p.slug, title: p.title, date: p.date, description: p.description, img: p.img, tags: p.tags, category: p.category }));
-
 ---
 
-<Layout 
-  title={i18nConfig.home.title}
-  description={i18nConfig.home.description}
-  postsCount={allPosts.length}
->
-  <HorizontalCategories 
-    categories={categories} 
-    activeCategory={null} 
-    posts={postListData}
-  />
-
-  <div class="flex flex-col xl:flex-row gap-4 sm:gap-6 xl:gap-8 items-start justify-center">
-    {/* Center Articles Feed - FIRST in DOM for SEO */}
-    <div class="w-full xl:flex-1 min-w-0 flex flex-col gap-4 order-1 xl:order-2">
-      <SearchablePosts posts={postListData} client:idle />
-    </div>
-
-    {/* Left Sidebar - AFTER content in DOM, visually on left via order-1 */}
-    <aside
-      id="sidebar-left"
-      class="w-full xl:w-[260px] shrink-0 flex flex-col gap-4 sm:gap-6 xl:sticky xl:top-[100px] order-2 xl:order-1"
-      style="animation-delay: 0.06s"
-    >
-      <LeftSidebar posts={postListData} tags={tags} showTags={false} />
-    </aside>
-
-    {/* Right Sidebar */}
-    <aside
-      id="sidebar-right"
-      class="w-full xl:w-[260px] shrink-0 flex flex-col gap-4 sm:gap-6 xl:sticky xl:top-[100px] order-3 xl:order-3"
-      style="animation-delay: 0.1s"
-      transition:name="sidebar-right"
-    >
-      <PostsTimelineWidget posts={postListData} />
-    </aside>
-  </div>
+<Layout title="SunTBurst 个人门户" description="把学习、实践与知识连接成一张长期生长的地图" isPortalHome hidePageBanner>
+  <PortalHome model={model} />
 </Layout>

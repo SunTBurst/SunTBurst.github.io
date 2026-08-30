@@ -156,7 +156,7 @@
       >
         <!-- Avatar & Meta Header -->
         <div class="flex gap-4 items-center mb-4 select-none">
-          <img src={siteConfig.avatar} alt="TSun" class="h-10 w-10 flex-shrink-0 -rotate-3 rounded-sm border-3 border-[#0284c7] bg-[#fde68a] shadow-[4px_4px_0px_0px_#0284c7]" />
+          <img src={siteConfig.avatar} alt="SunTBurst" class="h-10 w-10 flex-shrink-0 -rotate-3 rounded-sm border-3 border-[#0284c7] bg-[#fde68a] shadow-[4px_4px_0px_0px_#0284c7]" />
           <div>
              <div class="font-black text-[#0284c7] tracking-wide flex items-center gap-2 text-sm leading-none">
                 {siteConfig.author}

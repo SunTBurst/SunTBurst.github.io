@@ -1,0 +1,5 @@
+---
+import FeaturePreview from '../components/FeaturePreview.astro';
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="访问统计预览" description="访问统计的同意与匿名化边界"><FeaturePreview feature="stats" title="访问统计" purpose="未来仅在明确同意和可审计配置下提供站点访问趋势。" requirements="需要 SunTBurst 自有的统计服务、站点标识、匿名化设置、同意策略与禁用验证。" privacy="未同意时不发请求，不显示假 0，也不保留可识别访客的精确轨迹。" fallback="当前不接入统计服务，因此没有访问量或在线人数可展示。" /></Layout>

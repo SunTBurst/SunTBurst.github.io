@@ -1,6 +1,6 @@
 export const infoConfig = {
   banner: {
-    title: 'TSun 的博客',
+    title: 'SunTBurst 个人门户',
     gridPatternOpacity: 0.16,
     labels: {
       category: '分类',
@@ -13,6 +13,6 @@ export const infoConfig = {
     },
   },
   subtitle: {
-    sequence: ['记录学习、思考与日常', 2000, '慢慢写，持续整理', 2000],
+    sequence: ['连接学习、实践与知识', 2000, '持续记录，长期整理', 2000],
   },
 } as const;

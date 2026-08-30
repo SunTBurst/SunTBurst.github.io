@@ -16,6 +16,8 @@ interface Props {
   isTalk?: boolean;
   postsCount?: number;
   hideFooter?: boolean;
+  hidePageBanner?: boolean;
+  isPortalHome?: boolean;
 }
 
 const {
@@ -29,6 +31,8 @@ const {
   isArticle = false,
   postsCount = 0,
   hideFooter = false,
+  hidePageBanner = false,
+  isPortalHome = false,
 } = Astro.props;
 
 const documentTitle = title === siteConfig.title ? title : `${title} | ${siteConfig.title}`;
@@ -53,10 +57,10 @@ const socialImage = image ? new URL(image, Astro.site ?? siteConfig.url) : new U
   </head>
   <body class="bg-[#f8fafc] text-slate-800 dark:bg-slate-900 dark:text-slate-100">
     <NavBar />
-    <div class={`flex min-h-screen flex-col pt-16 ${isArticle ? 'article-paper-shell' : ''}`}>
+    <div class={`flex min-h-screen flex-col pt-28 xl:pt-20 ${isArticle ? 'article-paper-shell' : ''}`}>
       <main id="main-content" class="flex-1 px-2 py-3 sm:px-6 sm:py-6 md:px-8 md:py-8">
         <div class="mx-auto w-full max-w-[1440px]">
-          <div class="mb-5 sm:mb-8">
+          {!hidePageBanner && !isPortalHome && <div class="mb-5 sm:mb-8">
             <PageBanner
               pathname={Astro.url.pathname}
               categoryName={categoryName}
@@ -65,15 +69,31 @@ const socialImage = image ? new URL(image, Astro.site ?? siteConfig.url) : new U
               post={post}
               client:visible
             />
-          </div>
+          </div>}
           <slot />
         </div>
       </main>
       {!hideFooter && (
         <footer class="border-t-4 border-[#0284c7] bg-white px-4 py-5 text-center text-xs font-bold text-slate-500 dark:bg-slate-800 dark:text-slate-300">
-          © {new Date().getFullYear()} TSun · 内容来自本地 Markdown
+          © {new Date().getFullYear()} SunTBurst · 公开内容来自本地文件
         </footer>
       )}
     </div>
+    <script>
+      function installPortalToolConsumers() {
+        const state = window as Window & { __portalToolConsumersInstalled?: boolean };
+        if (state.__portalToolConsumersInstalled) return;
+        state.__portalToolConsumersInstalled = true;
+
+        window.addEventListener('portal:open-search', () => {
+          if (window.location.pathname !== '/search' && window.location.pathname !== '/search/') {
+            window.location.assign('/search');
+          }
+        });
+        window.addEventListener('portal:random-explore', () => window.location.assign('/explore'));
+      }
+
+      installPortalToolConsumers();
+    </script>
   </body>
 </html>

@@ -17,7 +17,7 @@ try {
 
 // https://astro.build/config
 export default defineConfig({
-  site: process.env.PUBLIC_SITE_URL || 'https://example.github.io',
+  site: process.env.PUBLIC_SITE_URL || 'https://suntburst.github.io',
   output: 'static',
   outDir: 'dist',
   build: {

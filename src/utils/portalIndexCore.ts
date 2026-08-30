@@ -1,6 +1,11 @@
-import type { PortalIndexEntry } from '../types/portal';
+import type { KnowledgeTopic, PortalIndexEntry } from '../types/portal';
 
 export const normalizeSearchText = (value: string) => value.trim().toLocaleLowerCase('zh-CN');
+
+export function matchesPortalTopic(entryTopics: string[], topic: Pick<KnowledgeTopic, 'slug' | 'title'>): boolean {
+  const configuredNames = new Set([normalizeSearchText(topic.slug), normalizeSearchText(topic.title)]);
+  return entryTopics.some((entryTopic) => configuredNames.has(normalizeSearchText(entryTopic)));
+}
 
 export function pickRandomEntry(entries: PortalIndexEntry[], randomValue = Math.random()): PortalIndexEntry | null {
   if (entries.length === 0) return null;

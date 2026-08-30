@@ -15,6 +15,10 @@ test('portal config never uses invented numeric claims', () => {
   assert.doesNotMatch(serialized, /(?:访问|在线|用户|文章)[^\n]{0,12}\d+/);
 });
 
+test('portal project fallback uses its canonical emitted detail route', () => {
+  assert.equal(portalConfig.projects[0]?.href, '/projects/suntburst-portal/');
+});
+
 test('portal config rejects protocol-relative exploration paths', () => {
   const invalidHrefConfig = {
     ...portalConfig,

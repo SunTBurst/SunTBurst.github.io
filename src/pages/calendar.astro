@@ -1,0 +1,15 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { buildPortalIndex } from '../utils/portalIndex';
+const entries = (await buildPortalIndex()).filter((entry) => entry.kind !== 'page');
+const groups = new Map<string, typeof entries>();
+for (const entry of entries) {
+  const date = entry.updatedAt.slice(0, 10);
+  groups.set(date, [...(groups.get(date) ?? []), entry]);
+}
+const dates = [...groups.keys()].sort((a, b) => b.localeCompare(a));
+---
+
+<Layout title="内容日历" description="按实际公开日期回看内容" postsCount={entries.length}>
+  <section class="mx-auto max-w-4xl border-4 border-[#0284c7] bg-white p-5 shadow-[7px_7px_0_0_#0284c7] dark:bg-slate-800 sm:p-8"><h1 class="text-3xl font-black text-[#075985] dark:text-[#bae6fd]">内容日历</h1>{dates.length === 0 ? <p class="mt-4 font-bold">暂无公开日期记录。</p> : <div class="mt-5 grid gap-5">{dates.map((date) => <section><h2 class="text-xl font-black text-[#075985] dark:text-[#bae6fd]">{date}</h2><ul class="mt-2 grid gap-2">{groups.get(date)?.map((entry) => <li><a class="flex min-h-[44px] min-w-0 items-center break-all border-2 border-[#0284c7] px-3 font-bold" href={entry.href}>{entry.kind} · {entry.title}</a></li>)}</ul></section>)}</div>}</section>
+</Layout>

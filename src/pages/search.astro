@@ -1,0 +1,8 @@
+---
+import UnifiedSearch from '../components/UnifiedSearch.svelte';
+import Layout from '../layouts/Layout.astro';
+import { buildPortalIndex } from '../utils/portalIndex';
+const entries = await buildPortalIndex();
+---
+
+<Layout title="搜索" description="在构建期公开索引中搜索"><UnifiedSearch entries={entries} client:load /></Layout>

@@ -1,0 +1,5 @@
+---
+import FeaturePreview from '../components/FeaturePreview.astro';
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="音乐预览" description="自有音乐配置的启用边界"><FeaturePreview feature="music" title="音乐" purpose="未来可播放 SunTBurst 自有或明确授权的音频与歌单。" requirements="需要确认音频授权、由 SunTBurst 控制的资源配置、跨页状态和失败降级。" privacy="不自动播放，不代理未知或无授权音源，不用访客行为暗中生成画像。" fallback="当前没有配置歌单，也不加载任何音频或外部播放器。" /></Layout>

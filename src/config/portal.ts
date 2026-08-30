@@ -18,6 +18,6 @@ export const portalConfig: PortalConfig = {
     { slug: 'ai-knowledge', title: 'AI 与知识库', description: '带权限和引用的检索增强问答。', status: 'mapping' },
   ],
   projects: [
-    { slug: 'suntburst-portal', title: 'SunTBurst 个人门户', summary: '把静态博客建设成公开门户和知识入口。', status: 'building', href: '/projects#suntburst-portal', updated: '2026-08-30' },
+    { slug: 'suntburst-portal', title: 'SunTBurst 个人门户', summary: '把静态博客建设成公开门户和知识入口。', status: 'building', href: '/projects/suntburst-portal/', updated: '2026-08-30' },
   ],
 };

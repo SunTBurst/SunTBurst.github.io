@@ -1,52 +1,34 @@
-<div aria-label="全局工具" class="flex flex-wrap items-center gap-2">
-  <button
-    type="button"
-    data-portal-tool="search"
-    class="min-h-[44px] min-w-[44px] border-2 border-[#0284c7] bg-white px-3 text-sm font-black text-[#0284c7] shadow-[2px_2px_0px_0px_#0284c7] transition hover:-translate-y-0.5 hover:bg-[#0ea5e9] hover:text-white motion-reduce:transition-none motion-reduce:hover:translate-y-0 focus:outline-none focus:ring-4 focus:ring-[#0ea5e9]/40 dark:bg-slate-700 dark:text-[#fde68a]"
-  >
-    搜索
-  </button>
-  <button
-    type="button"
-    data-portal-tool="random"
-    class="min-h-[44px] min-w-[44px] border-2 border-[#0284c7] bg-[#fde68a] px-3 text-sm font-black text-[#0284c7] shadow-[2px_2px_0px_0px_#0284c7] transition hover:-translate-y-0.5 hover:bg-[#0ea5e9] hover:text-white motion-reduce:transition-none motion-reduce:hover:translate-y-0 focus:outline-none focus:ring-4 focus:ring-[#0ea5e9]/40 dark:bg-slate-700 dark:text-[#fde68a]"
-  >
-    随机
-  </button>
-  <a
-    href="/favorites"
-    class="flex min-h-[44px] min-w-[44px] items-center justify-center border-2 border-[#0284c7] bg-[#e0f2fe] px-3 text-sm font-black text-[#0284c7] shadow-[2px_2px_0px_0px_#0284c7] transition hover:-translate-y-0.5 hover:bg-[#0ea5e9] hover:text-white motion-reduce:transition-none motion-reduce:hover:translate-y-0 focus:outline-none focus:ring-4 focus:ring-[#0ea5e9]/40 dark:bg-slate-800 dark:text-[#bae6fd]"
-  >
-    收藏
-  </a>
-  <button
-    type="button"
-    data-portal-tool="theme"
-    aria-pressed="false"
-    class="min-h-[44px] min-w-[44px] border-2 border-[#0284c7] bg-white px-3 text-sm font-black text-[#0284c7] shadow-[2px_2px_0px_0px_#0284c7] transition hover:-translate-y-0.5 hover:bg-[#0ea5e9] hover:text-white motion-reduce:transition-none motion-reduce:hover:translate-y-0 focus:outline-none focus:ring-4 focus:ring-[#0ea5e9]/40 dark:bg-slate-700 dark:text-[#fde68a]"
-  >
-    主题
-  </button>
-  <a
-    href="/knowledge"
-    class="flex min-h-[44px] min-w-[44px] items-center justify-center border-2 border-[#0284c7] bg-[#e0f2fe] px-3 text-sm font-black text-[#0284c7] shadow-[2px_2px_0px_0px_#0284c7] transition hover:-translate-y-0.5 hover:bg-[#0ea5e9] hover:text-white motion-reduce:transition-none motion-reduce:hover:translate-y-0 focus:outline-none focus:ring-4 focus:ring-[#0ea5e9]/40 dark:bg-slate-800 dark:text-[#bae6fd]"
-  >
-    知识平台
-  </a>
+<div aria-label="全局工具" class="flex max-w-full items-center gap-2 overflow-x-auto p-1">
+  <a href="/search" data-portal-tool="search" class="flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center border-2 border-[#0284c7] bg-white px-3 text-sm font-black text-[#075985] shadow-[2px_2px_0_0_#0284c7] transition hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#0ea5e9]/40 motion-reduce:transition-none motion-reduce:hover:translate-y-0 dark:bg-slate-700 dark:text-[#fde68a]">搜索</a>
+  <a href="/explore" data-portal-tool="random" class="flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center border-2 border-[#0284c7] bg-[#fde68a] px-3 text-sm font-black text-[#075985] shadow-[2px_2px_0_0_#0284c7] transition hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#0ea5e9]/40 motion-reduce:transition-none motion-reduce:hover:translate-y-0 dark:bg-slate-700 dark:text-[#fde68a]">随机</a>
+  <a href="/favorites" data-portal-tool="favorites" class="flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center border-2 border-[#0284c7] bg-[#e0f2fe] px-3 text-sm font-black text-[#075985] shadow-[2px_2px_0_0_#0284c7] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#0ea5e9]/40 dark:bg-slate-800 dark:text-[#bae6fd]">收藏</a>
+  <button type="button" data-portal-tool="theme" aria-pressed="false" class="min-h-[44px] min-w-[44px] shrink-0 border-2 border-[#0284c7] bg-white px-3 text-sm font-black text-[#075985] shadow-[2px_2px_0_0_#0284c7] transition hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#0ea5e9]/40 motion-reduce:transition-none motion-reduce:hover:translate-y-0 dark:bg-slate-700 dark:text-[#fde68a]">主题</button>
+  <a href="/knowledge" data-portal-tool="knowledge" class="flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center border-2 border-[#0284c7] bg-[#e0f2fe] px-3 text-sm font-black text-[#075985] shadow-[2px_2px_0_0_#0284c7] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#0ea5e9]/40 dark:bg-slate-800 dark:text-[#bae6fd]">知识地图</a>
+  <a href="/ai" data-portal-tool="ai" class="flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center border-2 border-[#0284c7] bg-[#fce7f3] px-3 text-sm font-black text-[#075985] shadow-[2px_2px_0_0_#0284c7] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#0ea5e9]/40 dark:bg-slate-800 dark:text-[#fbcfe8]">AI</a>
 </div>
 
 <script>
   import { persistThemePreference } from '../utils/themePreference';
 
-  document.querySelector('[data-portal-tool="search"]')?.addEventListener('click', () => {
+  document.querySelector<HTMLAnchorElement>('[data-portal-tool="search"]')?.addEventListener('click', (event) => {
+    event.preventDefault();
     window.dispatchEvent(new CustomEvent('portal:open-search'));
   });
-
-  document.querySelector('[data-portal-tool="random"]')?.addEventListener('click', () => {
+  document.querySelector<HTMLAnchorElement>('[data-portal-tool="random"]')?.addEventListener('click', (event) => {
+    event.preventDefault();
     window.dispatchEvent(new CustomEvent('portal:random-explore'));
   });
 
   const themeButton = document.querySelector<HTMLButtonElement>('[data-portal-tool="theme"]');
+  let storedTheme: string | null = null;
+  try {
+    storedTheme = window.localStorage.getItem('theme');
+  } catch {
+    storedTheme = null;
+  }
+  const initialDark = storedTheme ? storedTheme === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.classList.toggle('dark', initialDark);
+  themeButton?.setAttribute('aria-pressed', String(initialDark));
   themeButton?.addEventListener('click', () => {
     const dark = document.documentElement.classList.toggle('dark');
     themeButton.setAttribute('aria-pressed', String(dark));

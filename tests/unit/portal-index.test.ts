@@ -2,10 +2,12 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
   assertUniqueLocalEntries,
+  matchesPortalTopic,
   normalizeSearchText,
   pickRandomEntry,
   plainTextSummary,
 } from '../../src/utils/portalIndexCore';
+import { portalConfig } from '../../src/config/portal';
 import type { PortalIndexEntry } from '../../src/types/portal';
 
 const entries: PortalIndexEntry[] = [
@@ -51,4 +53,12 @@ test('body summary omits absolute attachment URLs', () => {
     plainTextSummary('图片 https://files.example.test/attachment.webp 结束'),
     '图片 结束',
   );
+});
+
+test('topic matching accepts the configured slug or display title without cross-topic matches', () => {
+  const siteBuilding = portalConfig.topics.find(({ slug }) => slug === 'site-building');
+  assert.ok(siteBuilding);
+  assert.equal(matchesPortalTopic(['站点建设', 'Astro'], siteBuilding), true);
+  assert.equal(matchesPortalTopic(['site-building'], siteBuilding), true);
+  assert.equal(matchesPortalTopic(['知识管理'], siteBuilding), false);
 });

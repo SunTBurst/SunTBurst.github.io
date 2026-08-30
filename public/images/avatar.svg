@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-labelledby="title desc">
-  <title id="title">TSun 本地头像</title>
-  <desc id="desc">蓝色与黄色积木风格的 TS 字母头像</desc>
+  <title id="title">SunTBurst 本地头像</title>
+  <desc id="desc">蓝色与黄色积木风格的 SunTBurst 字母图形</desc>
   <rect width="160" height="160" rx="18" fill="#fde68a"/>
   <rect x="8" y="8" width="144" height="144" rx="12" fill="none" stroke="#0284c7" stroke-width="8"/>
   <path d="M34 44h54v18H70v56H51V62H34z" fill="#0284c7"/>

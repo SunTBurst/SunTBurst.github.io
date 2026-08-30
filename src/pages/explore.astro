@@ -1,0 +1,10 @@
+---
+import ExploreDock from '../components/home/ExploreDock.svelte';
+import Layout from '../layouts/Layout.astro';
+import { buildPortalIndex } from '../utils/portalIndex';
+const entries = (await buildPortalIndex()).filter((entry) => entry.href !== '/explore' && !/\.(?:xml|json|txt|css|js|svg|png|jpe?g|webp)(?:[?#]|$)/i.test(entry.href));
+---
+
+<Layout title="随机探索" description="只从真实公开 HTML 路由中随机选择">
+  <div class="mx-auto max-w-4xl"><section class="border-4 border-[#db2777] bg-[#fdf2f8] p-5 shadow-[7px_7px_0_0_#db2777] dark:bg-pink-950/40"><h1 class="text-3xl font-black text-pink-900 dark:text-pink-100">随机探索</h1><p class="mt-3 font-bold leading-7">候选项直接来自构建期统一公开索引，不下载第二份列表，也不会跳到未知站点。</p></section><ExploreDock entries={entries} client:load /></div>
+</Layout>

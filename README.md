@@ -1,8 +1,8 @@
-# TSun 的博客
+# SunTBurst 个人门户
 
-这是一个使用 Astro 构建的个人静态博客，保留了原项目的 Toy Brick Brutalism（积木粗野主义）视觉风格。文章、说说、图片和站点信息都保存在本地文件中，构建后可交给 GitHub Pages 托管。
+这是一个使用 Astro 构建的个人公开门户，保留 Toy Brick Brutalism（积木粗野主义）视觉风格。文章、说说、公开知识、项目、更新、图片和站点信息都保存在本地文件中，并由 GitHub Pages 托管。
 
-当前项目只是“可部署”状态，尚未创建远程仓库，也没有发布到互联网。AI、评论、访问统计、天气、随机图片、邮件订阅、音乐和在线状态等外部功能均未接入。
+站点默认公开地址为 `https://suntburst.github.io`。AI、访问统计、邮件订阅、音乐和服务状态目前是无网络请求的 preview，只说明用途、配置要求和隐私边界，不提供虚构数据或不可用表单。
 
 ## 本地启动
 
@@ -66,31 +66,31 @@ draft: false
 
 ## 构建网站
 
-正式构建前设置网站地址。可以复制 `.env.example` 为 `.env`，再把其中的地址改成自己的 GitHub Pages 地址；也可以在 PowerShell 中临时设置：
+正式构建默认使用 `https://suntburst.github.io`。预览其他部署地址时，可以复制 `.env.example` 为 `.env` 后修改，或在 PowerShell 中临时覆盖：
 
 ```powershell
-$env:PUBLIC_SITE_URL = 'https://你的用户名.github.io'
+$env:PUBLIC_SITE_URL = 'https://preview.example'
 npx --yes pnpm@9.15.4 build
 ```
 
 构建结果位于 `dist/`。站点的 canonical、RSS、sitemap 和 robots 地址都会使用同一个 `PUBLIC_SITE_URL`。
 
-## 最后部署到 GitHub Pages
+## 部署到 GitHub Pages
 
-准备公开发布时，再手工完成以下步骤：
+需要重新配置 GitHub Pages 时，可检查以下步骤：
 
-1. 在 GitHub 新建一个公开仓库，名称必须是 `<你的用户名>.github.io`，不要勾选自动创建 README。
+1. 确认公开仓库名称和 Pages 地址与 `suntburst.github.io` 配置一致。
 2. 打开新仓库的 `Settings` → `Pages`，将发布来源选择为 `GitHub Actions`。
 3. 在本项目根目录添加远程仓库并推送 `main`：
 
    ```powershell
-   git remote add origin https://github.com/<你的用户名>/<你的用户名>.github.io.git
+   git remote add origin https://github.com/suntburst/suntburst.github.io.git
    git push -u origin main
    ```
 
-4. 打开仓库的 `Actions` 页面，等待 `Deploy to GitHub Pages` 工作流完成。若首次工作流因 Pages 尚未启用而失败，打开该工作流，点击 `Run workflow`，选择 `main` 后重新运行。完成后访问 `https://<你的用户名>.github.io`。
+4. 打开仓库的 `Actions` 页面，等待 `Deploy to GitHub Pages` 工作流完成；完成后访问 `https://suntburst.github.io`。
 
-本地准备阶段不会替你创建 GitHub 仓库、推送代码或发布网站。
+本地命令不会自动创建远程仓库或推送代码。
 
 ## 来源说明
 

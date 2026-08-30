@@ -16,7 +16,7 @@ interface Props {
 const { model } = Astro.props;
 ---
 
-<main aria-label="个人门户首页" class="mx-auto w-full max-w-6xl px-3 py-6 sm:px-6 sm:py-10">
+<div aria-label="个人门户首页" class="mx-auto w-full max-w-6xl px-1 py-3 sm:px-4 sm:py-8">
   <HomeHero identity={model.identity} lastUpdated={model.lastUpdated} />
   <StartHereGrid paths={model.startHere} />
   <KnowledgeMap topics={model.topics} />
@@ -46,4 +46,4 @@ const { model } = Astro.props;
   )}
   <ExploreDock entries={model.exploreEntries} client:load />
   <EnvironmentPreview items={model.environment} />
-</main>
+</div>

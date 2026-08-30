@@ -1,0 +1,5 @@
+---
+import FeaturePreview from '../components/FeaturePreview.astro';
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="服务状态预览" description="公开服务状态摘要的安全边界"><FeaturePreview feature="status" title="服务状态" purpose="未来可展示经过缓存和脱敏的 SunTBurst 自有服务公开状态摘要。" requirements="需要自有健康检查、缓存、过期规则、脱敏与故障降级，不能暴露内部地址或日志。" privacy="不根据访客位置或第三方活动推断站主在线状态；过期数据必须显示未知。" fallback="当前没有状态数据源，状态为尚未配置，而不是虚构的绿色或在线。" /></Layout>

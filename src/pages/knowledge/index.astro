@@ -1,0 +1,24 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { portalConfig } from '../../config/portal';
+import { getPublishedKnowledge } from '../../utils/portalCollections';
+import { normalizeEntrySlug } from '../../utils/slugify';
+
+const entries = (await getPublishedKnowledge()).sort((a, b) => b.data.updated.getTime() - a.data.updated.getTime());
+---
+
+<Layout title="知识地图" description="按真实主题组织的 SunTBurst 公开知识快照" postsCount={entries.length}>
+  <div class="mx-auto grid max-w-5xl gap-6">
+    <section class="border-4 border-[#059669] bg-[#ecfdf5] p-5 shadow-[6px_6px_0_0_#059669] dark:bg-emerald-950/40 sm:p-8">
+      <h1 class="text-3xl font-black text-emerald-900 dark:text-emerald-100">公开知识地图</h1>
+      <p class="mt-3 font-bold leading-7 text-slate-700 dark:text-slate-200">这里只展示已发布的公开快照。独立私有知识平台尚未启用，本页没有登录或私有检索能力。</p>
+      <ul class="mt-5 grid gap-3 sm:grid-cols-3">
+        {portalConfig.topics.map((topic) => <li class="border-2 border-emerald-700 bg-white p-3 dark:bg-slate-800"><a class="flex min-h-[44px] items-center font-black text-emerald-900 underline dark:text-emerald-100" href={`/topics/${topic.slug}`}>{topic.title}</a><p class="text-sm font-bold leading-6">{topic.description}</p></li>)}
+      </ul>
+    </section>
+    <section class="border-4 border-[#0284c7] bg-white p-5 shadow-[6px_6px_0_0_#0284c7] dark:bg-slate-800 sm:p-8">
+      <h2 class="text-2xl font-black text-[#075985] dark:text-[#bae6fd]">已发布知识</h2>
+      {entries.length === 0 ? <p class="mt-4 font-bold">目前没有公开知识快照；主题框架仍可用于了解收录方向。</p> : <ul class="mt-4 grid gap-4">{entries.map((entry) => <li class="min-w-0 border-2 border-[#0284c7] p-4"><a class="flex min-h-[44px] min-w-0 items-center break-all font-black text-[#075985] underline dark:text-[#bae6fd]" href={`/knowledge/${encodeURIComponent(normalizeEntrySlug(entry))}/`}>{entry.data.title}</a><p class="mt-2 font-bold leading-6">{entry.data.summary}</p><p class="mt-2 text-sm font-black">{entry.data.status} · 更新至 {entry.data.updated.toISOString().slice(0, 10)}</p></li>)}</ul>}
+    </section>
+  </div>
+</Layout>

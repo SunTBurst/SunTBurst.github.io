@@ -1,0 +1,5 @@
+---
+import FeaturePreview from '../components/FeaturePreview.astro';
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="AI 导览预览" description="公开 AI 导览的启用条件与当前无网络回退"><FeaturePreview feature="ai" title="AI 导览" purpose="未来只围绕本站公开内容回答栏目与导航问题，并为回答提供可核对的页面引用。" requirements="需要 SunTBurst 自有的服务、公开索引适配、限流、预算和安全验证；当前没有配置这些能力。" privacy="公开 AI 与私有知识必须隔离，不上传未发布内容，不把访客输入交给未知服务。" fallback="当前保持零网络请求。请使用本地统一搜索和主题地图查找公开内容。" /></Layout>

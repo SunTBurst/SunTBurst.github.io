@@ -1,0 +1,27 @@
+---
+interface Props {
+  feature: string;
+  title: string;
+  purpose: string;
+  privacy: string;
+  requirements: string;
+  fallback: string;
+}
+
+const { feature, title, purpose, privacy, requirements, fallback } = Astro.props;
+---
+
+<article data-feature={feature} data-state="preview" class="mx-auto max-w-3xl border-4 border-[#0284c7] bg-white p-5 shadow-[7px_7px_0_0_#0284c7] dark:bg-slate-800 sm:p-8">
+  <p class="inline-block border-2 border-[#0284c7] bg-[#fde68a] px-3 py-1 text-xs font-black tracking-[0.18em] text-[#075985]">PREVIEW</p>
+  <h1 class="mt-4 break-words text-3xl font-black text-[#075985] dark:text-[#bae6fd]">{title}</h1>
+  <p class="mt-4 font-bold leading-7 text-slate-700 dark:text-slate-200">{purpose}</p>
+  <section class="mt-6 border-2 border-[#0284c7] bg-[#e0f2fe] p-4 dark:bg-slate-900">
+    <h2 class="text-lg font-black text-[#075985] dark:text-[#bae6fd]">启用前需要什么</h2>
+    <p class="mt-2 font-bold leading-7 text-slate-700 dark:text-slate-200">{requirements}</p>
+  </section>
+  <section class="mt-4 border-2 border-[#7c3aed] bg-[#f5f3ff] p-4 dark:bg-violet-950/40">
+    <h2 class="text-lg font-black text-violet-900 dark:text-violet-100">隐私边界</h2>
+    <p class="mt-2 font-bold leading-7 text-slate-700 dark:text-slate-200">{privacy}</p>
+  </section>
+  <p class="mt-4 border-2 border-dashed border-[#0284c7] p-4 font-bold leading-7 text-slate-700 dark:text-slate-200">{fallback}</p>
+</article>
