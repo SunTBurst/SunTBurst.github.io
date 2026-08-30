@@ -1,0 +1,53 @@
+<div aria-label="全局工具" class="flex flex-wrap items-center gap-2">
+  <button
+    type="button"
+    data-portal-tool="search"
+    class="min-h-[44px] min-w-[44px] border-2 border-[#0284c7] bg-white px-3 text-sm font-black text-[#0284c7] shadow-[2px_2px_0px_0px_#0284c7] transition hover:-translate-y-0.5 hover:bg-[#0ea5e9] hover:text-white focus:outline-none focus:ring-4 focus:ring-[#0ea5e9]/40 dark:bg-slate-700 dark:text-[#fde68a]"
+  >
+    搜索
+  </button>
+  <button
+    type="button"
+    data-portal-tool="random"
+    class="min-h-[44px] min-w-[44px] border-2 border-[#0284c7] bg-[#fde68a] px-3 text-sm font-black text-[#0284c7] shadow-[2px_2px_0px_0px_#0284c7] transition hover:-translate-y-0.5 hover:bg-[#0ea5e9] hover:text-white focus:outline-none focus:ring-4 focus:ring-[#0ea5e9]/40 dark:bg-slate-700 dark:text-[#fde68a]"
+  >
+    随机
+  </button>
+  <a
+    href="/favorites"
+    class="flex min-h-[44px] min-w-[44px] items-center justify-center border-2 border-[#0284c7] bg-[#e0f2fe] px-3 text-sm font-black text-[#0284c7] shadow-[2px_2px_0px_0px_#0284c7] transition hover:-translate-y-0.5 hover:bg-[#0ea5e9] hover:text-white focus:outline-none focus:ring-4 focus:ring-[#0ea5e9]/40 dark:bg-slate-800 dark:text-[#bae6fd]"
+  >
+    收藏
+  </a>
+  <button
+    type="button"
+    data-portal-tool="theme"
+    aria-pressed="false"
+    class="min-h-[44px] min-w-[44px] border-2 border-[#0284c7] bg-white px-3 text-sm font-black text-[#0284c7] shadow-[2px_2px_0px_0px_#0284c7] transition hover:-translate-y-0.5 hover:bg-[#0ea5e9] hover:text-white focus:outline-none focus:ring-4 focus:ring-[#0ea5e9]/40 dark:bg-slate-700 dark:text-[#fde68a]"
+  >
+    主题
+  </button>
+  <a
+    href="/knowledge"
+    class="flex min-h-[44px] min-w-[44px] items-center justify-center border-2 border-[#0284c7] bg-[#e0f2fe] px-3 text-sm font-black text-[#0284c7] shadow-[2px_2px_0px_0px_#0284c7] transition hover:-translate-y-0.5 hover:bg-[#0ea5e9] hover:text-white focus:outline-none focus:ring-4 focus:ring-[#0ea5e9]/40 dark:bg-slate-800 dark:text-[#bae6fd]"
+  >
+    知识平台
+  </a>
+</div>
+
+<script>
+  document.querySelector('[data-portal-tool="search"]')?.addEventListener('click', () => {
+    window.dispatchEvent(new CustomEvent('portal:open-search'));
+  });
+
+  document.querySelector('[data-portal-tool="random"]')?.addEventListener('click', () => {
+    window.dispatchEvent(new CustomEvent('portal:random-explore'));
+  });
+
+  const themeButton = document.querySelector<HTMLButtonElement>('[data-portal-tool="theme"]');
+  themeButton?.addEventListener('click', () => {
+    const dark = document.documentElement.classList.toggle('dark');
+    localStorage.setItem('theme', dark ? 'dark' : 'light');
+    themeButton.setAttribute('aria-pressed', String(dark));
+  });
+</script>
