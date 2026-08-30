@@ -2,6 +2,16 @@ export type FeatureImplementationStatus = 'planned' | 'implemented' | 'verified'
 export type FeatureRuntimeState = 'disabled' | 'preview' | 'enabled';
 export type PortalKind = 'page' | 'post' | 'talk' | 'knowledge' | 'project' | 'update';
 
+export interface PortalIndexEntry {
+  id: string;
+  kind: PortalKind;
+  title: string;
+  description: string;
+  href: `/${string}`;
+  updatedAt: string;
+  topics: string[];
+}
+
 export interface PortalLink {
   title: string;
   description: string;

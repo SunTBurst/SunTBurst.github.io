@@ -1,17 +1,9 @@
 import { getProcessedPosts } from '../utils/postsFetcher';
+import { toLegacyPostPayload } from '../utils/portalIndex';
 
 export async function GET() {
   const posts = await getProcessedPosts();
-  const payload = posts.map(post => ({
-    id: post.id,
-    slug: post.slug,
-    title: post.title,
-    date: post.date,
-    description: post.description,
-    img: post.img,
-    tags: post.tags,
-    category: post.category,
-  }));
+  const payload = posts.map(toLegacyPostPayload);
 
   return new Response(JSON.stringify(payload), {
     headers: {
