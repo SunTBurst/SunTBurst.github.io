@@ -91,7 +91,7 @@
   aria-expanded={open}
   aria-controls="mobile-main-menu"
   on:click={openMenu}
-  class="min-h-[44px] min-w-[44px] border-2 border-[#0284c7] bg-[#fde68a] px-3 text-sm font-black text-[#0284c7] shadow-[3px_3px_0px_0px_#0284c7] transition hover:-translate-y-0.5 hover:bg-[#0ea5e9] hover:text-white focus:outline-none focus:ring-4 focus:ring-[#0ea5e9]/40 dark:bg-slate-700 dark:text-[#fde68a]"
+  class="min-h-[44px] min-w-[44px] border-2 border-[#0284c7] bg-[#fde68a] px-3 text-sm font-black text-[#0284c7] shadow-[3px_3px_0px_0px_#0284c7] transition hover:-translate-y-0.5 hover:bg-[#0ea5e9] hover:text-white motion-reduce:transition-none motion-reduce:hover:translate-y-0 focus:outline-none focus:ring-4 focus:ring-[#0ea5e9]/40 dark:bg-slate-700 dark:text-[#fde68a]"
 >
   菜单
 </button>
@@ -114,7 +114,7 @@
         type="button"
         aria-label="关闭主菜单"
         on:click={closeMenu}
-        class="min-h-[44px] min-w-[44px] border-2 border-[#0284c7] bg-white px-3 text-sm font-black text-[#0284c7] shadow-[2px_2px_0px_0px_#0284c7] transition hover:bg-[#f87171] hover:text-white focus:outline-none focus:ring-4 focus:ring-[#0ea5e9]/40 dark:bg-slate-700 dark:text-[#fde68a]"
+        class="min-h-[44px] min-w-[44px] border-2 border-[#0284c7] bg-white px-3 text-sm font-black text-[#0284c7] shadow-[2px_2px_0px_0px_#0284c7] transition hover:bg-[#f87171] hover:text-white motion-reduce:transition-none focus:outline-none focus:ring-4 focus:ring-[#0ea5e9]/40 dark:bg-slate-700 dark:text-[#fde68a]"
       >
         关闭
       </button>
@@ -129,7 +129,7 @@
               <a
                 href={item.href}
                 on:click={closeMenu}
-                class="flex min-h-[44px] items-center border-2 border-[#0284c7] bg-[#e0f2fe] px-3 text-sm font-black text-[#0284c7] shadow-[2px_2px_0px_0px_#0284c7] transition hover:-translate-y-0.5 hover:bg-[#0ea5e9] hover:text-white focus:outline-none focus:ring-4 focus:ring-[#0ea5e9]/40 dark:bg-slate-800 dark:text-[#bae6fd]"
+                class="flex min-h-[44px] items-center border-2 border-[#0284c7] bg-[#e0f2fe] px-3 text-sm font-black text-[#0284c7] shadow-[2px_2px_0px_0px_#0284c7] transition hover:-translate-y-0.5 hover:bg-[#0ea5e9] hover:text-white motion-reduce:transition-none motion-reduce:hover:translate-y-0 focus:outline-none focus:ring-4 focus:ring-[#0ea5e9]/40 dark:bg-slate-800 dark:text-[#bae6fd]"
               >
                 {item.label}
               </a>
