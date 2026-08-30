@@ -1,0 +1,43 @@
+export type FeatureImplementationStatus = 'planned' | 'implemented' | 'verified';
+export type FeatureRuntimeState = 'disabled' | 'preview' | 'enabled';
+export type PortalKind = 'page' | 'post' | 'talk' | 'knowledge' | 'project' | 'update';
+
+export interface PortalLink {
+  title: string;
+  description: string;
+  href: `/${string}`;
+  nextHref: `/${string}`;
+  accent: 'blue' | 'amber' | 'emerald' | 'violet';
+}
+
+export interface KnowledgeTopic {
+  slug: string;
+  title: string;
+  description: string;
+  status: 'mapping' | 'growing' | 'established';
+}
+
+export interface PortalProject {
+  slug: string;
+  title: string;
+  summary: string;
+  status: 'building' | 'maintaining' | 'archived';
+  href: `/${string}`;
+  updated: string;
+}
+
+export interface PortalUpdate {
+  title: string;
+  summary: string;
+  href: `/${string}`;
+  implementationStatus: FeatureImplementationStatus;
+  runtimeState: FeatureRuntimeState;
+}
+
+export interface PortalConfig {
+  identity: { name: string; tagline: string; timeZone: string };
+  startHere: PortalLink[];
+  focus: string[];
+  topics: KnowledgeTopic[];
+  projects: PortalProject[];
+}

@@ -11,7 +11,9 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "test": "node --test --test-concurrency=1 tests/*.test.mjs",
+    "test:unit": "tsx --test tests/unit/*.test.ts",
+    "test:node": "node --test --test-concurrency=1 tests/*.test.mjs",
+    "test": "pnpm test:unit && pnpm test:node",
     "test:content": "node --test tests/content-schema.test.mjs",
     "test:build": "node --test tests/production-build.test.mjs",
     "test:security": "node --test tests/talk-sanitization.test.mjs",
@@ -46,6 +48,7 @@
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.5",
     "tailwindcss": "^4.1.14",
+    "tsx": "4.20.5",
     "typescript": "~5.8.2"
   }
 }
