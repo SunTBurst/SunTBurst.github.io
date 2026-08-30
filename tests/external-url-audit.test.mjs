@@ -203,3 +203,42 @@ test('runtime sink audit detects browser network capabilities without URL litera
     { path: 'assets/network-capabilities.js', sink: 'serviceWorker.register' },
   ]);
 });
+
+test('runtime sink audit inspects executable HTML without flagging code examples', () => {
+  const findings = findRuntimeSinks([
+    {
+      path: 'synthetic.html',
+      text: [
+        '<script>fetch(endpoint)</script>',
+        '<button onclick="fetch(endpoint)">unsafe handler</button>',
+        '<pre><code>fetch(endpoint)</code></pre>',
+      ].join('\n'),
+    },
+    {
+      path: 'code-example-only.html',
+      text: '<pre><code>fetch(endpoint)</code></pre>',
+    },
+  ]);
+
+  assert.deepEqual(findings, [
+    { path: 'synthetic.html', sink: 'fetch' },
+  ]);
+});
+
+test('runtime sink audit detects ordinary and optional-chained service worker registration', () => {
+  const findings = findRuntimeSinks([
+    {
+      path: 'assets/service-worker-ordinary.js',
+      text: 'navigator.serviceWorker.register(endpoint);',
+    },
+    {
+      path: 'assets/service-worker-optional.js',
+      text: 'navigator.serviceWorker?.register(endpoint);',
+    },
+  ]);
+
+  assert.deepEqual(findings, [
+    { path: 'assets/service-worker-ordinary.js', sink: 'serviceWorker.register' },
+    { path: 'assets/service-worker-optional.js', sink: 'serviceWorker.register' },
+  ]);
+});

@@ -3,6 +3,7 @@ import path from 'node:path';
 
 const TEXT_ARTIFACT_PATTERN = /\.(?:astro|css|html|js|json|mjs|svg|svelte|ts|tsx|txt|xml)$/i;
 const RUNTIME_SCRIPT_PATTERN = /\.(?:astro|js|mjs|svelte|ts|tsx)$/i;
+const RUNTIME_MARKUP_PATTERN = /\.(?:html|svg|xml)$/i;
 const URL_PATTERN = /(?:https?:)?\/\/[^\s"'<>`)\\\]]+/g;
 const CONTENT_LINK_PATTERN = /<a\b(?:(?!>)[\s\S])*?\bhref\s*=\s*(["'])\s*((?:https?:)?\/\/[^\s"'<>`)\\\]]+)\s*\1/gi;
 const XML_NAMESPACE_PATTERN = /\bxmlns(?::[\w.-]+)?\s*=\s*(["'])\s*(https?:\/\/[^\s"'<>`)\\\]]+)\s*\1/gi;
@@ -50,8 +51,79 @@ const RUNTIME_SINK_PATTERNS = [
   { sink: 'importScripts', pattern: /(?<![\w$])importScripts(?![\w$])/ },
   { sink: 'Worker', pattern: /(?<![\w$])Worker(?![\w$])/ },
   { sink: 'SharedWorker', pattern: /(?<![\w$])SharedWorker(?![\w$])/ },
-  { sink: 'serviceWorker.register', pattern: /(?<![\w$])serviceWorker\s*(?:\?\.)?\.\s*register(?![\w$])/ },
+  { sink: 'serviceWorker.register', pattern: /(?<![\w$])serviceWorker\s*(?:\.|\?\.)\s*register(?![\w$])/ },
 ];
+
+function extractExecutableMarkupText(text) {
+  const executableParts = [];
+
+  for (const match of text.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script\s*>/gi)) {
+    executableParts.push(match[1]);
+  }
+
+  let position = 0;
+  while (position < text.length) {
+    const tagStart = text.indexOf('<', position);
+    if (tagStart === -1) break;
+    if (!/[a-z]/i.test(text[tagStart + 1] ?? '')) {
+      position = tagStart + 1;
+      continue;
+    }
+
+    let quote = '';
+    let tagEnd = tagStart + 1;
+    for (; tagEnd < text.length; tagEnd += 1) {
+      const character = text[tagEnd];
+      if (quote) {
+        if (character === quote) quote = '';
+      } else if (character === '"' || character === "'") {
+        quote = character;
+      } else if (character === '>') {
+        break;
+      }
+    }
+    if (tagEnd >= text.length) break;
+
+    const tag = text.slice(tagStart + 1, tagEnd);
+    let cursor = tag.search(/\s/);
+    if (cursor === -1) {
+      position = tagEnd + 1;
+      continue;
+    }
+
+    while (cursor < tag.length) {
+      while (/\s/.test(tag[cursor] ?? '')) cursor += 1;
+      const nameStart = cursor;
+      while (cursor < tag.length && !/[\s=]/.test(tag[cursor])) cursor += 1;
+      const name = tag.slice(nameStart, cursor);
+      while (/\s/.test(tag[cursor] ?? '')) cursor += 1;
+
+      let value = '';
+      if (tag[cursor] === '=') {
+        cursor += 1;
+        while (/\s/.test(tag[cursor] ?? '')) cursor += 1;
+        const valueQuote = tag[cursor] === '"' || tag[cursor] === "'" ? tag[cursor] : '';
+        if (valueQuote) {
+          cursor += 1;
+          const valueStart = cursor;
+          while (cursor < tag.length && tag[cursor] !== valueQuote) cursor += 1;
+          value = tag.slice(valueStart, cursor);
+          if (cursor < tag.length) cursor += 1;
+        } else {
+          const valueStart = cursor;
+          while (cursor < tag.length && !/\s/.test(tag[cursor])) cursor += 1;
+          value = tag.slice(valueStart, cursor);
+        }
+      }
+
+      if (/^on[a-z][\w:.-]*$/i.test(name)) executableParts.push(value);
+    }
+
+    position = tagEnd + 1;
+  }
+
+  return executableParts.join('\n');
+}
 
 function trimUrl(url) {
   return url.replace(/[.,;:]+$/, '');
@@ -101,9 +173,13 @@ export function findUnexpectedRuntimeSinks(artifacts) {
   const findings = [];
 
   for (const artifact of artifacts) {
-    if (!RUNTIME_SCRIPT_PATTERN.test(artifact.path)) continue;
+    let executableText;
+    if (RUNTIME_SCRIPT_PATTERN.test(artifact.path)) executableText = artifact.text;
+    else if (RUNTIME_MARKUP_PATTERN.test(artifact.path)) executableText = extractExecutableMarkupText(artifact.text);
+    else continue;
+
     for (const { sink, pattern } of RUNTIME_SINK_PATTERNS) {
-      if (pattern.test(artifact.text)) findings.push({ path: artifact.path, sink });
+      if (pattern.test(executableText)) findings.push({ path: artifact.path, sink });
     }
   }
 

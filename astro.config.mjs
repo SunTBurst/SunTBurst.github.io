@@ -22,6 +22,9 @@ export default defineConfig({
   markdown: {
     remarkPlugins: [remarkGfm, remarkMath, remarkAdmonitions],
     rehypePlugins: [rehypeKatex, rehypeShiftHeadings],
+    remarkRehype: {
+      allowDangerousHtml: false,
+    },
   },
   vite: {
     plugins: [tailwindcss({
