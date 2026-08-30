@@ -4,7 +4,7 @@ import { existsSync, readFileSync, readdirSync, rmSync } from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
-import { findUnexpectedExternalUrls } from './helpers/external-url-audit.mjs';
+import { collectTextArtifacts, findUnexpectedExternalUrls } from './helpers/external-url-audit.mjs';
 
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const distDir = path.join(projectRoot, 'dist');
@@ -22,15 +22,6 @@ function readTextArtifacts(directory) {
     if (entry.isDirectory()) return readTextArtifacts(target);
     if (!/\.(?:css|html|js|json|svg|txt|xml)$/.test(entry.name)) return [];
     return [readFileSync(target, 'utf8')];
-  });
-}
-
-function collectTextArtifacts(directory, root = directory) {
-  return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
-    const target = path.join(directory, entry.name);
-    if (entry.isDirectory()) return collectTextArtifacts(target, root);
-    if (!/\.(?:html|js|xml)$/.test(entry.name)) return [];
-    return [{ path: path.relative(root, target).replaceAll('\\', '/'), text: readFileSync(target, 'utf8') }];
   });
 }
 
@@ -74,7 +65,7 @@ test('production build emits the local TSun blog without upstream services', () 
   assert.deepEqual(
     findUnexpectedExternalUrls(collectTextArtifacts(distDir), 'https://tsun.test'),
     [],
-    'expected built HTML, JavaScript, and XML to contain no unknown external runtime URLs',
+    'expected every built text artifact to contain no unknown external runtime URLs',
   );
 
   for (const disabledRoute of ['ai', 'api', 'comments', 'music', 'server-status', 'statistics', 'status']) {

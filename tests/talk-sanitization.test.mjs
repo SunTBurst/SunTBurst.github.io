@@ -19,6 +19,8 @@ test('built talk pages render ordinary Markdown without executable HTML or unsaf
     '',
     '普通 **加粗内容** 与 [站内链接](/about)。',
     '',
+    '![合法单图](/images/avatar.svg)',
+    '',
     '<img src="x" onerror="alert(1)">',
     '<script>window.__talk_xss = true</script>',
     '[危险链接](javascript:alert(1))',
@@ -37,6 +39,7 @@ test('built talk pages render ordinary Markdown without executable HTML or unsaf
       assert.doesNotMatch(output, /<a\b[^>]*href=["']javascript:/i, 'expected unsafe link protocols to be absent');
       assert.match(output, /<strong>加粗内容<\/strong>/, 'expected ordinary Markdown emphasis to render');
       assert.match(output, /<a\b[^>]*href="\/about"[^>]*>站内链接<\/a>/, 'expected an ordinary local Markdown link to render');
+      assert.match(output, /<img\b[^>]*src="\/images\/avatar\.svg"[^>]*alt="合法单图"/i, 'expected one safe local talk image to render');
     }
   } finally {
     await rm(fixturePath, { force: true });
