@@ -159,25 +159,25 @@ test('published portal helpers exclude entries marked draft', async () => {
   );
   const fixturePage = path.join(projectRoot, 'src', 'pages', 'portal-helper-test.astro');
 
-  await Promise.all(draftFixtures.map(async (fixture, index) => {
-    await mkdir(path.dirname(fixturePaths[index]), { recursive: true });
-    await writeFile(fixturePaths[index], fixture.contents, 'utf8');
-  }));
-  await writeFile(fixturePage, [
-    '---',
-    "import { getPublishedKnowledge, getPublishedProjects, getPublishedUpdates } from '../utils/portalCollections';",
-    'const [knowledge, projects, updates] = await Promise.all([',
-    '  getPublishedKnowledge(),',
-    '  getPublishedProjects(),',
-    '  getPublishedUpdates(),',
-    ']);',
-    'const titles = [...knowledge, ...projects, ...updates].map((entry) => entry.data.title);',
-    '---',
-    '<pre>{JSON.stringify(titles)}</pre>',
-    '',
-  ].join('\n'), 'utf8');
-
   try {
+    await Promise.all(draftFixtures.map(async (fixture, index) => {
+      await mkdir(path.dirname(fixturePaths[index]), { recursive: true });
+      await writeFile(fixturePaths[index], fixture.contents, 'utf8');
+    }));
+    await writeFile(fixturePage, [
+      '---',
+      "import { getPublishedKnowledge, getPublishedProjects, getPublishedUpdates } from '../utils/portalCollections';",
+      'const [knowledge, projects, updates] = await Promise.all([',
+      '  getPublishedKnowledge(),',
+      '  getPublishedProjects(),',
+      '  getPublishedUpdates(),',
+      ']);',
+      'const titles = [...knowledge, ...projects, ...updates].map((entry) => entry.data.title);',
+      '---',
+      '<pre>{JSON.stringify(titles)}</pre>',
+      '',
+    ].join('\n'), 'utf8');
+
     const build = spawnSync(process.execPath, [astroCli, 'build'], {
       cwd: projectRoot,
       encoding: 'utf8',
