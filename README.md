@@ -6,7 +6,7 @@
 
 ## 本地启动
 
-需要 Node.js 22 或更高版本。打开 Visual Studio 的终端，进入本项目目录后运行：
+需要 Node.js 22.12.0 或更高版本。打开 Visual Studio 的终端，进入本项目目录后运行：
 
 ```powershell
 npx --yes pnpm@9.15.4 install --frozen-lockfile
