@@ -33,8 +33,52 @@ const talksCollection = defineCollection({
   })
 });
 
+const knowledgeCollection = defineCollection({
+  loader: glob({ pattern: "**/*.md", base: "./src/content/knowledge" }),
+  schema: z.object({
+    title: z.string().min(1),
+    summary: z.string().min(1),
+    published: z.coerce.date(),
+    updated: z.coerce.date(),
+    topics: z.array(z.string()).default([]),
+    status: z.enum(['seed', 'growing', 'stable']).default('seed'),
+    sources: z.array(z.object({ title: z.string(), url: z.string().url() })).default([]),
+    draft: z.boolean().default(false),
+  }),
+});
+
+const projectsCollection = defineCollection({
+  loader: glob({ pattern: "**/*.md", base: "./src/content/projects" }),
+  schema: z.object({
+    title: z.string().min(1),
+    summary: z.string().min(1),
+    started: z.coerce.date(),
+    updated: z.coerce.date(),
+    status: z.enum(['building', 'maintaining', 'archived']),
+    tags: z.array(z.string()).default([]),
+    links: z.array(z.object({ label: z.string(), href: z.string() })).default([]),
+    draft: z.boolean().default(false),
+  }),
+});
+
+const updatesCollection = defineCollection({
+  loader: glob({ pattern: "**/*.md", base: "./src/content/updates" }),
+  schema: z.object({
+    title: z.string().min(1),
+    summary: z.string().min(1),
+    published: z.coerce.date(),
+    kind: z.enum(['site', 'knowledge', 'project', 'content']),
+    href: z.string().startsWith('/'),
+    status: z.enum(['completed', 'in-progress']),
+    draft: z.boolean().default(false),
+  }),
+});
+
 export const collections = {
   posts: postsCollection,
-  talks: talksCollection
+  talks: talksCollection,
+  knowledge: knowledgeCollection,
+  projects: projectsCollection,
+  updates: updatesCollection,
 };
 
