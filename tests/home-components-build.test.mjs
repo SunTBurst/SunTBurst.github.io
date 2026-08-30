@@ -13,6 +13,7 @@ const harnessOutput = path.join(projectRoot, 'dist', '__portal-home-test');
 const touchHarnessSource = path.join(projectRoot, 'src', 'pages', '__portal-home-touch-target-test.astro');
 const touchHarnessRoute = path.join(projectRoot, 'src', 'pages', '[...portalHomeTouchTargetTest].astro');
 const touchHarnessOutput = path.join(projectRoot, 'dist', '__portal-home-touch-target-test');
+const longUnbrokenToken = 'UNBROKENHOMEPAGELINKTITLEANDPATHFORNARROWSCREENWRAPPINGCHECK';
 const sectionIds = [
   'identity',
   'start-here',
@@ -33,6 +34,9 @@ function assertTouchTarget(html, marker, expectedCount) {
     assert.match(target, /class="[^"]*px-[^"]*"/, `expected ${marker} to retain horizontal hit-area padding`);
     assert.match(target, /class="[^"]*focus-visible:ring-4[^"]*"/, `expected ${marker} to preserve a visible keyboard focus ring`);
     assert.match(target, /class="[^"]*motion-reduce:transition-none[^"]*"/, `expected ${marker} to disable link animation for reduced motion`);
+    assert.match(target, /class="[^"]*max-w-full[^"]*"/, `expected ${marker} to stay within a narrow parent`);
+    assert.match(target, /class="[^"]*min-w-0[^"]*"/, `expected ${marker} to shrink in a flex context`);
+    assert.match(target, /class="[^"]*break-all[^"]*"/, `expected ${marker} text to wrap at arbitrary break points`);
   }
 }
 
@@ -126,9 +130,9 @@ import { buildHomeModel } from '../utils/homeModel';
 const post = {
   id: 'post:touch-target',
   kind: 'post',
-  title: '触达测试文章',
+  title: '${longUnbrokenToken}',
   description: '用于验证真实构建产物中的内容链接触达范围。',
-  href: '/posts/touch-target',
+  href: '/posts/${longUnbrokenToken.toLowerCase()}',
   updatedAt: '2026-08-31',
   topics: [],
 };
@@ -170,6 +174,7 @@ export function getStaticPaths() {
     const htmlPath = path.join(touchHarnessOutput, 'index.html');
     assert.ok(existsSync(htmlPath), 'expected the dedicated touch-target homepage output');
     const html = readFileSync(htmlPath, 'utf8');
+    assert.match(html, new RegExp(longUnbrokenToken), 'expected the long unbroken fixture title in the emitted page');
     assertTouchTarget(html, 'start-current', 3);
     assertTouchTarget(html, 'start-next', 3);
     assertTouchTarget(html, 'project-primary', 1);
