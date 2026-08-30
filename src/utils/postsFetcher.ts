@@ -1,5 +1,7 @@
-import { getCollection } from 'astro:content';
 import { seoConfig } from '../config/seo';
+import { getPublishedPosts, getPublishedTalks } from './contentCollections';
+import { siteDateTime } from './dateFormat';
+import { renderTalkContent, type TalkImage } from './talkContent';
 
 export interface PostItem {
   id: string;
@@ -20,7 +22,9 @@ export interface TalkItem {
   slug: string;
   title: string;
   date: string;
-  content: string;
+  sanitizedHtml: string;
+  plainText: string;
+  images: TalkImage[];
   tags: string[];
   location: string;
   weather: string;
@@ -29,7 +33,7 @@ export interface TalkItem {
 }
 
 export async function getProcessedPosts(): Promise<PostItem[]> {
-  const rawPosts = await getCollection('posts');
+  const rawPosts = await getPublishedPosts();
   
   const processed = rawPosts.map((post: any) => {
     const data = post.data;
@@ -54,20 +58,7 @@ export async function getProcessedPosts(): Promise<PostItem[]> {
       keywords = data.keyword.split(/[,，]/).map((k: string) => k.trim()).filter(Boolean);
     }
 
-    let parsedDate = '未知时间';
-    const rawDate = data.date || data.published;
-    if (rawDate) {
-      const d = new Date(rawDate);
-      if (!isNaN(d.getTime())) {
-        const year = d.getFullYear();
-        const month = String(d.getMonth() + 1).padStart(2, '0');
-        const day = String(d.getDate()).padStart(2, '0');
-        const hours = String(d.getHours()).padStart(2, '0');
-        const minutes = String(d.getMinutes()).padStart(2, '0');
-        const seconds = String(d.getSeconds()).padStart(2, '0');
-        parsedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-      }
-    }
+    const parsedDate = siteDateTime(data.published);
 
     let customSlug = post.slug || post.id;
     if (data.slug && typeof data.slug === 'string' && data.slug.trim() !== '') {
@@ -131,7 +122,7 @@ export async function getProcessedPosts(): Promise<PostItem[]> {
 }
 
 export async function getProcessedTalks(): Promise<TalkItem[]> {
-  const rawTalks = await getCollection('talks');
+  const rawTalks = await getPublishedTalks();
 
   const processed = rawTalks.map((talk: any) => {
     const data = talk.data;
@@ -142,20 +133,7 @@ export async function getProcessedTalks(): Promise<TalkItem[]> {
       tags = data.tags.split(',').map((t: string) => t.trim());
     }
     
-    let parsedDate = '未知时间';
-    const rawDate = data.published || data.date;
-    if (rawDate) {
-      const d = new Date(rawDate);
-      if (!isNaN(d.getTime())) {
-        const year = d.getFullYear();
-        const month = String(d.getMonth() + 1).padStart(2, '0');
-        const day = String(d.getDate()).padStart(2, '0');
-        const hours = String(d.getHours()).padStart(2, '0');
-        const minutes = String(d.getMinutes()).padStart(2, '0');
-        const seconds = String(d.getSeconds()).padStart(2, '0');
-        parsedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-      }
-    }
+    const parsedDate = siteDateTime(data.published);
 
     let customSlug = talk.slug || talk.id;
     if (data.slug && typeof data.slug === 'string' && data.slug.trim() !== '') {
@@ -171,12 +149,16 @@ export async function getProcessedTalks(): Promise<TalkItem[]> {
       }
     }
 
+    const renderedContent = renderTalkContent(talk.body || '');
+
     return {
       id: talk.id || customSlug,
       slug: customSlug,
       title: data.title?.trim() || '随手记',
       date: parsedDate,
-      content: talk.body || '',
+      sanitizedHtml: renderedContent.sanitizedHtml,
+      plainText: renderedContent.plainText,
+      images: renderedContent.images,
       tags,
       location: data.location || '',
       weather: data.weather || '',

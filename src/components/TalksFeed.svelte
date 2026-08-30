@@ -33,28 +33,6 @@
     visibleCount = Math.min(visibleCount + talksPerPage, filteredTalks.length);
   }
 
-  // Parse markdown helper
-  function formatMarkdown(text: string): string {
-    if (!text) return "";
-    let html = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-    html = html.replace(/\[(.*?)\]\((.*?)\)/g, '<a class="text-[#0ea5e9] font-bold hover:underline" href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
-    return html.split('\n\n').map(p => `<p class="mb-3.5 leading-relaxed break-words">${p.replace(/\n/g, '<br/>')}</p>`).join('');
-  }
-
-  // Get image list inside post
-  function extractImages(content: string): {src: string; alt: string}[] {
-    const imageRegex = /!\[(.*?)\]\((.*?)\)/g;
-    const matches = Array.from(content.matchAll(imageRegex)).map((m) => ({
-      alt: m[1] || '',
-      src: m[2]
-    }));
-    return matches;
-  }
-
-  function getContentWithoutImages(content: string): string {
-    return content.replace(/!\[.*?\]\((.*?)\)/g, '').trim();
-  }
-
   function openLightbox(imagesList: string[], index: number, e: Event) {
     e.stopPropagation();
     lightboxImages = imagesList;
@@ -168,9 +146,6 @@
     {/if}
 
     {#each displayedTalks as talk, i (talk.id)}
-      {@const images = extractImages(talk.content)}
-      {@const textOnly = getContentWithoutImages(talk.content)}
-      
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <!-- svelte-ignore a11y-no-static-element-interactions -->
       <div 
@@ -204,24 +179,24 @@
             </div>
           {/if}
           
-          {#if textOnly}
+          {#if talk.sanitizedHtml}
             <div class="talk-fold-wrap">
               <div class="prose max-w-none text-slate-755 dark:text-slate-300 leading-relaxed font-medium">
-                {@html formatMarkdown(textOnly)}
+                {@html talk.sanitizedHtml}
               </div>
             </div>
           {/if}
 
           <!-- Nine-grid Image Gallery -->
-          {#if images.length > 0}
-            <div class="mt-4 grid gap-2 {images.length === 1 ? 'grid-cols-1 max-w-sm' : images.length === 2 || images.length === 4 ? 'grid-cols-2 max-w-xs' : 'grid-cols-3 max-w-md'}">
-              {#each images as src, idx}
+          {#if talk.images.length > 0}
+            <div class="mt-4 grid gap-2 {talk.images.length === 1 ? 'grid-cols-1 max-w-sm' : talk.images.length === 2 || talk.images.length === 4 ? 'grid-cols-2 max-w-xs' : 'grid-cols-3 max-w-md'}">
+              {#each talk.images as image, idx}
                 <!-- svelte-ignore a11y-click-events-have-key-events -->
                 <div 
                   class="w-full overflow-hidden rounded-sm border-2 border-[#0284c7] hover:border-[#f59e0b] shadow-[2px_2px_0px_0px_rgba(2,132,199,0.15)] hover:shadow-[3px_3px_0px_0px_#0284c7] transition-all cursor-pointer bg-slate-50 relative group-hover:scale-[1.015] {images.length === 1 ? 'aspect-video sm:aspect-[4/3] max-h-80' : 'aspect-square'}"
-                  on:click|stopPropagation={(e) => openLightbox(images.map(i => i.src), idx, e)}
+                  on:click|stopPropagation={(e) => openLightbox(talk.images.map((item) => item.src), idx, e)}
                 >
-                   <img src={src.src} alt={src.alt || `${talk.title || '说说'} 配图 ${idx + 1}`} class="w-full h-full object-cover transition-transform duration-550 hover:scale-[1.06]" loading="lazy" decoding="async" />
+                   <img src={image.src} alt={image.alt || `${talk.title || '说说'} 配图 ${idx + 1}`} class="w-full h-full object-cover transition-transform duration-550 hover:scale-[1.06]" loading="lazy" decoding="async" />
                 </div>
               {/each}
             </div>

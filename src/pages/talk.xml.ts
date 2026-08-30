@@ -1,11 +1,8 @@
 import rss from '@astrojs/rss';
-import { getCollection } from 'astro:content';
+import { getPublishedTalks } from '../utils/contentCollections';
+import { renderTalkContent } from '../utils/talkContent';
 import { siteConfig } from '../config/site';
-import MarkdownIt from 'markdown-it';
-import sanitizeHtml from 'sanitize-html';
 import type { APIContext } from 'astro';
-
-const parser = new MarkdownIt();
 
 function stripInvalidXmlChars(str: string): string {
   return str.replace(
@@ -15,7 +12,7 @@ function stripInvalidXmlChars(str: string): string {
 }
 
 export async function GET(context: APIContext) {
-  const talks = await getCollection('talks');
+  const talks = await getPublishedTalks();
 
   const siteUrl = (context.site ?? new URL(siteConfig.url)).toString().replace(/\/$/, '');
   const author = siteConfig.author;
@@ -24,23 +21,16 @@ export async function GET(context: APIContext) {
     .map((talk) => {
       const body = typeof talk.body === 'string' ? talk.body : '';
       const cleaned = stripInvalidXmlChars(body);
+      const rendered = renderTalkContent(cleaned);
       const slug = (talk.data.slug || talk.slug || talk.id || '').trim();
       const permalink = `${siteUrl}/talk/${slug}/`;
       return {
         title: talk.data.title || '随手记',
         pubDate: talk.data.published,
-        description: body
-          .replace(/!\[.*?\]\(.*?\)/g, '')
-          .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
-          .replace(/[#*`_~>|\-]/g, '')
-          .replace(/\s+/g, ' ')
-          .trim()
-          .slice(0, 150) || '',
+        description: rendered.plainText.slice(0, 150),
         link: permalink,
         guid: permalink,
-        content: sanitizeHtml(parser.render(cleaned), {
-          allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img']),
-        }),
+        content: rendered.sanitizedHtml,
         customData: `<dc:creator><![CDATA[${author}]]></dc:creator>`,
       };
     })

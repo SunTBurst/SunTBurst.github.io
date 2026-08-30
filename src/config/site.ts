@@ -6,6 +6,7 @@ export const siteConfig = {
   author: 'TSun',
   url: siteUrl,
   avatar: '/images/avatar.svg',
+  timeZone: 'Asia/Riyadh',
 } as const;
 
 export const navigation = [

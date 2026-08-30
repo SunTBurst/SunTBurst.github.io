@@ -29,7 +29,7 @@ function talkSeoDescription(raw: string, max = 150): string {
   return plain.slice(0, max);
 }
 
-const seoDescription = talkSeoDescription(talk.content || '');
+const seoDescription = talkSeoDescription(talk.plainText || '');
 ---
 
 <Layout 

@@ -1,9 +1,10 @@
-import { getCollection } from 'astro:content';
+import { getPublishedPosts, getPublishedTalks } from '../utils/contentCollections';
 import { siteConfig } from '../config/site';
 import MarkdownIt from 'markdown-it';
 import sanitizeHtml from 'sanitize-html';
 import type { APIContext } from 'astro';
 import { rssDate } from '../utils/dateFormat';
+import { renderTalkContent } from '../utils/talkContent';
 
 const parser = new MarkdownIt();
 
@@ -42,8 +43,8 @@ function renderItem(title: string, url: string, desc: string, pubDate: string, c
 
 export async function GET(context: APIContext) {
   const [posts, talks] = await Promise.all([
-    getCollection('posts'),
-    getCollection('talks'),
+    getPublishedPosts(),
+    getPublishedTalks(),
   ]);
 
   const siteUrl = (context.site ?? new URL(siteConfig.url)).toString().replace(/\/$/, '');
@@ -69,13 +70,12 @@ export async function GET(context: APIContext) {
     ...talks.map((talk) => {
       const body = typeof talk.body === 'string' ? talk.body : '';
       const cleaned = stripInvalidXmlChars(body);
+      const rendered = renderTalkContent(cleaned);
       const slug = (talk.data.slug || talk.slug || talk.id || '').trim();
       const url = `${siteUrl}/talk/${slug}/`;
       const pubDate = rssDate(talk.data.published);
-      const desc = body.substring(0, 200).replace(/[#*`_\[\]()\-]/g, '').trim() || '';
-      const content = sanitizeHtml(parser.render(cleaned), {
-        allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img']),
-      });
+      const desc = rendered.plainText.slice(0, 200);
+      const content = rendered.sanitizedHtml;
       return {
         pubDate,
         sortTime: new Date(pubDate).getTime(),

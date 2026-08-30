@@ -1,5 +1,6 @@
 import rss from '@astrojs/rss';
-import { getCollection } from 'astro:content';
+import { getPublishedPosts, getPublishedTalks } from '../utils/contentCollections';
+import { renderTalkContent } from '../utils/talkContent';
 import { siteConfig } from '../config/site';
 import MarkdownIt from 'markdown-it';
 import sanitizeHtml from 'sanitize-html';
@@ -24,8 +25,8 @@ function stripMarkdown(md: string): string {
 
 export async function GET(context: APIContext) {
   const [posts, talks] = await Promise.all([
-    getCollection('posts'),
-    getCollection('talks'),
+    getPublishedPosts(),
+    getPublishedTalks(),
   ]);
 
   const siteUrl = (context.site ?? new URL(siteConfig.url)).toString().replace(/\/$/, '');
@@ -53,17 +54,16 @@ export async function GET(context: APIContext) {
     ...talks.map((talk) => {
       const body = typeof talk.body === 'string' ? talk.body : '';
       const cleaned = stripInvalidXmlChars(body);
+      const rendered = renderTalkContent(cleaned);
       const slug = (talk.data.slug || talk.slug || talk.id || '').trim();
       const permalink = `${siteUrl}/talk/${slug}/`;
       return {
         title: `「说说」${talk.data.title || '随手记'}`,
         pubDate: talk.data.published,
-        description: body.substring(0, 200).replace(/[#*`_\[\]()\-]/g, '').trim() || '',
+        description: rendered.plainText.slice(0, 200),
         link: permalink,
         guid: permalink,
-        content: sanitizeHtml(parser.render(cleaned), {
-          allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img']),
-        }),
+        content: rendered.sanitizedHtml,
         customData: `<dc:creator><![CDATA[${author}]]></dc:creator>`,
       };
     }),

@@ -1,4 +1,4 @@
-import { getCollection } from 'astro:content';
+import { getPublishedPosts, getPublishedTalks } from '../utils/contentCollections';
 import { normalizeEntrySlug, postPath, talkPath } from '../utils/slugify';
 import { calendarDate } from '../utils/dateFormat';
 
@@ -16,8 +16,8 @@ function escapeXml(unsafe: string): string {
 }
 
 export async function GET(context: any) {
-  const rawPosts = await getCollection('posts');
-  const rawTalks = await getCollection('talks');
+  const rawPosts = await getPublishedPosts();
+  const rawTalks = await getPublishedTalks();
   
   // Normalize domain of the site (remove trailing slash)
   const siteUrl = context.site?.toString() || new URL('/', context.url).toString();

@@ -10,6 +10,10 @@
     "test": "node --test --test-concurrency=1 tests/*.test.mjs",
     "test:content": "node --test tests/content-schema.test.mjs",
     "test:build": "node --test tests/production-build.test.mjs",
+    "test:security": "node --test tests/talk-sanitization.test.mjs",
+    "test:drafts": "node --test tests/draft-publication.test.mjs",
+    "test:url-audit": "node --test tests/external-url-audit.test.mjs",
+    "test:timezone": "node --test tests/timezone-date.test.mjs",
     "lint": "tsc --noEmit"
   },
   "dependencies": {

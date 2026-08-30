@@ -1,5 +1,5 @@
 import rss from '@astrojs/rss';
-import { getCollection } from 'astro:content';
+import { getPublishedPosts } from '../utils/contentCollections';
 import { siteConfig } from '../config/site';
 import MarkdownIt from 'markdown-it';
 import sanitizeHtml from 'sanitize-html';
@@ -23,7 +23,7 @@ function stripMarkdown(md: string): string {
 }
 
 export async function GET(context: APIContext) {
-  const posts = await getCollection('posts');
+  const posts = await getPublishedPosts();
 
   const siteUrl = (context.site ?? new URL(siteConfig.url)).toString().replace(/\/$/, '');
   const author = siteConfig.author;
