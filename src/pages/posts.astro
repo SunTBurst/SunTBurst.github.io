@@ -76,7 +76,7 @@ const years = Object.keys(yearsMap).sort((a, b) => b.localeCompare(a));
 
               <div class="flex flex-col gap-4">
                 {archiveMap[key].map(post => (
-                  <a href={`/posts/${encodeURIComponent(post.slug)}`} data-astro-prefetch class="relative z-10 group flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 p-3 bg-white border-2 border-[#0284c7]/30 hover:border-[#0284c7] rounded-sm transition-all hover:-translate-y-1 hover:shadow-[4px_4px_0px_0px_#0284c7]">
+                  <a href={`/posts/${encodeURIComponent(post.slug)}`} class="relative z-10 group flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 p-3 bg-white border-2 border-[#0284c7]/30 hover:border-[#0284c7] rounded-sm transition-all hover:-translate-y-1 hover:shadow-[4px_4px_0px_0px_#0284c7]">
                     <span class="font-mono text-xs font-black text-slate-400 shrink-0">
                       {post.date.substring(5, 10)}
                     </span>

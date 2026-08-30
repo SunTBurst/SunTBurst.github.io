@@ -1,8 +1,6 @@
 ---
-import { ClientRouter } from 'astro:transitions';
 import NavBar from '../components/NavBar.astro';
 import { PageBanner } from '../components/PageBanner';
-import PrefetchLinks from '../components/PrefetchLinks.svelte';
 import { siteConfig } from '../config/site';
 import '../index.css';
 
@@ -52,7 +50,6 @@ const socialImage = image ? new URL(image, Astro.site ?? siteConfig.url) : new U
     <link rel="canonical" href={canonicalUrl} />
     <link rel="icon" href={siteConfig.avatar} type="image/svg+xml" />
     <title>{documentTitle}</title>
-    <ClientRouter />
   </head>
   <body class="bg-[#f8fafc] text-slate-800 dark:bg-slate-900 dark:text-slate-100">
     <NavBar />
@@ -78,6 +75,5 @@ const socialImage = image ? new URL(image, Astro.site ?? siteConfig.url) : new U
         </footer>
       )}
     </div>
-    <PrefetchLinks client:load />
   </body>
 </html>

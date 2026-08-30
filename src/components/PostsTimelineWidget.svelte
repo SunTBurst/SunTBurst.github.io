@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-
   interface TimelinePost {
     slug: string;
     title: string;
@@ -8,27 +6,8 @@
   }
 
   export let posts: TimelinePost[] = [];
-  export let dataUrl: string = '';
 
   let openGroups = new Set<string>();
-
-  onMount(() => {
-    if (posts.length > 0) return;
-    if (!dataUrl) return;
-
-    fetch(dataUrl)
-      .then(res => res.ok ? res.json() : Promise.reject(new Error(`Failed to load ${dataUrl}`)))
-      .then((loadedPosts: TimelinePost[]) => {
-        if (Array.isArray(loadedPosts)) {
-          posts = loadedPosts.map(post => ({
-            slug: post.slug,
-            title: post.title,
-            date: post.date,
-          }));
-        }
-      })
-      .catch(err => console.warn('[PostsTimelineWidget] post data unavailable', err));
-  });
 
   $: groupedPosts = posts.reduce((acc, post) => {
     if (!post.date || post.date === '未知时间') return acc;
@@ -88,7 +67,6 @@
               {#each groupedPosts[ym] as post}
                 <a
                   href={`/posts/${encodeURIComponent(post.slug)}`}
-                  data-astro-prefetch
                   class="block text-[11px] font-bold text-[#0284c7]/80 hover:text-[#0ea5e9] cursor-pointer truncate transition-colors py-0.5 relative z-10"
                   title={post.title}
                 >
@@ -105,6 +83,6 @@
 {:else}
   <div class="bg-white dark:bg-slate-800 border-4 border-[#0284c7] p-4 shadow-[6px_6px_0px_0px_#0284c7] rounded-sm w-full animate-card-entrance opacity-0" style="animation-delay: 0.12s">
     <h3 class="font-black text-[#0284c7] uppercase tracking-wider mb-2 text-sm">归档目录</h3>
-    <p class="text-xs font-bold text-slate-400">加载中...</p>
+    <p class="text-xs font-bold text-slate-400">暂无文章</p>
   </div>
 {/if}

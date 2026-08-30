@@ -50,7 +50,6 @@ const months = Object.keys(groupedPosts);
               return (
                 <a 
                   href={`/posts/${encodeURIComponent(post.slug)}`}
-                  data-astro-prefetch
                   class="block text-[11px] font-bold text-[#0284c7]/80 hover:text-[#0ea5e9] cursor-pointer truncate transition-colors py-0.5 relative z-10"
                   title={post.title}
                 >

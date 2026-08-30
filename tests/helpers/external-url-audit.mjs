@@ -1,16 +1,11 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 
-const TEXT_ARTIFACT_PATTERN = /\.(?:css|html|js|json|svg|txt|xml)$/i;
-const URL_PATTERN = /(?:https?:)?\/\/(?:(?!&quot;)[^\s"'<>`)\\\]])+/g;
-const CONTENT_LINK_PATTERNS = [
-  /<a\b[^>]*?\bhref=(?:"|')((?:https?:)?\/\/[^\s"'<>`)\\\]]+)/gi,
-  /&lt;a\b(?:(?!&gt;)[\s\S])*?\bhref=&quot;((?:https?:)?\/\/(?:(?!&quot;)[^\s"'<>`)\\\]])+)/gi,
-];
-const XML_NAMESPACE_PATTERNS = [
-  /\bxmlns(?::[\w.-]+)?=(?:"|')(https?:\/\/[^\s"'<>`)\\\]]+)/gi,
-  /\bxmlns(?::[\w.-]+)?=&quot;(https?:\/\/(?:(?!&quot;)[^\s"'<>`)\\\]])+)/gi,
-];
+const TEXT_ARTIFACT_PATTERN = /\.(?:astro|css|html|js|json|mjs|svg|svelte|ts|tsx|txt|xml)$/i;
+const RUNTIME_SCRIPT_PATTERN = /\.(?:astro|js|mjs|svelte|ts|tsx)$/i;
+const URL_PATTERN = /(?:https?:)?\/\/[^\s"'<>`)\\\]]+/g;
+const CONTENT_LINK_PATTERN = /<a\b(?:(?!>)[\s\S])*?\bhref\s*=\s*(["'])\s*((?:https?:)?\/\/[^\s"'<>`)\\\]]+)\s*\1/gi;
+const XML_NAMESPACE_PATTERN = /\bxmlns(?::[\w.-]+)?\s*=\s*(["'])\s*(https?:\/\/[^\s"'<>`)\\\]]+)\s*\1/gi;
 
 const XML_NAMESPACES = new Set([
   'http://purl.org/dc/elements/1.1/',
@@ -24,97 +19,73 @@ const XML_NAMESPACES = new Set([
   'http://www.w3.org/XML/1998/namespace',
 ]);
 
-const JS_DIAGNOSTIC_PREFIXES = [
+const JS_VENDOR_URLS = new Set([
   'https://react.dev/errors/',
   'https://svelte.dev/e/',
+  'https://svelte.dev/e/async_derived_orphan',
+  'https://svelte.dev/e/derived_inert',
+  'https://svelte.dev/e/each_key_duplicate',
+  'https://svelte.dev/e/effect_in_teardown',
+  'https://svelte.dev/e/effect_in_unowned_derived',
+  'https://svelte.dev/e/effect_orphan',
+  'https://svelte.dev/e/effect_update_depth_exceeded',
+  'https://svelte.dev/e/hydration_failed',
+  'https://svelte.dev/e/hydration_mismatch',
+  'https://svelte.dev/e/lifecycle_legacy_only',
+  'https://svelte.dev/e/lifecycle_outside_component',
+  'https://svelte.dev/e/props_invalid_value',
+  'https://svelte.dev/e/state_descriptors_fixed',
+  'https://svelte.dev/e/state_prototype_fixed',
+  'https://svelte.dev/e/state_unsafe_mutation',
+  'https://svelte.dev/e/svelte_boundary_reset_noop',
+  'https://svelte.dev/e/svelte_boundary_reset_onerror',
+]);
+
+const RUNTIME_SINK_PATTERNS = [
+  { sink: 'fetch', pattern: /(?<![\w$])fetch(?![\w$])/ },
+  { sink: 'XMLHttpRequest', pattern: /(?<![\w$])XMLHttpRequest(?![\w$])/ },
+  { sink: 'WebSocket', pattern: /(?<![\w$])WebSocket(?![\w$])/ },
+  { sink: 'EventSource', pattern: /(?<![\w$])EventSource(?![\w$])/ },
+  { sink: 'sendBeacon', pattern: /(?<![\w$])sendBeacon(?![\w$])/ },
+  { sink: 'importScripts', pattern: /(?<![\w$])importScripts(?![\w$])/ },
+  { sink: 'Worker', pattern: /(?<![\w$])Worker(?![\w$])/ },
+  { sink: 'SharedWorker', pattern: /(?<![\w$])SharedWorker(?![\w$])/ },
+  { sink: 'serviceWorker.register', pattern: /(?<![\w$])serviceWorker\s*(?:\?\.)?\.\s*register(?![\w$])/ },
 ];
 
 function trimUrl(url) {
   return url.replace(/[.,;:]+$/, '');
 }
 
-function urlOffset(match) {
-  return match.index + match[0].lastIndexOf(match[1]);
+function captureOffset(match, captureIndex) {
+  return match.index + match[0].lastIndexOf(match[captureIndex]);
 }
 
-function isJavaScriptDiagnostic(pathname, url, text, index) {
-  if (!/\.js$/i.test(pathname)) return false;
-  if (!JS_DIAGNOSTIC_PREFIXES.some((prefix) => url.startsWith(prefix))) return false;
+function normalizeMarkupEntities(text) {
+  return text.replace(/&(?:lt|gt|quot|apos|#\d+|#x[\da-f]+);/gi, (entity) => {
+    const name = entity.slice(1, -1).toLowerCase();
+    let character;
 
-  const before = text.slice(Math.max(0, index - 180), index);
-  const after = text.slice(index + url.length, index + url.length + 720);
-  if (url.startsWith('https://react.dev/errors/')) {
-    if (url !== 'https://react.dev/errors/') return false;
-
-    const builder = /(?:^|[;}])function\s+[\w$]+\(([\w$]+)\)\{var\s+([\w$]+)=["'`]$/.exec(before);
-    const start = /^["'`]\+([\w$]+);if\(1<arguments\.length\)\{/.exec(after);
-    const result = /return["'`]Minified React error #["'`]\+([\w$]+)\+["'`]; visit ["'`]\+([\w$]+)\+["'`] for the full message or use the non-minified dev environment for full errors and additional helpful warnings\.["'`]\}/.exec(after);
-    return Boolean(builder && start && result
-      && start[1] === builder[1]
-      && result[1] === builder[1]
-      && result[2] === builder[2]);
-  }
-  return /(?:new Error|console\.(?:warn|error)|\.startsWith)\(\s*["'`]$/i.test(before)
-    && /^["'`]\s*\)/.test(after);
-}
-
-function isIdentifierCharacter(character) {
-  return typeof character === 'string' && /[A-Za-z0-9_$]/.test(character);
-}
-
-function isJavaScriptNamespaceConstant(pathname, url, text, index) {
-  if (!/\.js$/i.test(pathname) || !XML_NAMESPACES.has(url)) return false;
-
-  const statementStart = text.lastIndexOf(';', index - 1) + 1;
-  const declarationPrefix = text.slice(statementStart, index);
-  if (!/^\s*const\b/.test(declarationPrefix)) return false;
-
-  const assignment = /([A-Za-z_$][\w$]*)=["'`]$/.exec(declarationPrefix);
-  if (!assignment) return false;
-
-  const declarationEnd = text.indexOf(';', index + url.length);
-  if (declarationEnd === -1) return false;
-  const declaration = text.slice(statementStart, declarationEnd + 1);
-  const svelteNamespaces = [
-    'http://www.w3.org/1999/xhtml',
-    'http://www.w3.org/2000/svg',
-    'http://www.w3.org/1998/Math/MathML',
-  ];
-  if (!svelteNamespaces.every((namespace) => declaration.includes('="' + namespace + '"')
-    || declaration.includes("='" + namespace + "'"))) return false;
-
-  const identifier = assignment[1];
-  let hasSafeUse = false;
-  let occurrence = text.indexOf(identifier);
-  while (occurrence !== -1) {
-    const nextIndex = occurrence + identifier.length;
-    if (!isIdentifierCharacter(text[occurrence - 1]) && !isIdentifierCharacter(text[nextIndex])) {
-      const before = text.slice(Math.max(0, occurrence - 32), occurrence);
-      const after = text.slice(nextIndex, nextIndex + 64);
-      const isAssignment = occurrence >= statementStart && occurrence < declarationEnd
-        && (after.startsWith('="' + url + '"') || after.startsWith("='" + url + "'"));
-      const isComparison = /(?:===|!==)\s*$/.test(before) || /^\s*(?:===|!==)/.test(after);
-      const isDomNamespaceCall = /(?:createElementNS|setAttributeNS)\(\s*$/.test(before);
-      const isExportAlias = /^\s+as\s+[A-Za-z_$][\w$]*/.test(after);
-
-      if (!isAssignment && !isComparison && !isDomNamespaceCall && !isExportAlias) return false;
-      if (!isAssignment) hasSafeUse = true;
+    if (name === 'lt') character = '<';
+    else if (name === 'gt') character = '>';
+    else if (name === 'quot') character = '"';
+    else if (name === 'apos') character = "'";
+    else {
+      const radix = name.startsWith('#x') ? 16 : 10;
+      const digits = name.slice(radix === 16 ? 2 : 1);
+      const codePoint = Number.parseInt(digits, radix);
+      if (!Number.isInteger(codePoint) || codePoint > 0x10ffff) return entity;
+      character = String.fromCodePoint(codePoint);
     }
-    occurrence = text.indexOf(identifier, nextIndex);
-  }
 
-  return hasSafeUse;
+    if (!['<', '>', '"', "'"].includes(character)) return entity;
+    return `${' '.repeat(entity.length - character.length)}${character}`;
+  });
 }
 
-function isJavaScriptNamespace(pathname, url, text, index) {
-  if (!/\.js$/i.test(pathname) || !XML_NAMESPACES.has(url)) return false;
-
-  const before = text.slice(Math.max(0, index - 100), index);
-  const after = text.slice(index + url.length, index + url.length + 40);
-  if (/(?:createElementNS|setAttributeNS)\(\s*["'`]$/i.test(before)) return true;
-  if (/(?:namespaceURI(?:===|!==)|case)["'`]$/i.test(before)) return true;
-  if (/[\w$]+\([^,]{0,60},\s*["'`]$/.test(before) && /^["'`],\s*["'`](?:xlink:|xml:)/.test(after)) return true;
-  return isJavaScriptNamespaceConstant(pathname, url, text, index);
+function isJavaScriptVendorUrl(pathname, url) {
+  if (!/\.js$/i.test(pathname)) return false;
+  return XML_NAMESPACES.has(url) || JS_VENDOR_URLS.has(url);
 }
 
 export function collectTextArtifacts(directory, root = directory) {
@@ -126,28 +97,42 @@ export function collectTextArtifacts(directory, root = directory) {
   });
 }
 
+export function findUnexpectedRuntimeSinks(artifacts) {
+  const findings = [];
+
+  for (const artifact of artifacts) {
+    if (!RUNTIME_SCRIPT_PATTERN.test(artifact.path)) continue;
+    for (const { sink, pattern } of RUNTIME_SINK_PATTERNS) {
+      if (pattern.test(artifact.text)) findings.push({ path: artifact.path, sink });
+    }
+  }
+
+  return findings;
+}
+
 export function findUnexpectedExternalUrls(artifacts, siteUrl) {
   const siteOrigin = new URL(siteUrl).origin;
   const findings = [];
 
   for (const artifact of artifacts) {
     const { path: artifactPath, text } = artifact;
+    const normalizedText = normalizeMarkupEntities(text);
+    const hasRuntimeSink = findUnexpectedRuntimeSinks([artifact]).length > 0;
     const contentLinkPositions = new Set(
-      CONTENT_LINK_PATTERNS.flatMap((pattern) => Array.from(text.matchAll(pattern), urlOffset)),
+      Array.from(normalizedText.matchAll(CONTENT_LINK_PATTERN), (match) => captureOffset(match, 2)),
     );
     const namespacePositions = new Set(
-      XML_NAMESPACE_PATTERNS.flatMap((pattern) => Array.from(text.matchAll(pattern)))
-        .filter((match) => XML_NAMESPACES.has(trimUrl(match[1])))
-        .map(urlOffset),
+      Array.from(normalizedText.matchAll(XML_NAMESPACE_PATTERN))
+        .filter((match) => XML_NAMESPACES.has(trimUrl(match[2])))
+        .map((match) => captureOffset(match, 2)),
     );
 
-    for (const match of text.matchAll(URL_PATTERN)) {
+    for (const match of normalizedText.matchAll(URL_PATTERN)) {
       const url = trimUrl(match[0]);
       if (new URL(url, siteOrigin).origin === siteOrigin) continue;
       if (contentLinkPositions.has(match.index)) continue;
       if (namespacePositions.has(match.index)) continue;
-      if (isJavaScriptNamespace(artifactPath, url, text, match.index)) continue;
-      if (isJavaScriptDiagnostic(artifactPath, url, text, match.index)) continue;
+      if (!hasRuntimeSink && isJavaScriptVendorUrl(artifactPath, url)) continue;
       findings.push({ path: artifactPath, url });
     }
   }

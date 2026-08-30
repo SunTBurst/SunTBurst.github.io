@@ -4,10 +4,13 @@ import { existsSync, readFileSync, readdirSync, rmSync } from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
-import { collectTextArtifacts, findUnexpectedExternalUrls } from './helpers/external-url-audit.mjs';
+import * as externalUrlAudit from './helpers/external-url-audit.mjs';
+
+const { collectTextArtifacts, findUnexpectedExternalUrls } = externalUrlAudit;
 
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const distDir = path.join(projectRoot, 'dist');
+const srcDir = path.join(projectRoot, 'src');
 const astroCli = path.join(projectRoot, 'node_modules', 'astro', 'bin', 'astro.mjs');
 
 function readDist(relativePath) {
@@ -45,6 +48,15 @@ test('production build emits the local TSun blog without upstream services', () 
   const home = readDist('index.html');
   assert.match(home, /TSun 的博客/, 'expected the built homepage to carry the TSun identity');
   assert.match(home, /https:\/\/tsun\.test\//, 'expected PUBLIC_SITE_URL to control generated absolute URLs');
+  const mobileCalendarStart = home.indexOf('id="mobile-calendar-dialog"');
+  const mobileCalendarEnd = home.indexOf('</dialog>', mobileCalendarStart);
+  assert.notEqual(mobileCalendarStart, -1, 'expected the mobile calendar dialog on the homepage');
+  assert.notEqual(mobileCalendarEnd, -1, 'expected the mobile calendar dialog to close');
+  assert.match(
+    home.slice(mobileCalendarStart, mobileCalendarEnd),
+    /hello-world/,
+    'expected the mobile calendar to receive the build-time local post data',
+  );
 
   const welcomePost = readDist('posts/hello-world/index.html');
   assert.match(welcomePost, /欢迎来到 TSun 的博客/, 'expected the original local welcome post route');
@@ -62,8 +74,24 @@ test('production build emits the local TSun blog without upstream services', () 
     'expected built pages to contain no upstream or external-service identity',
   );
 
+  const artifacts = collectTextArtifacts(distDir);
+  assert.equal(
+    typeof externalUrlAudit.findUnexpectedRuntimeSinks,
+    'function',
+    'expected the artifact audit to expose the zero-network-sink check',
+  );
   assert.deepEqual(
-    findUnexpectedExternalUrls(collectTextArtifacts(distDir), 'https://tsun.test'),
+    externalUrlAudit.findUnexpectedRuntimeSinks(artifacts),
+    [],
+    'expected emitted JavaScript to contain no browser network capabilities',
+  );
+  assert.deepEqual(
+    externalUrlAudit.findUnexpectedRuntimeSinks(collectTextArtifacts(srcDir)),
+    [],
+    'expected browser source to contain no network capabilities',
+  );
+  assert.deepEqual(
+    findUnexpectedExternalUrls(artifacts, 'https://tsun.test'),
     [],
     'expected every built text artifact to contain no unknown external runtime URLs',
   );

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { afterUpdate, onMount } from 'svelte';
+  import { onMount } from 'svelte';
   import { flip } from 'svelte/animate';
   import { fade } from 'svelte/transition';
   import { siteConfig, i18nConfig } from '../config/site';
@@ -16,236 +16,10 @@
   }
 
   export let posts: SearchablePost[] = [];
-  export let dataUrl: string = '';
   export let postsPerPage: number = 10;
 
   let searchQuery = '';
   let currentPage = 1;
-  let isLoadingPosts = false;
-  let loadFailed = false;
-  let feedEl: HTMLElement;
-
-  // Keep client bandwidth predictable: at most two article HTML requests run together.
-  const MAX_PREFETCH_REQUESTS = 6;
-  const PREFETCH_ROOT_MARGIN = '800px';
-  const CACHE_NAME = 'blog-article-cache-v1';
-  const CACHE_TTL = 30 * 60 * 1000; // 30 分钟
-  const prefetchedUrls = new Set<string>();
-  const queuedUrls = new Set<string>();
-  const inflightUrls = new Set<string>();
-  let prefetchObserver: IntersectionObserver | null = null;
-  let prefetchAbortController: AbortController | null = null;
-
-  // 预加载进度状态：link.href → 0~100（Svelte 响应式，用于卡片进度条）
-  let prefetchProgress = new Map<string, number>();
-
-  // ===== 缓存模块 =====
-
-  function getCache(): Promise<Cache | null> {
-    try { return caches.open(CACHE_NAME); }
-    catch { return Promise.resolve(null); }
-  }
-
-  async function storeCachedArticle(url: string, html: string) {
-    const cache = await getCache();
-    if (!cache) return;
-    const payload = JSON.stringify({ ts: Date.now(), html });
-    const req = new Request(url.startsWith('http') ? url : location.origin + url);
-    await cache.put(req, new Response(payload, { headers: { 'Content-Type': 'application/json' } }));
-  }
-
-  // 更新全局统计 + 面板显示
-  function updatePanel() {
-    if (typeof window === 'undefined') return;
-    (window as any).__cacheStats = {
-      cached: prefetchedUrls.size,
-      queued: queuedUrls.size,
-      loading: prefetchProgress.size,
-    };
-  }
-
-  // 标记点击 HIT/MISS（供 Layout 面板读取）
-  function markClick(hit: boolean, slug: string) {
-    try {
-      sessionStorage.setItem('[cache]lastClick', (hit ? 'HIT ' : 'MISS ') + slug);
-    } catch {}
-    updatePanel();
-  }
-
-  function getConnection() {
-    return (navigator as Navigator & {
-      connection?: {
-        saveData?: boolean;
-        effectiveType?: string;
-      };
-    }).connection;
-  }
-
-  function getMaxConcurrentPrefetches() {
-    const connection = getConnection();
-    if (connection?.saveData) return 0;
-    if (/^(slow-)?2g$/.test(connection?.effectiveType || '')) return 0;
-    if (connection?.effectiveType === '3g') return 1;
-    return MAX_PREFETCH_REQUESTS;
-  }
-
-  async function prefetchArticle(url: string) {
-    if (!prefetchAbortController) return;
-
-    try {
-      const response = await fetch(url, {
-        signal: prefetchAbortController.signal,
-        credentials: 'same-origin',
-        redirect: 'follow',
-        priority: 'low',
-      } as RequestInit);
-
-      if (!response.ok || !response.body) {
-        inflightUrls.delete(url);
-        prefetchProgress.delete(url);
-        prefetchProgress = prefetchProgress;
-        drainPrefetchQueue();
-        return;
-      }
-
-      // 流式读取计算进度（有 Content-Length 按比例，否则按累计字节估算）
-      const total = Number(response.headers.get('Content-Length')) || 0;
-      const reader = response.body.getReader();
-      let received = 0;
-      const chunks: Uint8Array[] = [];
-
-      const progressMinInterval = 100;
-      let lastProgressAt = 0;
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        if (value) {
-          chunks.push(value);
-          received += value.length;
-          const now = Date.now();
-          // 节流：100ms 内不重复触发 Svelte 重渲染（避免 afterUpdate 风暴）
-          if (now - lastProgressAt >= progressMinInterval) {
-            lastProgressAt = now;
-            const pct = total
-              ? Math.min(100, Math.round((received / total) * 100))
-              : Math.min(99, Math.round(received / 1024));
-            prefetchProgress.set(url, pct);
-            prefetchProgress = prefetchProgress;
-          }
-        }
-      }
-      // 存入 Cache Storage
-      const decoder = new TextDecoder();
-      let html = '';
-      for (const chunk of chunks) html += decoder.decode(chunk, { stream: true });
-      html += decoder.decode();
-      await storeCachedArticle(url, html);
-
-      prefetchProgress.set(url, 100);
-      prefetchProgress = prefetchProgress;
-      updatePanel();
-      // 完成后短暂展示满条，再淡出清除（视觉上"预加载完成"的提示）
-      setTimeout(() => {
-        prefetchProgress.delete(url);
-        prefetchProgress = prefetchProgress;
-        updatePanel();
-      }, 400);
-    } catch {
-      // A failed prefetch must never turn into a visible homepage error.
-      prefetchProgress.delete(url);
-      prefetchProgress = prefetchProgress;
-    } finally {
-      inflightUrls.delete(url);
-      drainPrefetchQueue();
-    }
-  }
-
-  function drainPrefetchQueue() {
-    const limit = Math.max(0, getMaxConcurrentPrefetches() - inflightUrls.size);
-    const urls = Array.from(queuedUrls).slice(0, limit);
-
-    for (const url of urls) {
-      queuedUrls.delete(url);
-      inflightUrls.add(url);
-      void prefetchArticle(url);
-    }
-  }
-
-  function queuePrefetch(link: HTMLAnchorElement) {
-    const url = link.href;
-    if (
-      prefetchedUrls.has(url) ||
-      queuedUrls.has(url) ||
-      inflightUrls.has(url) ||
-      url === window.location.href
-    ) return;
-
-    prefetchedUrls.add(url);
-    queuedUrls.add(url);
-    drainPrefetchQueue();
-  }
-
-  function addPrefetchLink(href: string) {
-    if (prefetchedUrls.has(href)) return;
-    const existing = document.querySelector(`link[rel="prefetch"][href="${href}"]`);
-    if (existing) return;
-    const link = document.createElement('link');
-    link.rel = 'prefetch';
-    link.href = href;
-    link.as = 'document';
-    link.crossOrigin = 'anonymous';
-    document.head.appendChild(link);
-  }
-
-  function scanPrefetchTargets(root: HTMLElement) {
-    if (!prefetchObserver || getConnection()?.saveData) return;
-
-    for (const link of root.querySelectorAll<HTMLAnchorElement>('a[href^="/posts/"]')) {
-      const url = new URL(link.href, window.location.href);
-      if (
-        url.origin !== window.location.origin ||
-        url.pathname === '/posts/' ||
-        prefetchedUrls.has(url.href)
-      ) continue;
-
-      addPrefetchLink(url.href);
-      prefetchObserver.observe(link);
-    }
-  }
-
-  function handlePrefetchEntries(entries: IntersectionObserverEntry[]) {
-    const visible = entries
-      .filter(entry => entry.isIntersecting)
-      .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
-
-    for (const entry of visible) {
-      const link = entry.target;
-      prefetchObserver?.unobserve(link);
-      if (link instanceof HTMLAnchorElement) queuePrefetch(link);
-    }
-  }
-
-  function setupPrefetcher() {
-    if (!feedEl || prefetchObserver) return;
-
-    prefetchAbortController = new AbortController();
-    prefetchObserver = new IntersectionObserver(handlePrefetchEntries, {
-      rootMargin: PREFETCH_ROOT_MARGIN,
-      threshold: 0,
-    });
-    scanPrefetchTargets(feedEl);
-  }
-
-  function teardownPrefetcher() {
-    prefetchObserver?.disconnect();
-    prefetchObserver = null;
-    prefetchAbortController?.abort();
-    prefetchAbortController = null;
-    queuedUrls.clear();
-    inflightUrls.clear();
-    prefetchProgress.clear();
-    prefetchProgress = prefetchProgress;
-  }
 
   const placeholderImg = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="190" height="120"%3E%3C/svg%3E';
 
@@ -273,59 +47,9 @@
 
     window.addEventListener('blog-search', handleGlobalSearch);
 
-    // 点击追踪：判断 HIT/MISS（不阻止导航）
-    // 提到具名变量，cleanup 中一并移除，避免 View Transitions 换页后堆积
-    const handleClickTrack = (e: Event) => {
-      const target = e.target as HTMLElement;
-      const link = target.closest('a[href^="/posts/"]') as HTMLAnchorElement | null;
-      if (!link) return;
-      if ((e as MouseEvent).metaKey || (e as MouseEvent).ctrlKey || (e as MouseEvent).shiftKey || (e as MouseEvent).altKey || (e as MouseEvent).button !== 0) return;
-      const url = link.href;
-      if (/\/posts\/?$/.test(url)) return;
-      const slug = url.split('/').filter(Boolean).pop() || '';
-      markClick(prefetchedUrls.has(url), slug);
-    };
-    document.addEventListener('click', handleClickTrack, true);
-
-    updatePanel();
-
-    if (dataUrl) {
-      isLoadingPosts = posts.length === 0;
-      fetch(dataUrl)
-        .then(res => res.ok ? res.json() : Promise.reject(new Error(`Failed to load ${dataUrl}`)))
-        .then((loadedPosts: SearchablePost[]) => {
-          if (Array.isArray(loadedPosts) && loadedPosts.length > 0) {
-            posts = loadedPosts;
-          }
-        })
-        .catch(err => {
-          loadFailed = true;
-          console.warn('[SearchablePosts] post data unavailable', err);
-        })
-        .finally(() => {
-          isLoadingPosts = false;
-        });
-    }
-
     return () => {
       window.removeEventListener('blog-search', handleGlobalSearch);
-      document.removeEventListener('click', handleClickTrack, true);
-      teardownPrefetcher();
     };
-  });
-
-  // 多个 chunk 在同一帧触发更新时，afterUpdate 只合帧跑一次
-  let rafPending = false;
-  afterUpdate(() => {
-    if (isLoadingPosts || !feedEl) return;
-    setupPrefetcher();
-    if (!rafPending && prefetchObserver) {
-      rafPending = true;
-      requestAnimationFrame(() => {
-        rafPending = false;
-        if (feedEl && prefetchObserver) scanPrefetchTargets(feedEl);
-      });
-    }
   });
 
   $: filteredPosts = posts.filter(post => {
@@ -440,14 +164,10 @@
     </div>
   </div>
 
-  <div bind:this={feedEl} class="flex flex-col gap-4 sm:gap-6 md:gap-8 mt-2 sm:mt-1">
-    {#if isLoadingPosts}
+  <div class="flex flex-col gap-4 sm:gap-6 md:gap-8 mt-2 sm:mt-1">
+    {#if displayedPosts.length === 0}
       <div class="bg-white dark:bg-slate-800 border-4 border-[#0284c7] p-12 shadow-[6px_6px_0px_0px_#0284c7] rounded-sm text-center">
-        <p class="text-[#0284c7] font-black tracking-widest uppercase">文章加载中...</p>
-      </div>
-    {:else if displayedPosts.length === 0}
-      <div class="bg-white dark:bg-slate-800 border-4 border-[#0284c7] p-12 shadow-[6px_6px_0px_0px_#0284c7] rounded-sm text-center">
-        <p class="text-[#0284c7] font-black tracking-widest uppercase">{loadFailed ? '文章数据加载失败' : i18nConfig.search.noResults}</p>
+        <p class="text-[#0284c7] font-black tracking-widest uppercase">{i18nConfig.search.noResults}</p>
       </div>
     {/if}
 
@@ -459,14 +179,6 @@
         animate:flip={{ duration: 400 }}
         transition:fade={{ duration: 250 }}
       >
-        {#if prefetchProgress.has(`/posts/${encodeURIComponent(post.slug)}/`)}
-          <div class="prefetch-bar-container">
-            <div
-              class="prefetch-bar"
-              style="width: {prefetchProgress.get(`/posts/${encodeURIComponent(post.slug)}/`) ?? 0}%"
-            ></div>
-          </div>
-        {/if}
         <div class="bg-white dark:bg-slate-800 border-4 border-[#0284c7] rounded-sm p-0 flex flex-row overflow-hidden shadow-[6px_6px_0px_0px_#0284c7] hover:shadow-[10px_10px_0px_0px_#10b981] hover:-translate-y-1 transition-all duration-300">
           <div class="flex-1 p-3.5 sm:p-5 md:p-6 flex flex-col justify-between min-w-0">
             <a href={`/posts/${encodeURIComponent(post.slug)}/`} class="block group">
@@ -607,25 +319,3 @@
     {/if}
   </div>
 </div>
-
-<style>
-  :global(.prefetch-bar-container) {
-    position: absolute;
-    left: 8px;
-    right: 8px;
-    top: 4px;
-    height: 3px;
-    background: rgba(2, 132, 199, 0.15);
-    border-radius: 999px;
-    overflow: hidden;
-    z-index: 10;
-    pointer-events: none;
-  }
-  :global(.prefetch-bar) {
-    height: 100%;
-    background: linear-gradient(90deg, #34d399, #10b981);
-    border-radius: 999px;
-    transition: width 0.18s ease-out;
-    box-shadow: 0 0 6px rgba(16, 185, 129, 0.7);
-  }
-</style>
