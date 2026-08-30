@@ -1,6 +1,6 @@
 import { getCollection } from 'astro:content';
 import { normalizeEntrySlug, postPath, talkPath } from '../utils/slugify';
-import { beijingWallDate } from '../utils/dateFormat';
+import { calendarDate } from '../utils/dateFormat';
 
 function escapeXml(unsafe: string): string {
   return unsafe.replace(/[<>&'"]/g, (c) => {
@@ -27,11 +27,15 @@ export async function GET(context: any) {
     { loc: `${domain}`, priority: '1.0', changefreq: 'daily' },
     { loc: `${domain}/talks/`, priority: '0.8', changefreq: 'daily' },
     { loc: `${domain}/posts/`, priority: '0.5', changefreq: 'weekly' },
+    { loc: `${domain}/tags/`, priority: '0.5', changefreq: 'weekly' },
+    { loc: `${domain}/about/`, priority: '0.4', changefreq: 'monthly' },
+    { loc: `${domain}/friends/`, priority: '0.3', changefreq: 'monthly' },
+    { loc: `${domain}/privacy/`, priority: '0.2', changefreq: 'yearly' },
   ];
 
   rawPosts.forEach((post: any) => {
     const customSlug = normalizeEntrySlug(post);
-    const lastmod = beijingWallDate(post.data.published || post.data.date) || null;
+    const lastmod = calendarDate(post.data.published) || null;
     urls.push({
       loc: `${domain}${postPath(customSlug)}`,
       priority: '0.8',
@@ -42,7 +46,7 @@ export async function GET(context: any) {
 
   rawTalks.forEach((talk: any) => {
     const customSlug = normalizeEntrySlug(talk);
-    const lastmod = beijingWallDate(talk.data.date) || null;
+    const lastmod = calendarDate(talk.data.published) || null;
     urls.push({
       loc: `${domain}${talkPath(customSlug)}`,
       priority: '0.6',

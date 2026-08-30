@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { TalkItem } from '../utils/postsFetcher';
   import SvelteLightbox from './SvelteLightbox.svelte';
+  import { siteConfig } from '../config/site';
 
   export let talk: TalkItem;
 
@@ -52,10 +53,10 @@
   >
     <!-- Avatar & Meta Header -->
     <div class="flex gap-4 items-center mb-4 select-none">
-      <div class="rounded-sm bg-[#0ea5e9] border-3 border-[#0284c7] shadow-[4px_4px_0px_0px_#0284c7] flex-shrink-0 flex items-center justify-center transform -rotate-3 w-12 h-12 font-black text-white">B</div>
+      <img src={siteConfig.avatar} alt="TSun" class="h-12 w-12 flex-shrink-0 -rotate-3 rounded-sm border-3 border-[#0284c7] bg-[#fde68a] shadow-[4px_4px_0px_0px_#0284c7]" />
       <div>
          <div class="font-black text-[#0284c7] tracking-wide flex items-center gap-2 text-lg">
-            博客
+            {siteConfig.author}
             {#if talk.mood}
               <span class="text-xs ml-1" title="心情">{talk.mood}</span>
             {/if}
@@ -112,13 +113,7 @@
       {/if}
     </div>
 
-    <!-- Share footer -->
-    <div class="mt-8 border-t-2 border-dashed border-[#0284c7]/20 pt-4 flex justify-between items-center pl-0 sm:pl-[64px]">
-       <div class="flex gap-3">
-         <button class="flex items-center gap-1.5 px-3 py-1.5 border-2 border-[#0284c7] bg-white dark:bg-slate-700 text-[#0284c7] text-xs font-black shadow-[2px_2px_0px_0px_#0284c7] hover:bg-[#0284c7] hover:text-white transition-colors cursor-pointer rounded-sm transform active:translate-y-0.5 active:shadow-[0px_0px_0px_0px_#0284c7]">
-           🤍 LIKE
-         </button>
-       </div>
+    <div class="mt-8 flex justify-end border-t-2 border-dashed border-[#0284c7]/20 pt-4 pl-0 sm:pl-[64px]">
        <div class="text-[10px] uppercase font-mono font-bold text-slate-400 dark:text-slate-500 select-none">
           ID: {talk.id}
        </div>

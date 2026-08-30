@@ -1,20 +1,17 @@
 ---
+import { navigation, siteConfig } from '../config/site';
+
 const { pathname } = Astro.url;
-const links = [
-  { href: '/', label: '首页' },
-  { href: '/posts', label: '文章' },
-  { href: '/tags', label: '标签' },
-];
 ---
 
 <nav class="fixed top-0 left-0 right-0 z-[100] bg-white dark:bg-slate-800 border-b-4 border-[#0284c7] px-3 py-2 sm:px-6 sm:py-3 shadow-[0px_4px_0px_0px_rgba(30,58,138,0.1)]" transition:name="navbar" transition:persist>
   <div class="max-w-[1440px] mx-auto flex items-center justify-between gap-3">
-    <a href="/" class="flex items-center gap-2 text-[#0284c7] font-black tracking-widest text-sm sm:text-base">
-      <span class="w-8 h-8 flex items-center justify-center bg-[#fde68a] border-2 border-[#0284c7] shadow-[2px_2px_0px_0px_#0284c7]">B</span>
-      <span>博客</span>
+    <a href="/" class="flex shrink-0 items-center gap-2 text-[#0284c7] font-black tracking-widest text-sm sm:text-base">
+      <img src={siteConfig.avatar} alt="TSun" class="h-8 w-8 border-2 border-[#0284c7] bg-[#fde68a] shadow-[2px_2px_0px_0px_#0284c7]" />
+      <span class="hidden sm:inline">TSun</span>
     </a>
-    <div class="flex items-center gap-1 sm:gap-2">
-      {links.map((link) => (
+    <div class="flex items-center gap-1 overflow-x-auto py-1 sm:gap-2">
+      {navigation.map((link) => (
         <a
           href={link.href}
           class={`px-2.5 py-1.5 border-2 border-[#0284c7] text-xs sm:text-sm font-black rounded-sm transition-colors ${pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href)) ? 'bg-[#0284c7] text-white' : 'text-[#0284c7] bg-[#fde68a] hover:bg-[#0ea5e9] hover:text-white'}`}
@@ -22,6 +19,18 @@ const links = [
           {link.label}
         </a>
       ))}
+      <button id="theme-toggle" type="button" aria-label="切换深浅主题" class="h-8 w-8 shrink-0 border-2 border-[#0284c7] bg-white text-sm font-black text-[#0284c7] shadow-[2px_2px_0px_0px_#0284c7] dark:bg-slate-700 dark:text-[#fde68a]">◐</button>
     </div>
   </div>
 </nav>
+
+<script is:inline>
+  const savedTheme = localStorage.getItem('theme');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.classList.toggle('dark', savedTheme ? savedTheme === 'dark' : prefersDark);
+
+  document.getElementById('theme-toggle')?.addEventListener('click', () => {
+    const enabled = document.documentElement.classList.toggle('dark');
+    localStorage.setItem('theme', enabled ? 'dark' : 'light');
+  });
+</script>

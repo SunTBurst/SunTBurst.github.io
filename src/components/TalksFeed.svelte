@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { siteConfig } from '../config/site';
   import type { TalkItem } from '../utils/postsFetcher';
   import SvelteLightbox from './SvelteLightbox.svelte';
   import { onMount, afterUpdate, tick } from 'svelte';
@@ -180,10 +181,10 @@
       >
         <!-- Avatar & Meta Header -->
         <div class="flex gap-4 items-center mb-4 select-none">
-          <div class="rounded-sm bg-[#0ea5e9] border-3 border-[#0284c7] shadow-[4px_4px_0px_0px_#0284c7] flex-shrink-0 flex items-center justify-center transform -rotate-3 w-10 h-10 font-black text-white">B</div>
+          <img src={siteConfig.avatar} alt="TSun" class="h-10 w-10 flex-shrink-0 -rotate-3 rounded-sm border-3 border-[#0284c7] bg-[#fde68a] shadow-[4px_4px_0px_0px_#0284c7]" />
           <div>
              <div class="font-black text-[#0284c7] tracking-wide flex items-center gap-2 text-sm leading-none">
-                博客
+                {siteConfig.author}
                 {#if talk.mood}
                   <span class="text-xs ml-1" title="心情">{talk.mood}</span>
                 {/if}

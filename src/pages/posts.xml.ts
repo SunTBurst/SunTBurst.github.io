@@ -37,7 +37,7 @@ export async function GET(context: APIContext) {
       const permalink = `${siteUrl}/posts/${slug}/`;
       return {
         title: post.data.title,
-        pubDate: post.data.published || post.data.date,
+        pubDate: post.data.published,
         description: desc,
         link: permalink,
         guid: permalink,

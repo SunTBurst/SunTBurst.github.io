@@ -40,7 +40,7 @@ export async function GET(context: APIContext) {
       const permalink = `${siteUrl}/posts/${slug}/`;
       return {
         title: post.data.title,
-        pubDate: post.data.published || post.data.date,
+        pubDate: post.data.published,
         description: desc,
         link: permalink,
         guid: permalink,
@@ -56,8 +56,8 @@ export async function GET(context: APIContext) {
       const slug = (talk.data.slug || talk.slug || talk.id || '').trim();
       const permalink = `${siteUrl}/talk/${slug}/`;
       return {
-        title: `「说说」${talk.data.title}`,
-        pubDate: talk.data.date,
+        title: `「说说」${talk.data.title || '随手记'}`,
+        pubDate: talk.data.published,
         description: body.substring(0, 200).replace(/[#*`_\[\]()\-]/g, '').trim() || '',
         link: permalink,
         guid: permalink,

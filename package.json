@@ -7,10 +7,14 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
+    "test": "node --test --test-concurrency=1 tests/*.test.mjs",
+    "test:content": "node --test tests/content-schema.test.mjs",
+    "test:build": "node --test tests/production-build.test.mjs",
     "lint": "tsc --noEmit"
   },
   "dependencies": {
     "@astrojs/mdx": "^6.0.2",
+    "@astrojs/react": "^6.0.4",
     "@astrojs/rss": "^4.0.18",
     "@astrojs/svelte": "^8.1.2",
     "@tailwindcss/typography": "^0.5.19",
@@ -18,19 +22,21 @@
     "astro": "^6.4.2",
     "katex": "^0.17.0",
     "markdown-it": "^14.1.0",
+    "motion": "^13.1.1",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "react-type-animation": "^3.2.0",
     "rehype-katex": "^7.0.1",
     "remark-gfm": "^4.0.1",
     "remark-math": "^6.0.0",
     "sanitize-html": "^2.13.0",
-    "svelte": "^5.56.2",
-    "vite": "^6.2.3"
+    "svelte": "^5.56.2"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",
-    "autoprefixer": "^10.4.21",
-    "esbuild": "^0.25.0",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.5",
     "tailwindcss": "^4.1.14",
-    "tsx": "^4.21.0",
     "typescript": "~5.8.2"
   }
 }

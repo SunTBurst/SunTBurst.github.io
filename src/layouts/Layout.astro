@@ -1,7 +1,9 @@
 ---
 import { ClientRouter } from 'astro:transitions';
 import NavBar from '../components/NavBar.astro';
+import { PageBanner } from '../components/PageBanner';
 import PrefetchLinks from '../components/PrefetchLinks.svelte';
+import { siteConfig } from '../config/site';
 import '../index.css';
 
 interface Props {
@@ -13,18 +15,27 @@ interface Props {
   post?: { title: string; date: string; dateISO?: string; keywords?: string[] } | null;
   keywords?: string[] | null;
   isArticle?: boolean;
+  isTalk?: boolean;
+  postsCount?: number;
   hideFooter?: boolean;
 }
 
 const {
-  title = '博客',
-  description = '个人博客',
+  title = siteConfig.title,
+  description = siteConfig.subtitle,
   image,
+  categoryName = null,
+  tagName = null,
   keywords = [],
   post = null,
   isArticle = false,
+  postsCount = 0,
   hideFooter = false,
 } = Astro.props;
+
+const documentTitle = title === siteConfig.title ? title : `${title} | ${siteConfig.title}`;
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site ?? siteConfig.url);
+const socialImage = image ? new URL(image, Astro.site ?? siteConfig.url) : new URL(siteConfig.avatar, Astro.site ?? siteConfig.url);
 ---
 
 <!doctype html>
@@ -34,11 +45,13 @@ const {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
     {keywords.length > 0 && <meta name="keywords" content={keywords.join(', ')} />}
-    <meta property="og:title" content={title} />
+    <meta property="og:title" content={documentTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content={post ? 'article' : 'website'} />
-    {image && <meta property="og:image" content={image} />}
-    <title>{title}</title>
+    <meta property="og:image" content={socialImage} />
+    <link rel="canonical" href={canonicalUrl} />
+    <link rel="icon" href={siteConfig.avatar} type="image/svg+xml" />
+    <title>{documentTitle}</title>
     <ClientRouter />
   </head>
   <body class="bg-[#f8fafc] text-slate-800 dark:bg-slate-900 dark:text-slate-100">
@@ -46,12 +59,22 @@ const {
     <div class={`flex min-h-screen flex-col pt-16 ${isArticle ? 'article-paper-shell' : ''}`}>
       <main id="main-content" class="flex-1 px-2 py-3 sm:px-6 sm:py-6 md:px-8 md:py-8">
         <div class="mx-auto w-full max-w-[1440px]">
+          <div class="mb-5 sm:mb-8">
+            <PageBanner
+              pathname={Astro.url.pathname}
+              categoryName={categoryName}
+              tagName={tagName}
+              postsCount={postsCount}
+              post={post}
+              client:visible
+            />
+          </div>
           <slot />
         </div>
       </main>
       {!hideFooter && (
         <footer class="border-t-4 border-[#0284c7] bg-white px-4 py-5 text-center text-xs font-bold text-slate-500 dark:bg-slate-800 dark:text-slate-300">
-          博客
+          © {new Date().getFullYear()} TSun · 内容来自本地 Markdown
         </footer>
       )}
     </div>

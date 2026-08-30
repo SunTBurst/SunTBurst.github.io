@@ -143,8 +143,9 @@ export async function getProcessedTalks(): Promise<TalkItem[]> {
     }
     
     let parsedDate = '未知时间';
-    if (data.date) {
-      const d = new Date(data.date);
+    const rawDate = data.published || data.date;
+    if (rawDate) {
+      const d = new Date(rawDate);
       if (!isNaN(d.getTime())) {
         const year = d.getFullYear();
         const month = String(d.getMonth() + 1).padStart(2, '0');
@@ -173,7 +174,7 @@ export async function getProcessedTalks(): Promise<TalkItem[]> {
     return {
       id: talk.id || customSlug,
       slug: customSlug,
-      title: data.title || '日常动态',
+      title: data.title?.trim() || '随手记',
       date: parsedDate,
       content: talk.body || '',
       tags,

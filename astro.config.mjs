@@ -1,5 +1,6 @@
 import { defineConfig } from 'astro/config';
 import svelte from '@astrojs/svelte';
+import react from '@astrojs/react';
 import mdx from '@astrojs/mdx';
 import tailwindcss from '@tailwindcss/vite';
 import remarkMath from 'remark-math';
@@ -10,13 +11,14 @@ import { rehypeShiftHeadings } from './src/plugins/rehype-shift-headings.mjs';
 
 // https://astro.build/config
 export default defineConfig({
+  site: process.env.PUBLIC_SITE_URL || 'https://example.github.io',
   output: 'static',
   outDir: 'dist',
   build: {
     inlineStylesheets: 'never',
     compressHTML: true,
   },
-  integrations: [svelte(), mdx()],
+  integrations: [svelte(), react(), mdx()],
   markdown: {
     remarkPlugins: [remarkGfm, remarkMath, remarkAdmonitions],
     rehypePlugins: [rehypeKatex, rehypeShiftHeadings],

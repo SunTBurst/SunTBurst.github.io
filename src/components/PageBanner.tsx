@@ -118,7 +118,7 @@ export function PageBanner({
           </div>
           <SecondaryHeading className="text-xs md:text-lg font-bold text-slate-700 dark:text-slate-200 font-mono h-8 md:h-11 flex items-center justify-center md:justify-end -rotate-1 max-w-[70vw] md:max-w-[450px]">
             <TypeAnimation
-              sequence={infoConfig.banner.talkTicker.sequence}
+              sequence={[...infoConfig.banner.talkTicker.sequence]}
               wrapper="span"
               cursor={true}
               repeat={Infinity}
@@ -168,11 +168,11 @@ export function PageBanner({
           <a href="/" className="hover:opacity-90 active:scale-98 transition-all inline-block">
             {isHome ? (
               <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-[#0284c7] mb-1.5 sm:mb-3 md:mb-5 tracking-widest transform -rotate-1 inline-block">
-                {infoConfig.banner.title}'s blog
+                {infoConfig.banner.title}
               </h1>
             ) : (
               <p className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-[#0284c7] mb-1.5 sm:mb-3 md:mb-5 tracking-widest transform -rotate-1 inline-block">
-                {infoConfig.banner.title}'s blog
+                {infoConfig.banner.title}
               </p>
             )}
           </a>
@@ -182,7 +182,7 @@ export function PageBanner({
             }`}
           >
             <TypeAnimation
-              sequence={infoConfig.subtitle.sequence}
+              sequence={[...infoConfig.subtitle.sequence]}
               wrapper="span"
               cursor={true}
               repeat={Infinity}

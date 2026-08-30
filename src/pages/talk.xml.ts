@@ -27,8 +27,8 @@ export async function GET(context: APIContext) {
       const slug = (talk.data.slug || talk.slug || talk.id || '').trim();
       const permalink = `${siteUrl}/talk/${slug}/`;
       return {
-        title: talk.data.title,
-        pubDate: talk.data.date,
+        title: talk.data.title || '随手记',
+        pubDate: talk.data.published,
         description: body
           .replace(/!\[.*?\]\(.*?\)/g, '')
           .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
