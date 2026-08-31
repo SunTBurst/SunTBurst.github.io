@@ -1,0 +1,75 @@
+---
+---
+
+<script>
+  import {
+    type StorageLike,
+    type StoredPortalItem,
+    FOOTPRINTS_STORAGE_KEY,
+    HISTORY_ENABLED_KEY,
+    readStoredItems,
+    upsertStoredItem,
+    writeStoredItems,
+  } from '../utils/browserStorage';
+
+  type FootprintRecordInput = {
+    href: string;
+    title: string;
+    kind: string;
+    savedAt: number;
+  };
+
+  function inferKind(pathname: string): StoredPortalItem['kind'] {
+    if (pathname.startsWith('/posts/')) return 'post';
+    if (pathname.startsWith('/talks/')) return 'talk';
+    if (pathname.startsWith('/knowledge/')) return 'knowledge';
+    if (pathname.startsWith('/projects/')) return 'project';
+    if (pathname.startsWith('/changelog')) return 'update';
+    if (pathname === '/posts' || pathname === '/talks') return 'page';
+    return 'page';
+  }
+
+  function isSafeLocalPath(href: string): href is `/${string}` {
+    if (!href.startsWith('/')) return false;
+    if (href.startsWith('//')) return false;
+    if (href.includes('?') || href.includes('#')) return false;
+    return true;
+  }
+
+  function recordFootprint(storage: StorageLike) {
+    try {
+      if (storage.getItem(HISTORY_ENABLED_KEY) !== '1') return;
+    } catch {
+      return;
+    }
+
+    const pathname = window.location.pathname;
+    if (!isSafeLocalPath(pathname)) return;
+
+    const payload: FootprintRecordInput = {
+      href: pathname,
+      title: document.title || pathname,
+      kind: inferKind(pathname),
+      savedAt: Date.now(),
+    };
+
+    const current = readStoredItems(storage, FOOTPRINTS_STORAGE_KEY);
+    const next = upsertStoredItem(current, payload);
+    writeStoredItems(storage, FOOTPRINTS_STORAGE_KEY, next);
+  }
+
+  function attachRecord(storage: StorageLike) {
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+      requestAnimationFrame(() => recordFootprint(storage));
+      return;
+    }
+    window.addEventListener('DOMContentLoaded', () => requestAnimationFrame(() => recordFootprint(storage)), { once: true });
+  }
+
+  if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+    try {
+      const storage = window.localStorage as StorageLike;
+      attachRecord(storage);
+    } catch {}
+  }
+</script>

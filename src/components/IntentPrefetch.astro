@@ -1,0 +1,69 @@
+---
+---
+
+<script>
+  const skippedPrefixes = ['/knowledge-app', '/login'];
+  const prefetched = new Set<string>();
+  const excludedConnectionTypes = new Set(['2g', 'slow-2g']);
+
+  function isEligible(target: HTMLAnchorElement): string | null {
+    const href = target.getAttribute('href');
+    if (!href) return null;
+    if (target.target && target.target.toLowerCase() !== '_self' && target.target !== '') return null;
+
+    let url: URL;
+    try {
+      url = new URL(href, window.location.href);
+    } catch {
+      return null;
+    }
+
+    if (url.origin !== window.location.origin) return null;
+    if (!url.pathname.startsWith('/')) return null;
+    if (url.pathname.startsWith('//')) return null;
+    if (url.pathname === window.location.pathname) return null;
+    if (skippedPrefixes.some((prefix) => url.pathname.startsWith(prefix))) return null;
+    if (url.search || url.hash) return null;
+    if (prefetched.has(url.pathname)) return null;
+
+    const connection = navigator.connection;
+    if (connection?.saveData === true) return null;
+    if (connection?.effectiveType && excludedConnectionTypes.has(connection.effectiveType)) return null;
+
+    return url.pathname;
+  }
+
+  function addPrefetch(pathname: string) {
+    if (prefetched.has(pathname)) return;
+    const link = document.createElement('link');
+    link.rel = 'prefetch';
+    link.href = pathname;
+    link.as = 'document';
+    document.head.appendChild(link);
+    prefetched.add(pathname);
+  }
+
+  function onIntent(event: Event) {
+    if (event.defaultPrevented) return;
+    const source = event.target;
+    if (!(source instanceof Element)) return;
+    const anchor = source.closest('a[href]');
+    if (!(anchor instanceof HTMLAnchorElement)) return;
+    const pathname = isEligible(anchor);
+    if (!pathname) return;
+    addPrefetch(pathname);
+  }
+
+  function install() {
+    document.body?.addEventListener('mouseover', onIntent, { capture: true });
+    document.body?.addEventListener('focusin', onIntent, { capture: true });
+  }
+
+  if (typeof document !== 'undefined' && typeof window !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', install, { once: true });
+    } else {
+      install();
+    }
+  }
+</script>

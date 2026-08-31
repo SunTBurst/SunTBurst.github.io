@@ -1,7 +1,11 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import FavoritesManager from '../components/FavoritesManager.svelte';
+import { buildPortalIndex } from '../utils/portalIndex';
+
+const entries = await buildPortalIndex();
 ---
 
-<Layout title="收藏与足迹" description="当前浏览器内的本地收藏边界">
-  <section class="mx-auto max-w-3xl border-4 border-[#0284c7] bg-white p-5 shadow-[7px_7px_0_0_#0284c7] dark:bg-slate-800 sm:p-8"><h1 class="text-3xl font-black text-[#075985] dark:text-[#bae6fd]">收藏与阅读足迹</h1><p class="mt-4 font-bold leading-7">收藏功能将在 Task 7 写入当前浏览器本地存储；本页现在不会上传数据，也不声称已经保存任何内容。</p><p class="mt-3 font-bold leading-7">共享设备上的本地记录需要由使用者主动清除，不保存文章正文。</p><a class="mt-5 flex min-h-[44px] items-center font-black underline" href="/start">返回探索入口</a></section>
+<Layout title="收藏与足迹" description="当前浏览器本地收藏与阅读足迹边界">
+  <FavoritesManager entries={entries} client:load />
 </Layout>

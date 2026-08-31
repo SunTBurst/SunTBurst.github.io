@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import type { PortalIndexEntry } from '../types/portal';
+  import BookmarkButton from './BookmarkButton.svelte';
   import { tryFocusPortalSearch } from '../utils/portalToolActivation';
   import { normalizeSearchText } from '../utils/portalIndexCore';
   import { decideUnifiedSearchKey, resolveSearchActiveIndex } from '../utils/unifiedSearchCore';
@@ -88,6 +89,7 @@
             class="flex min-h-[44px] min-w-0 max-w-full items-center break-all px-2 font-black text-[#075985] underline decoration-2 underline-offset-4 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#0ea5e9]/40 dark:text-[#bae6fd]"
           >{result.title}</a>
           <p class="mt-1 break-words text-sm font-bold leading-6 text-slate-600 dark:text-slate-300">{result.description}</p>
+          <BookmarkButton entry={result} />
         </li>
       {/each}
     </ul>
