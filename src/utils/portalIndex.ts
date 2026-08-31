@@ -25,6 +25,7 @@ const staticPages: PortalIndexEntry[] = [
   ['lab', '实验室', '查看可控的小工具和实验', '/lab'],
   ['favorites', '收藏与足迹', '了解当前浏览器内的本地收藏边界', '/favorites'],
   ['weather', '利雅得天气', '主动读取利雅得实时天气', '/weather'],
+  ['random-image', '随机画片', '从本站自有的授权画片中随机探索', '/random-image'],
   ['ai', 'AI 导览', '了解公开 AI 导览的启用条件和当前替代入口', '/ai'],
   ['music', '音乐', '了解自有音乐配置和当前静态状态', '/music'],
   ['stats', '访问统计', '了解统计的同意边界和当前静态状态', '/stats'],

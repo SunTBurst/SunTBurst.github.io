@@ -71,7 +71,7 @@ test('production build emits the local SunTBurst portal with one consent-based w
   assert.doesNotMatch(builtOutput, /\bTSun\b/, 'expected SunTBurst to remain the only current public product identity');
   assert.doesNotMatch(
     builtOutput,
-    /upxuu|waline|umami|clarity|blogapi|randomImage|weatherApi|serverURL|vercel|cloudflare/i,
+    /upxuu|waline|umami|clarity|blogapi|randomImageApi|weatherApi|serverURL|vercel|cloudflare/i,
     'expected built pages to contain no upstream or external-service identity',
   );
 

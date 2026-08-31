@@ -32,6 +32,7 @@ const fixedRoutes = [
   '/lab',
   '/favorites',
   '/weather',
+  '/random-image',
   '/ai',
   '/music',
   '/stats',
@@ -90,7 +91,7 @@ test('production build emits every fixed and indexed public HTML route with hone
   const readyLabHrefs = Array.from(labHtml.matchAll(/<a\b(?=[^>]*data-lab-tool="ready")(?=[^>]*href="([^"]+)")[^>]*>/g), (match) => match[1]);
   assert.deepEqual(
     readyLabHrefs,
-    ['/search', '/explore', '/favorites', '/calendar', '/timeline', '/rss.xml', '/weather'],
+    ['/search', '/explore', '/favorites', '/calendar', '/timeline', '/rss.xml', '/weather', '/random-image'],
     'expected the lab to explain every tool counted as available on the homepage',
   );
 
@@ -99,6 +100,15 @@ test('production build emits every fixed and indexed public HTML route with hone
   assert.match(weatherHtml, /点击后才会向 Open-Meteo 发送请求/, 'expected an explicit external-request disclosure');
   assert.match(weatherHtml, /查看利雅得实时天气/, 'expected an explicit activation control');
   assert.doesNotMatch(weatherHtml, /api\.open-meteo\.com/, 'expected the static page not to embed or preload the weather endpoint');
+
+  const randomImageHtml = readRoute('/random-image');
+  assert.match(randomImageHtml, /data-random-image-panel/, 'expected the licensed random-image tool');
+  assert.equal((randomImageHtml.match(/data-curated-image=/g) ?? []).length, 1, 'expected one dimensioned image to load at a time');
+  assert.match(randomImageHtml, /width="1200"/);
+  assert.match(randomImageHtml, /height="800"/);
+  assert.match(randomImageHtml, /换一张/);
+  assert.match(randomImageHtml, /本站自有使用权/);
+  assert.doesNotMatch(randomImageHtml, /https?:\/\/(?:picsum|images\.unsplash|source\.unsplash)/i, 'expected no unknown image hotlink');
   const previewLabHrefs = Array.from(labHtml.matchAll(/<a\b(?=[^>]*data-lab-tool="preview")(?=[^>]*href="([^"]+)")[^>]*>/g), (match) => match[1]);
   assert.deepEqual(
     previewLabHrefs,

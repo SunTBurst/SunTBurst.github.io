@@ -1,0 +1,25 @@
+---
+import Layout from '../layouts/Layout.astro';
+import RandomImagePanel from '../components/RandomImagePanel.svelte';
+import rawImages from '../data/media/random-images.json';
+import { parseCuratedImages } from '../utils/randomImages';
+
+const images = parseCuratedImages(rawImages);
+---
+
+<Layout title="随机画片" description="从本站自有的授权画片中随机探索" hidePageBanner>
+  <div class="mx-auto grid max-w-5xl gap-6">
+    <RandomImagePanel images={images} client:load />
+
+    <section class="grid gap-4 sm:grid-cols-2">
+      <div class="border-3 border-emerald-700 bg-emerald-50 p-5 dark:bg-emerald-950/30">
+        <h2 class="text-xl font-black text-emerald-900 dark:text-emerald-100">为什么使用本地精选</h2>
+        <p class="mt-2 font-bold leading-7 text-slate-700 dark:text-slate-200">随机不等于来源不明。本地精选可以稳定控制加载速度、替代文本、尺寸和使用权，也不会在访客不知情时连接图片热链。</p>
+      </div>
+      <div class="border-3 border-slate-600 bg-slate-100 p-5 dark:bg-slate-800">
+        <h2 class="text-xl font-black text-slate-900 dark:text-slate-100">当前画片池</h2>
+        <p class="mt-2 font-bold leading-7 text-slate-700 dark:text-slate-200">当前收录 {images.length} 张 1200×800 的原创画片，主题连接沙漠、知识地图与探索星空。后续新增素材也必须先补齐来源与授权清单。</p>
+      </div>
+    </section>
+  </div>
+</Layout>

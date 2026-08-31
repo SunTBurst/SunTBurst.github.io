@@ -1,0 +1,32 @@
+[
+  {
+    "id": "desert-path",
+    "src": "/images/random/desert-path.jpg",
+    "width": 1200,
+    "height": 800,
+    "alt": "晨光下的沙漠小路通向远方城市剪影",
+    "license": "本站自有使用权（AI 生成素材）",
+    "credit": "SunTBurst × OpenAI 图像生成",
+    "sourceUrl": "/changelog#2026-08-31-random-images-live"
+  },
+  {
+    "id": "knowledge-map",
+    "src": "/images/random/knowledge-map.jpg",
+    "width": 1200,
+    "height": 800,
+    "alt": "书架、道路与星空连接成一张蓝金色知识地图",
+    "license": "本站自有使用权（AI 生成素材）",
+    "credit": "SunTBurst × OpenAI 图像生成",
+    "sourceUrl": "/changelog#2026-08-31-random-images-live"
+  },
+  {
+    "id": "night-constellation",
+    "src": "/images/random/night-constellation.jpg",
+    "width": 1200,
+    "height": 800,
+    "alt": "夜色沙漠中的观测台、灯光小径与知识星座",
+    "license": "本站自有使用权（AI 生成素材）",
+    "credit": "SunTBurst × OpenAI 图像生成",
+    "sourceUrl": "/changelog#2026-08-31-random-images-live"
+  }
+]
