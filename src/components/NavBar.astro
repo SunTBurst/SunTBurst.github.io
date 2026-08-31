@@ -5,7 +5,7 @@ import { isNavigationActive, navigationGroups } from '../config/navigation';
 import { siteConfig } from '../config/site';
 
 const { pathname } = Astro.url;
-const linkClass = (active: boolean) => `flex min-h-[44px] items-center border-2 border-[#0284c7] px-3 text-sm font-black shadow-[2px_2px_0_0_#0284c7] transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#0ea5e9]/40 motion-reduce:transition-none ${active ? 'bg-[#0284c7] text-white' : 'bg-[#fde68a] text-[#075985] hover:-translate-y-0.5 hover:bg-[#0ea5e9] hover:text-white motion-reduce:hover:translate-y-0'}`;
+const linkClass = (active: boolean) => `flex min-h-[44px] items-center border-2 border-[#0284c7] px-3 text-sm font-black shadow-[2px_2px_0_0_#0284c7] transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#0ea5e9]/40 motion-reduce:transition-none ${active ? 'bg-[#0369a1] text-white' : 'bg-[#fde68a] text-[#075985] hover:-translate-y-0.5 hover:bg-[#0369a1] hover:text-white motion-reduce:hover:translate-y-0'}`;
 ---
 
 <header data-portal-shell class="fixed inset-x-0 top-0 z-[100] border-b-4 border-[#0284c7] bg-white px-2 py-2 shadow-[0_4px_0_0_rgba(30,58,138,0.12)] dark:bg-slate-900 sm:px-4">

@@ -62,7 +62,7 @@
 </script>
 
 <section data-share-menu class="rounded-sm border-4 border-[#0284c7] bg-white px-4 py-3 dark:bg-slate-800">
-  <h2 class="text-sm font-black text-[#0284c7]">分享本页</h2>
+  <h2 class="text-sm font-black text-[#075985]">分享本页</h2>
   <div class="mt-3 flex flex-wrap gap-2">
     <button
       type="button"
@@ -76,7 +76,7 @@
       href={buildXShareHref()}
       rel="noreferrer noopener"
       target="_blank"
-      class="min-h-[44px] border-2 border-[#0284c7] bg-white px-3 py-1 font-black text-[#075985] transition hover:-translate-y-0.5 hover:bg-[#0ea5e9] hover:text-white motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+      class="inline-flex min-h-[44px] items-center border-2 border-[#0284c7] bg-white px-3 py-1 font-black text-[#075985] transition hover:-translate-y-0.5 hover:bg-[#0369a1] hover:text-white focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#0ea5e9]/40 motion-reduce:transition-none motion-reduce:hover:translate-y-0"
     >
       分享到 X
     </a>
@@ -84,7 +84,7 @@
       href={buildTelegramShareHref()}
       rel="noreferrer noopener"
       target="_blank"
-      class="min-h-[44px] border-2 border-[#0284c7] bg-white px-3 py-1 font-black text-[#075985] transition hover:-translate-y-0.5 hover:bg-[#16a34a] hover:text-white motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+      class="inline-flex min-h-[44px] items-center border-2 border-[#0284c7] bg-white px-3 py-1 font-black text-[#075985] transition hover:-translate-y-0.5 hover:bg-[#166534] hover:text-white focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#0ea5e9]/40 motion-reduce:transition-none motion-reduce:hover:translate-y-0"
     >
       分享到 Telegram
     </a>

@@ -83,7 +83,7 @@ const relatedPosts = (() => {
         <article class="article-paper bg-[#efe1bf] dark:bg-slate-800 border-4 border-[#0284c7] p-4 sm:p-6 md:p-10 shadow-[6px_6px_0px_0px_#0284c7] sm:shadow-[8px_8px_0px_0px_#0284c7] rounded-sm animate-card-entrance opacity-0">
           <div class="border-b-4 border-[#0284c7] pb-6 mb-8 text-center md:text-left flex flex-col md:flex-row justify-between items-center gap-4">
             <div>
-              <h1 class="text-xl sm:text-2xl md:text-3xl font-black text-[#0284c7] mb-4 leading-tight">{post.title}</h1>
+              <h1 class="text-xl sm:text-2xl md:text-3xl font-black text-[#075985] mb-4 leading-tight">{post.title}</h1>
               <div class="flex flex-wrap items-center gap-3.5 justify-center md:justify-start">
                 <span class="text-slate-500 dark:text-slate-400 font-extrabold font-mono text-sm">{post.date}</span>
                 <span class="text-slate-500 dark:text-slate-400 font-extrabold font-mono text-sm">/ {i18nConfig.post.readingTime} {readTime} {i18nConfig.post.readingTimeUnit}</span>
@@ -91,7 +91,8 @@ const relatedPosts = (() => {
                 {post.category && (
                   <a 
                     href={`/category/${post.category}`} 
-                    class="bg-[#fde68a] border-2 border-[#0284c7] px-2.5 py-0.5 shadow-[2px_2px_0px_0px_#0284c7] text-center font-bold text-[#0284c7] text-xs hover:bg-[#0284c7] hover:text-white transition-colors"
+                    data-post-taxonomy
+                    class="inline-flex min-h-[44px] items-center bg-[#fde68a] border-2 border-[#0284c7] px-2.5 py-0.5 shadow-[2px_2px_0px_0px_#0284c7] text-center font-bold text-[#075985] text-xs hover:bg-[#0369a1] hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#0ea5e9]/40"
                   >
                     {post.category}
                   </a>
@@ -102,7 +103,8 @@ const relatedPosts = (() => {
                     {post.tags.map(tag => (
                       <a 
                         href={`/tag/${tag}`} 
-                        class="text-xs font-bold bg-white border-2 border-[#0284c7] text-slate-600 px-2.5 py-0.5 shadow-[2px_2px_0px_0px_#0284c7] hover:bg-[#0284c7] hover:text-white transition-colors"
+                        data-post-taxonomy
+                        class="inline-flex min-h-[44px] items-center text-xs font-bold bg-white border-2 border-[#0284c7] text-slate-700 px-2.5 py-0.5 shadow-[2px_2px_0px_0px_#0284c7] hover:bg-[#0369a1] hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#0ea5e9]/40"
                       >
                         #{tag}
                       </a>
@@ -133,11 +135,11 @@ const relatedPosts = (() => {
           
           <div class="relative z-10 space-y-4">
             <div class="flex items-start justify-between gap-3">
-              <h3 class="text-base sm:text-lg font-black text-[#0284c7] leading-snug min-w-0">{post.title}</h3>
+              <h3 class="text-base sm:text-lg font-black text-[#075985] leading-snug min-w-0">{post.title}</h3>
             </div>
             
-            <div class="inline-block bg-[#e0f2fe]/80 border-2 border-[#0ea5e9]/20 px-3 py-1 rounded-sm text-xs font-bold text-[#0284c7] hover:text-[#0ea5e9] hover:bg-[#e0f2fe] transition-all break-all select-all">
-              <a href={Astro.url.href} target="_blank" rel="noopener noreferrer">
+            <div class="inline-block bg-[#e0f2fe]/80 border-2 border-[#0ea5e9]/20 px-3 rounded-sm text-xs font-bold hover:bg-[#e0f2fe] transition-all break-all select-all">
+              <a href={Astro.url.href} target="_blank" rel="noopener noreferrer" data-post-canonical class="inline-flex min-h-[44px] items-center text-[#075985] underline decoration-2 underline-offset-4 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#0ea5e9]/40">
                 {Astro.url.href}
               </a>
             </div>
@@ -154,7 +156,7 @@ const relatedPosts = (() => {
               <div>
                 <div class="text-slate-400 font-bold mb-1 uppercase tracking-wider">{i18nConfig.post.licenseTitle}</div>
                 <div>
-                  <a href={contentConfig.license.url} class="font-bold text-[#0ea5e9] hover:underline hover:text-[#0284c7] transition-all">
+                  <a href={contentConfig.license.url} data-post-license class="inline-flex min-h-[44px] items-center font-bold text-[#075985] underline decoration-2 underline-offset-4 transition-all focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#0ea5e9]/40">
                     {contentConfig.license.name}
                   </a>
                 </div>
