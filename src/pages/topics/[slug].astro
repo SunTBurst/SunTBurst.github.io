@@ -3,6 +3,7 @@ import Layout from '../../layouts/Layout.astro';
 import { portalConfig } from '../../config/portal';
 import { buildPortalIndex } from '../../utils/portalIndex';
 import { matchesPortalTopic } from '../../utils/portalIndexCore';
+import { portalKindLabel, topicStatusLabel } from '../../utils/portalLabels';
 
 export function getStaticPaths() {
   return portalConfig.topics.map((topic) => ({ params: { slug: topic.slug }, props: { topic } }));
@@ -12,5 +13,5 @@ const entries = (await buildPortalIndex()).filter((entry) => entry.href !== `/to
 ---
 
 <Layout title={topic.title} description={topic.description} postsCount={entries.length}>
-  <section class="mx-auto max-w-4xl border-4 border-[#059669] bg-[#ecfdf5] p-5 shadow-[7px_7px_0_0_#059669] dark:bg-emerald-950/40 sm:p-8"><h1 class="text-3xl font-black text-emerald-900 dark:text-emerald-100">{topic.title}</h1><p class="mt-3 font-bold leading-7">{topic.description}</p>{entries.length === 0 ? <p class="mt-5 border-2 border-dashed border-emerald-700 p-4 font-bold">该主题目前只有配置框架，尚无匹配的已发布内容。</p> : <ul class="mt-5 grid gap-3">{entries.map((entry) => <li class="min-w-0 border-2 border-emerald-700 bg-white p-3 dark:bg-slate-800"><p class="text-xs font-black">{entry.kind} · {entry.updatedAt.slice(0, 10)}</p><a class="flex min-h-[44px] min-w-0 items-center break-all font-black text-emerald-900 underline dark:text-emerald-100" href={entry.href}>{entry.title}</a><p class="font-bold leading-6">{entry.description}</p></li>)}</ul>}</section>
+  <section class="mx-auto max-w-4xl border-4 border-[#059669] bg-[#ecfdf5] p-5 shadow-[7px_7px_0_0_#059669] dark:bg-emerald-950/40 sm:p-8"><h1 class="text-3xl font-black text-emerald-900 dark:text-emerald-100">{topic.title}</h1><p class="mt-3 font-bold leading-7">{topic.description}</p><p data-topic-status={topic.status} class="mt-2 text-xs font-black text-emerald-700 dark:text-emerald-300">{topicStatusLabel(topic.status)}</p>{entries.length === 0 ? <p class="mt-5 border-2 border-dashed border-emerald-700 p-4 font-bold">该主题目前只有配置框架，尚无匹配的已发布内容。</p> : <ul class="mt-5 grid gap-3">{entries.map((entry) => <li class="min-w-0 border-2 border-emerald-700 bg-white p-3 dark:bg-slate-800"><p class="text-xs font-black">{portalKindLabel(entry.kind)} · {entry.updatedAt.slice(0, 10)}</p><a class="flex min-h-[44px] min-w-0 items-center break-all font-black text-emerald-900 underline dark:text-emerald-100" href={entry.href}>{entry.title}</a><p class="font-bold leading-6">{entry.description}</p></li>)}</ul>}</section>
 </Layout>

@@ -13,5 +13,12 @@ export function validatePortalConfig(config: PortalConfig): string[] {
     ) errors.push(`invalid local path: ${link.title}`);
     if (link.href === link.nextHref) errors.push(`path must continue to a second page: ${link.title}`);
   }
+  if (config.journeys.length < 3) errors.push('at least three visitor journeys are required');
+  for (const journey of config.journeys) {
+    if (journey.stops.length < 3) errors.push(`journey must have at least three stops: ${journey.title}`);
+    for (const stop of journey.stops) {
+      if (!stop.href.startsWith('/') || stop.href.startsWith('//')) errors.push(`invalid journey stop: ${journey.title}`);
+    }
+  }
   return errors;
 }

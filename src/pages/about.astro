@@ -3,12 +3,28 @@ import MarkdownIt from 'markdown-it';
 import sanitizeHtml from 'sanitize-html';
 import aboutSource from '../config/about.md?raw';
 import Layout from '../layouts/Layout.astro';
+import { portalConfig } from '../config/portal';
 
 const html = sanitizeHtml(new MarkdownIt({ html: false, linkify: false }).render(aboutSource));
 ---
 
 <Layout title="关于" description="关于 SunTBurst 个人门户">
-  <article class="article-paper prose prose-lg mx-auto max-w-3xl border-4 border-[#0284c7] bg-white p-6 shadow-[8px_8px_0_0_#0284c7] dark:bg-slate-800 sm:p-10">
-    <Fragment set:html={html} />
-  </article>
+  <div class="mx-auto grid max-w-5xl gap-6">
+    <article class="article-paper prose prose-lg max-w-none border-4 border-[#0284c7] bg-white p-6 shadow-[8px_8px_0_0_#0284c7] dark:bg-slate-800 sm:p-10">
+      <Fragment set:html={html} />
+    </article>
+    <section aria-labelledby="editorial-principles-title" class="border-4 border-[#059669] bg-[#ecfdf5] p-5 shadow-[7px_7px_0_0_#059669] dark:bg-emerald-950/40 sm:p-8">
+      <p class="text-xs font-black tracking-[0.16em] text-emerald-700 dark:text-emerald-300">EDITORIAL PRINCIPLES</p>
+      <h2 id="editorial-principles-title" class="mt-1 text-2xl font-black text-emerald-900 dark:text-emerald-100">这个空间坚持什么</h2>
+      <ul class="mt-5 grid gap-4 sm:grid-cols-2">
+        {portalConfig.principles.map((principle) => (
+          <li data-editorial-principle={principle.slug} class="border-2 border-emerald-700 bg-white p-4 dark:bg-slate-800">
+            <h3 class="font-black text-emerald-900 dark:text-emerald-100">{principle.title}</h3>
+            <p class="mt-2 text-sm font-bold leading-6 text-slate-700 dark:text-slate-200">{principle.description}</p>
+          </li>
+        ))}
+      </ul>
+      <a href="/start" class="mt-5 inline-flex min-h-[44px] items-center border-2 border-emerald-700 bg-white px-4 py-2 font-black text-emerald-900 shadow-[3px_3px_0_0_#059669] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-500/40 dark:bg-slate-800 dark:text-emerald-100">选择一条漫游路线 →</a>
+    </section>
+  </div>
 </Layout>

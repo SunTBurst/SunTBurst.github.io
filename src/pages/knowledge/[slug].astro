@@ -2,6 +2,7 @@
 import { render } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import { getPublishedKnowledge } from '../../utils/portalCollections';
+import { knowledgeStatusLabel } from '../../utils/portalLabels';
 import { normalizeEntrySlug } from '../../utils/slugify';
 
 export async function getStaticPaths() {
@@ -16,7 +17,7 @@ const { Content } = await render(entry);
 <Layout title={entry.data.title} description={entry.data.summary}>
   <article class="article-paper prose prose-lg mx-auto max-w-3xl border-4 border-[#0284c7] p-5 shadow-[7px_7px_0_0_#0284c7] dark:bg-slate-800 sm:p-8">
     <h1>{entry.data.title}</h1>
-    <p><strong>公开状态：</strong>{entry.data.status} · <strong>更新日期：</strong>{entry.data.updated.toISOString().slice(0, 10)}</p>
+    <p><strong>公开状态：</strong><span data-knowledge-status={entry.data.status}>{knowledgeStatusLabel(entry.data.status)}</span> · <strong>更新日期：</strong>{entry.data.updated.toISOString().slice(0, 10)}</p>
     <p>这是公开发布快照；独立私有知识平台尚未启用。</p>
     <Content />
     {entry.data.sources.length > 0 && <section><h2>公开来源</h2><ul>{entry.data.sources.map((source) => <li><a href={source.url} rel="noopener noreferrer">{source.title}</a></li>)}</ul></section>}

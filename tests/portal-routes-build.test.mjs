@@ -99,6 +99,48 @@ test('production build emits every fixed and indexed public HTML route with hone
     'expected the lab to keep every planned external capability discoverable without claiming it is live',
   );
 
+  const startHtml = readRoute('/start');
+  assert.equal((startHtml.match(/data-visitor-journey=/g) ?? []).length, 3, 'expected three purposeful visitor journeys');
+  const journeyStops = Array.from(startHtml.matchAll(/<a\b(?=[^>]*data-journey-stop)(?=[^>]*href="([^"]+)")[^>]*>/g), (match) => match[1]);
+  assert.deepEqual(
+    journeyStops,
+    ['/about', '/now', '/changelog', '/knowledge', '/topics/knowledge-management', '/knowledge/personal-portal-map/', '/projects', '/topics/site-building', '/lab'],
+    'expected each journey to provide three ordinary local stops in editorial order',
+  );
+  for (const href of journeyStops) readRoute(href);
+
+  const aboutHtml = readRoute('/about');
+  assert.equal((aboutHtml.match(/data-editorial-principle=/g) ?? []).length, 4, 'expected four explicit editorial principles');
+  assert.match(aboutHtml, /这个空间如何生长/);
+  assert.match(aboutHtml, /公开与私有的边界/);
+
+  const nowHtml = readRoute('/now');
+  assert.equal((nowHtml.match(/data-current-focus(?:=|\s|>)/g) ?? []).length, 2, 'expected the current focus to remain explicit');
+  assert.equal((nowHtml.match(/data-roadmap-item=/g) ?? []).length, 3, 'expected three honest next-stage items');
+  assert.match(nowHtml, /已完成/);
+  assert.match(nowHtml, /需要配置/);
+
+  const projectHtml = readRoute('/projects/suntburst-portal/');
+  for (const heading of ['为什么建设这个门户', '已经具备什么', '当前结构', '下一步如何验收']) {
+    assert.match(projectHtml, new RegExp(heading), `expected project detail section ${heading}`);
+  }
+  assert.match(projectHtml, /data-project-status="building"[^>]*>建设中</, 'expected a natural project status label');
+
+  const knowledgeHtml = readRoute('/knowledge/personal-portal-map/');
+  for (const heading of ['公开层如何组织', '私有层为什么分开', 'AI 接入前置条件', '如何使用这张地图']) {
+    assert.match(knowledgeHtml, new RegExp(heading), `expected knowledge detail section ${heading}`);
+  }
+  assert.match(knowledgeHtml, /data-knowledge-status="growing"[^>]*>持续生长</, 'expected a natural knowledge status label');
+
+  const changelogHtml = readRoute('/changelog');
+  assert.match(changelogHtml, /门户探索与阅读体验完成升级/, 'expected the latest verified site change to be visible');
+  assert.match(changelogHtml, /data-update-kind="site"[^>]*>站点</, 'expected a natural update kind label');
+  assert.match(changelogHtml, /data-update-status="completed"[^>]*>已完成</, 'expected a natural update status label');
+
+  const topicsHtml = readRoute('/topics');
+  assert.equal((topicsHtml.match(/data-topic-status=/g) ?? []).length, 3, 'expected every topic status to be translated at the display boundary');
+  assert.doesNotMatch(topicsHtml, />\s*(?:mapping|growing|established)\s*</, 'expected no raw topic status in visitor-facing text');
+
   for (const unknownRoute of ['/knowledge/not-published/', '/projects/not-published/', '/topics/not-configured/']) {
     assert.equal(existsSync(hrefToHtmlPath(unknownRoute)), false, `expected unknown route ${unknownRoute} not to be generated`);
   }

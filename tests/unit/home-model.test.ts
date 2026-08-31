@@ -22,7 +22,7 @@ test('homepage model stays meaningful with every editorial collection empty', ()
   assert.deepEqual(model.topics, portalConfig.topics);
   assert.equal(model.projects[0]?.title, 'SunTBurst 个人门户');
   assert.equal(model.randomFallback, '/start');
-  assert.equal(model.lastUpdated, '2026-08-30');
+  assert.equal(model.lastUpdated, '2026-08-31');
   assert.equal(model.recent.length, 0);
   assert.deepEqual(model.pulse.map(({ label, value, href }) => ({ label, value, href })), [
     { label: '公开记录', value: '1', href: '/changelog' },

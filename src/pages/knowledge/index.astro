@@ -2,6 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import { portalConfig } from '../../config/portal';
 import { getPublishedKnowledge } from '../../utils/portalCollections';
+import { knowledgeStatusLabel } from '../../utils/portalLabels';
 import { normalizeEntrySlug } from '../../utils/slugify';
 
 const entries = (await getPublishedKnowledge()).sort((a, b) => b.data.updated.getTime() - a.data.updated.getTime());
@@ -18,7 +19,7 @@ const entries = (await getPublishedKnowledge()).sort((a, b) => b.data.updated.ge
     </section>
     <section class="border-4 border-[#0284c7] bg-white p-5 shadow-[6px_6px_0_0_#0284c7] dark:bg-slate-800 sm:p-8">
       <h2 class="text-2xl font-black text-[#075985] dark:text-[#bae6fd]">已发布知识</h2>
-      {entries.length === 0 ? <p class="mt-4 font-bold">目前没有公开知识快照；主题框架仍可用于了解收录方向。</p> : <ul class="mt-4 grid gap-4">{entries.map((entry) => <li class="min-w-0 border-2 border-[#0284c7] p-4"><a class="flex min-h-[44px] min-w-0 items-center break-all font-black text-[#075985] underline dark:text-[#bae6fd]" href={`/knowledge/${encodeURIComponent(normalizeEntrySlug(entry))}/`}>{entry.data.title}</a><p class="mt-2 font-bold leading-6">{entry.data.summary}</p><p class="mt-2 text-sm font-black">{entry.data.status} · 更新至 {entry.data.updated.toISOString().slice(0, 10)}</p></li>)}</ul>}
+      {entries.length === 0 ? <p class="mt-4 font-bold">目前没有公开知识快照；主题框架仍可用于了解收录方向。</p> : <ul class="mt-4 grid gap-4">{entries.map((entry) => <li class="min-w-0 border-2 border-[#0284c7] p-4"><a class="flex min-h-[44px] min-w-0 items-center break-all font-black text-[#075985] underline dark:text-[#bae6fd]" href={`/knowledge/${encodeURIComponent(normalizeEntrySlug(entry))}/`}>{entry.data.title}</a><p class="mt-2 font-bold leading-6">{entry.data.summary}</p><p class="mt-2 text-sm font-black"><span data-knowledge-status={entry.data.status}>{knowledgeStatusLabel(entry.data.status)}</span> · 更新至 {entry.data.updated.toISOString().slice(0, 10)}</p></li>)}</ul>}
     </section>
   </div>
 </Layout>

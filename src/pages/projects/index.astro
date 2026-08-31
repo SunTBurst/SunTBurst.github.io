@@ -1,6 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import { getPublishedProjects } from '../../utils/portalCollections';
+import { projectStatusLabel } from '../../utils/portalLabels';
 import { normalizeEntrySlug } from '../../utils/slugify';
 const entries = (await getPublishedProjects()).sort((a, b) => b.data.updated.getTime() - a.data.updated.getTime());
 ---
@@ -9,6 +10,6 @@ const entries = (await getPublishedProjects()).sort((a, b) => b.data.updated.get
   <section class="mx-auto max-w-4xl border-4 border-[#0284c7] bg-white p-5 shadow-[7px_7px_0_0_#f59e0b] dark:bg-slate-800 sm:p-8">
     <h1 class="text-3xl font-black text-[#075985] dark:text-[#bae6fd]">项目台</h1>
     <p class="mt-3 font-bold leading-7">这里只列出有公开内容依据的项目，不用计划代替已完成事实。</p>
-    {entries.length === 0 ? <p class="mt-5 border-2 border-dashed border-[#0284c7] p-4 font-bold">暂无已发布项目。</p> : <ul class="mt-5 grid gap-4 sm:grid-cols-2">{entries.map((entry) => <li class="min-w-0 border-3 border-[#0284c7] bg-[#e0f2fe] p-4 dark:bg-slate-900"><a class="flex min-h-[44px] min-w-0 items-center break-all font-black text-[#075985] underline dark:text-[#bae6fd]" href={`/projects/${encodeURIComponent(normalizeEntrySlug(entry))}/`}>{entry.data.title}</a><p class="mt-2 font-bold leading-6">{entry.data.summary}</p><p class="mt-3 text-sm font-black">{entry.data.status} · 更新至 {entry.data.updated.toISOString().slice(0, 10)}</p></li>)}</ul>}
+    {entries.length === 0 ? <p class="mt-5 border-2 border-dashed border-[#0284c7] p-4 font-bold">暂无已发布项目。</p> : <ul class="mt-5 grid gap-4 sm:grid-cols-2">{entries.map((entry) => <li class="min-w-0 border-3 border-[#0284c7] bg-[#e0f2fe] p-4 dark:bg-slate-900"><a class="flex min-h-[44px] min-w-0 items-center break-all font-black text-[#075985] underline dark:text-[#bae6fd]" href={`/projects/${encodeURIComponent(normalizeEntrySlug(entry))}/`}>{entry.data.title}</a><p class="mt-2 font-bold leading-6">{entry.data.summary}</p><p class="mt-3 text-sm font-black"><span data-project-status={entry.data.status}>{projectStatusLabel(entry.data.status)}</span> · 更新至 {entry.data.updated.toISOString().slice(0, 10)}</p></li>)}</ul>}
   </section>
 </Layout>

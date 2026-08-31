@@ -44,9 +44,34 @@ export interface PortalUpdate {
   runtimeState: FeatureRuntimeState;
 }
 
+export interface VisitorJourney {
+  slug: string;
+  title: string;
+  duration: string;
+  description: string;
+  outcome: string;
+  stops: Array<{ label: string; href: `/${string}` }>;
+}
+
+export interface EditorialPrinciple {
+  slug: string;
+  title: string;
+  description: string;
+}
+
+export interface PortalRoadmapItem {
+  title: string;
+  description: string;
+  state: 'completed' | 'configuration' | 'planned';
+  href: `/${string}`;
+}
+
 export interface PortalConfig {
   identity: { name: string; tagline: string; timeZone: string };
   startHere: PortalLink[];
+  journeys: VisitorJourney[];
+  principles: EditorialPrinciple[];
+  roadmap: PortalRoadmapItem[];
   focus: string[];
   topics: KnowledgeTopic[];
   projects: PortalProject[];
