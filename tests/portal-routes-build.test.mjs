@@ -151,6 +151,10 @@ test('production build emits every fixed and indexed public HTML route with hone
   assert.match(aboutHtml, /这个空间如何生长/);
   assert.match(aboutHtml, /公开与私有的边界/);
 
+  const friendsHtml = readRoute('/friends');
+  assert.match(friendsHtml, /友链与书签/);
+  assert.equal((friendsHtml.match(/data-curated-bookmark=/g) ?? []).length, 6, 'expected the friend directory to remain worth browsing before reciprocal links exist');
+
   const nowHtml = readRoute('/now');
   assert.equal((nowHtml.match(/data-current-focus(?:=|\s|>)/g) ?? []).length, 2, 'expected the current focus to remain explicit');
   assert.equal((nowHtml.match(/data-roadmap-item=/g) ?? []).length, 3, 'expected three honest next-stage items');

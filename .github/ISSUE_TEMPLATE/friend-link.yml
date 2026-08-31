@@ -1,0 +1,54 @@
+name: 友链申请
+description: 申请加入 SunTBurst 个人门户的真实友链列表
+title: "[友链申请] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢你愿意交换友链。这个 Issue 和填写内容都会公开，请勿填写邮箱、手机号或其他非公开个人信息。
+
+  - type: input
+    id: site_name
+    attributes:
+      label: 网站名称
+      description: 用于友链卡片展示的名称。
+      placeholder: 例如：某某的个人空间
+    validations:
+      required: true
+
+  - type: input
+    id: site_url
+    attributes:
+      label: 网站地址
+      description: 请填写可以公开访问的 HTTPS 地址。
+      placeholder: https://example.com/
+    validations:
+      required: true
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: 一句话介绍
+      description: 用一两句话说明网站主要记录什么，不要粘贴广告文案。
+      placeholder: 这是一个关于……的个人网站。
+    validations:
+      required: true
+
+  - type: input
+    id: topics
+    attributes:
+      label: 主要主题
+      description: 填写 1 至 3 个公开主题，以中文顿号分隔。
+      placeholder: 知识管理、个人博客
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: agreements
+    attributes:
+      label: 公开与内容确认
+      options:
+        - label: 我知道这是公开 Issue，并确认以上信息均可公开展示。
+          required: true
+        - label: 我确认网站能够正常访问，主要内容为原创或已明确标注来源，不包含违法、欺诈或恶意下载内容。
+          required: true

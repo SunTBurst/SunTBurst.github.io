@@ -33,7 +33,7 @@ const staticPages: PortalIndexEntry[] = [
   ['status', '构建状态', '查看当前部署快照与降级边界', '/status'],
   ['subscribe', '订阅', '了解双重确认订阅的启用条件', '/subscribe'],
   ['talks', '说说', '浏览公开的简短记录', '/talks'],
-  ['friends', '友链', '发现其他值得访问的个人空间', '/friends'],
+  ['friends', '友链与书签', '查看真实友链、公开申请入口和精选站外资料', '/friends'],
   ['privacy', '隐私', '了解本站的数据边界', '/privacy'],
 ].map(([id, title, description, href]) => ({
   id: `page:${id}`,
