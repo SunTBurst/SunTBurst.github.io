@@ -1,0 +1,57 @@
+---
+import { siteConfig } from '../config/site';
+
+const groups = [
+  {
+    title: '开始探索',
+    links: [
+      { href: '/start', label: '从这里开始' },
+      { href: '/search', label: '全站搜索' },
+      { href: '/explore', label: '随机探索' },
+    ],
+  },
+  {
+    title: '沿内容继续',
+    links: [
+      { href: '/knowledge', label: '知识地图' },
+      { href: '/projects', label: '项目台' },
+      { href: '/timeline', label: '内容时间线' },
+    ],
+  },
+  {
+    title: '了解这个空间',
+    links: [
+      { href: '/changelog', label: '更新记录' },
+      { href: '/about', label: '关于这个空间' },
+      { href: '/privacy', label: '隐私边界' },
+    ],
+  },
+] as const;
+---
+
+<footer data-portal-footer class="mt-8 border-t-4 border-[#0284c7] bg-[#e0f2fe] px-3 py-8 text-slate-800 dark:bg-slate-900 dark:text-slate-100 sm:px-6">
+  <div class="mx-auto grid w-full max-w-6xl gap-7 lg:grid-cols-[1.25fr_2fr]">
+    <section aria-labelledby="footer-identity-title" class="border-3 border-[#0284c7] bg-white p-5 shadow-[4px_4px_0_0_#0284c7] dark:bg-slate-800">
+      <p class="text-xs font-black tracking-[0.18em] text-[#0369a1] dark:text-[#bae6fd]">KEEP EXPLORING</p>
+      <h2 id="footer-identity-title" class="mt-2 text-2xl font-black text-[#075985] dark:text-[#bae6fd]">还可以继续往哪里走？</h2>
+      <p class="mt-3 text-sm font-bold leading-6 text-slate-600 dark:text-slate-300">从一个问题进入，再沿知识、项目和时间找到下一条线索。所有入口都来自本站已经发布的页面。</p>
+      <a href="/" class="mt-4 inline-flex min-h-[44px] items-center border-2 border-[#0284c7] bg-[#fde68a] px-4 py-2 font-black text-[#075985] shadow-[3px_3px_0_0_#0284c7] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#0ea5e9]/40">返回门户首页 →</a>
+    </section>
+
+    <nav aria-label="页尾继续探索" class="grid gap-4 sm:grid-cols-3">
+      {groups.map((group) => (
+        <section class="border-2 border-[#0284c7] bg-white p-4 dark:bg-slate-800">
+          <h2 class="text-sm font-black tracking-wide text-[#075985] dark:text-[#bae6fd]">{group.title}</h2>
+          <ul class="mt-3 grid gap-2">
+            {group.links.map((link) => (
+              <li>
+                <a href={link.href} data-footer-link class="flex min-h-[44px] items-center border-b-2 border-dashed border-[#0284c7]/40 text-sm font-black text-slate-700 underline decoration-2 underline-offset-4 transition hover:translate-x-1 hover:text-[#075985] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#0ea5e9]/40 motion-reduce:transition-none motion-reduce:hover:translate-x-0 dark:text-slate-200 dark:hover:text-[#bae6fd]">{link.label}</a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
+    </nav>
+  </div>
+  <p class="mx-auto mt-6 max-w-6xl text-center text-xs font-bold text-slate-600 dark:text-slate-300">© {new Date().getFullYear()} {siteConfig.author} · 公开内容来自本地文件 · 外部能力启用前先说明数据边界</p>
+</footer>

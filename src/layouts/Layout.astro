@@ -3,6 +3,7 @@ import NavBar from '../components/NavBar.astro';
 import IntentPrefetch from '../components/IntentPrefetch.astro';
 import ReadingFootprint from '../components/ReadingFootprint.astro';
 import PortalEffects from '../components/PortalEffects.astro';
+import PortalFooter from '../components/PortalFooter.astro';
 import { PageBanner } from '../components/PageBanner';
 import { siteConfig } from '../config/site';
 import '../index.css';
@@ -79,11 +80,7 @@ const socialImage = image ? new URL(image, Astro.site ?? siteConfig.url) : new U
           <slot />
         </div>
       </main>
-      {!hideFooter && (
-        <footer class="border-t-4 border-[#0284c7] bg-white px-4 py-5 text-center text-xs font-bold text-slate-500 dark:bg-slate-800 dark:text-slate-300">
-          © {new Date().getFullYear()} SunTBurst · 公开内容来自本地文件
-        </footer>
-      )}
+      {!hideFooter && <PortalFooter />}
     </div>
     <script>
       import { shouldLayoutConsumePortalSearch } from '../utils/portalToolActivation';

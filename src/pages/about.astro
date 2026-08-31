@@ -8,7 +8,7 @@ import { portalConfig } from '../config/portal';
 const html = sanitizeHtml(new MarkdownIt({ html: false, linkify: false }).render(aboutSource));
 ---
 
-<Layout title="关于" description="关于 SunTBurst 个人门户">
+<Layout title="关于" description="关于 SunTBurst 个人门户" hidePageBanner>
   <div class="mx-auto grid max-w-5xl gap-6">
     <article class="article-paper prose prose-lg max-w-none border-4 border-[#0284c7] bg-white p-6 shadow-[8px_8px_0_0_#0284c7] dark:bg-slate-800 sm:p-10">
       <Fragment set:html={html} />

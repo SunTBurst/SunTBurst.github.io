@@ -8,7 +8,7 @@ import { normalizeEntrySlug } from '../../utils/slugify';
 const entries = (await getPublishedKnowledge()).sort((a, b) => b.data.updated.getTime() - a.data.updated.getTime());
 ---
 
-<Layout title="知识地图" description="按真实主题组织的 SunTBurst 公开知识快照" postsCount={entries.length}>
+<Layout title="知识地图" description="按真实主题组织的 SunTBurst 公开知识快照" postsCount={entries.length} hidePageBanner>
   <div class="mx-auto grid max-w-5xl gap-6">
     <section class="border-4 border-[#059669] bg-[#ecfdf5] p-5 shadow-[6px_6px_0_0_#059669] dark:bg-emerald-950/40 sm:p-8">
       <h1 class="text-3xl font-black text-emerald-900 dark:text-emerald-100">公开知识地图</h1>

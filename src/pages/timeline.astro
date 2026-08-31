@@ -5,6 +5,6 @@ import { portalKindLabel } from '../utils/portalLabels';
 const entries = (await buildPortalIndex()).filter((entry) => entry.kind !== 'page');
 ---
 
-<Layout title="时间线" description="按更新时间查看全部公开内容" postsCount={entries.length}>
+<Layout title="时间线" description="按更新时间查看全部公开内容" postsCount={entries.length} hidePageBanner>
   <section class="mx-auto max-w-4xl border-4 border-[#7c3aed] bg-[#f5f3ff] p-5 shadow-[7px_7px_0_0_#7c3aed] dark:bg-violet-950/40 sm:p-8"><h1 class="text-3xl font-black text-violet-900 dark:text-violet-100">公开内容时间线</h1>{entries.length === 0 ? <p class="mt-4 font-bold">暂无公开内容。</p> : <ol class="mt-5 grid gap-3">{entries.map((entry) => <li class="min-w-0 border-l-4 border-violet-700 bg-white p-3 dark:bg-slate-800"><p class="text-xs font-black">{entry.updatedAt.slice(0, 10)} · {portalKindLabel(entry.kind)}</p><a class="flex min-h-[44px] min-w-0 items-center break-all font-black text-violet-900 underline dark:text-violet-100" href={entry.href}>{entry.title}</a></li>)}</ol>}</section>
 </Layout>

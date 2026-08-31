@@ -6,7 +6,7 @@ const readyTools = portalTools.filter(({ state }) => state === 'ready');
 const previewTools = portalTools.filter(({ state }) => state === 'preview');
 ---
 
-<Layout title="实验室" description="仅列出当前已实现并明确边界的本地实验">
+<Layout title="实验室" description="仅列出当前已实现并明确边界的本地实验" hidePageBanner>
   <div class="mx-auto grid max-w-5xl gap-6">
     <section class="border-4 border-[#0284c7] bg-white p-5 shadow-[7px_7px_0_0_#f59e0b] dark:bg-slate-800 sm:p-8">
       <p class="text-xs font-black tracking-[0.16em] text-[#0369a1]">LOCAL TOOLS</p>

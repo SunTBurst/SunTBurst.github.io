@@ -68,4 +68,36 @@ test('portal shell exposes grouped desktop navigation, hydrated mobile links, an
   for (const href of new Set(localHrefs)) {
     assert.ok(existsSync(hrefToHtmlPath(href)), `expected shell link ${href} to resolve to built HTML`);
   }
+
+  const footerMatch = html.match(/<footer\b[^>]*data-portal-footer[^>]*>([\s\S]*?)<\/footer>/);
+  assert.ok(footerMatch, 'expected a reusable portal footer');
+  const footer = footerMatch[1];
+  const footerLinks = Array.from(footer.matchAll(/<a\b(?=[^>]*data-footer-link)(?=[^>]*href="([^"]+)")[^>]*>([\s\S]*?)<\/a>/g), (match) => ({
+    href: match[1],
+    label: match[2].replace(/<[^>]+>/g, '').trim(),
+  }));
+  assert.deepEqual(
+    footerLinks,
+    [
+      { href: '/start', label: '从这里开始' },
+      { href: '/search', label: '全站搜索' },
+      { href: '/explore', label: '随机探索' },
+      { href: '/knowledge', label: '知识地图' },
+      { href: '/projects', label: '项目台' },
+      { href: '/timeline', label: '内容时间线' },
+      { href: '/changelog', label: '更新记录' },
+      { href: '/about', label: '关于这个空间' },
+      { href: '/privacy', label: '隐私边界' },
+    ],
+    'expected the footer to offer nine editorial next steps',
+  );
+  for (const { href } of footerLinks) {
+    assert.ok(existsSync(hrefToHtmlPath(href)), `expected footer link ${href} to resolve to built HTML`);
+  }
+
+  for (const route of ['/start', '/about', '/now', '/knowledge', '/projects', '/topics', '/lab', '/changelog', '/timeline']) {
+    const landingHtml = readFileSync(hrefToHtmlPath(route), 'utf8');
+    assert.doesNotMatch(landingHtml, /component-url="[^"]*PageBanner/, `expected ${route} to start with its own page content`);
+    assert.match(landingHtml, /<footer\b[^>]*data-portal-footer/, `expected ${route} to end with the portal footer`);
+  }
 });
