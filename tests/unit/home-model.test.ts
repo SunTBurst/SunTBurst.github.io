@@ -28,15 +28,15 @@ test('homepage model stays meaningful with every editorial collection empty', ()
     { label: '公开记录', value: '1', href: '/changelog' },
     { label: '知识主题', value: '3', href: '/topics' },
     { label: '建设项目', value: '1', href: '/projects' },
-    { label: '可用工具', value: '9', href: '/lab' },
+    { label: '可用工具', value: '11', href: '/lab' },
   ]);
   assert.deepEqual(
     model.tools.filter(({ state }) => state === 'ready').map(({ href }) => href),
-    ['/search', '/explore', '/favorites', '/calendar', '/timeline', '/rss.xml', '/weather', '/random-image', '/github'],
+    ['/search', '/explore', '/favorites', '/calendar', '/timeline', '/rss.xml', '/weather', '/random-image', '/github', '/stats', '/status'],
   );
   assert.deepEqual(
     model.tools.filter(({ state }) => state === 'preview').map(({ href }) => href),
-    ['/ai', '/stats', '/status', '/subscribe', '/music'],
+    ['/ai', '/subscribe', '/music'],
   );
   assert.equal(new Set(model.tools.map(({ href }) => href)).size, model.tools.length);
   assert.ok(model.tools.every(({ href }) => href.startsWith('/')));

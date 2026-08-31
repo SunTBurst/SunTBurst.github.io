@@ -62,7 +62,7 @@ test('production build emits the local SunTBurst portal with one consent-based w
   readDist('about/index.html');
   readDist('friends/index.html');
   readDist('tags/index.html');
-  for (const feature of ['ai', 'music', 'stats', 'status', 'subscribe']) {
+  for (const feature of ['ai', 'music', 'subscribe']) {
     const preview = readDist(`${feature}/index.html`);
     assert.match(preview, new RegExp(`data-feature="${feature}"`), `expected ${feature} preview identity`);
     assert.match(preview, /data-state="preview"/, `expected ${feature} preview state`);

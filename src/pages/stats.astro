@@ -1,5 +1,53 @@
 ---
-import FeaturePreview from '../components/FeaturePreview.astro';
 import Layout from '../layouts/Layout.astro';
+import { portalTools } from '../utils/homeModel';
+import { buildPortalIndex } from '../utils/portalIndex';
+import { buildSiteMetrics } from '../utils/siteMetrics';
+
+const metrics = buildSiteMetrics(await buildPortalIndex(), portalTools);
+const kindLabels = {
+  page: '公开页面',
+  post: '文章',
+  talk: '说说',
+  knowledge: '知识快照',
+  project: '项目',
+  update: '站点更新',
+};
 ---
-<Layout title="访问统计预览" description="访问统计的同意与匿名化边界"><FeaturePreview feature="stats" title="访问统计" purpose="未来仅在明确同意和可审计配置下提供站点访问趋势。" requirements="需要 SunTBurst 自有的统计服务、站点标识、匿名化设置、同意策略与禁用验证。" privacy="未同意时不发请求，不显示假 0，也不保留可识别访客的精确轨迹。" fallback="当前不接入统计服务，因此没有访问量或在线人数可展示。" /></Layout>
+
+<Layout title="站点数据" description="不追踪访客的内容与建设统计" hidePageBanner>
+  <div class="mx-auto grid max-w-5xl gap-6" data-site-metrics>
+    <section class="border-4 border-[#0284c7] bg-white p-5 shadow-[7px_7px_0_0_#f59e0b] dark:bg-slate-800 sm:p-8">
+      <p class="text-xs font-black tracking-[0.16em] text-[#0369a1]">LOCAL BUILD METRICS</p>
+      <h1 class="mt-1 text-3xl font-black text-[#075985] dark:text-[#bae6fd]">站点数据</h1>
+      <p class="mt-3 max-w-3xl font-bold leading-7 text-slate-700 dark:text-slate-200">这里只统计构建时已公开的内容、页面和工具，不追踪访客，不记录搜索词或阅读轨迹。</p>
+
+      <dl class="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div class="border-3 border-[#075985] bg-sky-50 p-4 dark:bg-sky-950/30"><dt class="text-xs font-black text-[#075985] dark:text-[#bae6fd]">索引路由</dt><dd class="mt-2 text-3xl font-black">{metrics.indexedRoutes}</dd></div>
+        <div class="border-3 border-emerald-700 bg-emerald-50 p-4 dark:bg-emerald-950/30"><dt class="text-xs font-black text-emerald-800 dark:text-emerald-200">公开记录</dt><dd class="mt-2 text-3xl font-black">{metrics.publicRecords}</dd></div>
+        <div class="border-3 border-violet-700 bg-violet-50 p-4 dark:bg-violet-950/30"><dt class="text-xs font-black text-violet-800 dark:text-violet-200">可用工具</dt><dd class="mt-2 text-3xl font-black">{metrics.readyTools}</dd></div>
+        <div class="border-3 border-amber-700 bg-amber-50 p-4 dark:bg-amber-950/30"><dt class="text-xs font-black text-amber-800 dark:text-amber-200">后续能力</dt><dd class="mt-2 text-3xl font-black">{metrics.previewTools}</dd></div>
+      </dl>
+    </section>
+
+    <section class="border-4 border-emerald-700 bg-emerald-50 p-5 shadow-[7px_7px_0_0_#047857] dark:bg-emerald-950/30 sm:p-8">
+      <p class="text-xs font-black tracking-[0.16em] text-emerald-700 dark:text-emerald-300">CONTENT BREAKDOWN</p>
+      <h2 class="mt-1 text-2xl font-black text-emerald-900 dark:text-emerald-100">公开索引构成</h2>
+      <ul class="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {Object.entries(kindLabels).map(([kind, label]) => (
+          <li class="border-3 border-emerald-700 bg-white p-4 dark:bg-slate-800">
+            <p class="text-sm font-black text-emerald-800 dark:text-emerald-200">{label}</p>
+            <p class="mt-2 text-2xl font-black">{metrics.byKind[kind as keyof typeof metrics.byKind]}</p>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section class="border-4 border-slate-600 bg-slate-100 p-5 shadow-[7px_7px_0_0_#475569] dark:bg-slate-800 sm:p-8">
+      <p class="text-xs font-black tracking-[0.16em] text-slate-600 dark:text-slate-300">PRIVACY BOUNDARY</p>
+      <h2 class="mt-1 text-2xl font-black text-slate-900 dark:text-slate-100">这里不显示什么</h2>
+      <p class="mt-3 font-bold leading-7 text-slate-700 dark:text-slate-200">访问量与在线人数当前没有合格的数据源，因此不显示数字，也不用“零”伪装成已经实施的统计。如果未来启用匿名分析，必须先提供明确同意、拒绝后零请求和删除说明。</p>
+      <a href="/privacy" class="mt-4 inline-flex min-h-[44px] items-center border-2 border-slate-600 bg-white px-4 py-2 font-black text-slate-900 shadow-[3px_3px_0_0_#475569] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-slate-500/40 dark:bg-slate-900 dark:text-slate-100">查看隐私边界 →</a>
+    </section>
+  </div>
+</Layout>

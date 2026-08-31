@@ -75,7 +75,7 @@ test('production build emits every fixed and indexed public HTML route with hone
   assert.ok(detailEntries.length >= 2, 'expected published knowledge and project details in the portal index');
   for (const entry of detailEntries) readRoute(entry.href);
 
-  for (const feature of ['ai', 'music', 'stats', 'status', 'subscribe']) {
+  for (const feature of ['ai', 'music', 'subscribe']) {
     const html = readRoute(`/${feature}`);
     assert.match(html, new RegExp(`data-feature="${feature}"`), `expected ${feature} feature identity`);
     assert.match(html, /data-state="preview"/, `expected ${feature} to remain an honest preview`);
@@ -92,7 +92,7 @@ test('production build emits every fixed and indexed public HTML route with hone
   const readyLabHrefs = Array.from(labHtml.matchAll(/<a\b(?=[^>]*data-lab-tool="ready")(?=[^>]*href="([^"]+)")[^>]*>/g), (match) => match[1]);
   assert.deepEqual(
     readyLabHrefs,
-    ['/search', '/explore', '/favorites', '/calendar', '/timeline', '/rss.xml', '/weather', '/random-image', '/github'],
+    ['/search', '/explore', '/favorites', '/calendar', '/timeline', '/rss.xml', '/weather', '/random-image', '/github', '/stats', '/status'],
     'expected the lab to explain every tool counted as available on the homepage',
   );
 
@@ -119,9 +119,19 @@ test('production build emits every fixed and indexed public HTML route with hone
   const previewLabHrefs = Array.from(labHtml.matchAll(/<a\b(?=[^>]*data-lab-tool="preview")(?=[^>]*href="([^"]+)")[^>]*>/g), (match) => match[1]);
   assert.deepEqual(
     previewLabHrefs,
-    ['/ai', '/stats', '/status', '/subscribe', '/music'],
+    ['/ai', '/subscribe', '/music'],
     'expected the lab to keep every planned external capability discoverable without claiming it is live',
   );
+
+  const statsHtml = readRoute('/stats');
+  assert.match(statsHtml, /data-site-metrics/);
+  assert.match(statsHtml, /不追踪访客/);
+  assert.doesNotMatch(statsHtml, /data-state="preview"|data-feature="stats"/);
+
+  const statusHtml = readRoute('/status');
+  assert.match(statusHtml, /data-build-status="verified-at-build"/);
+  assert.match(statusHtml, /构建时已验证/);
+  assert.doesNotMatch(statusHtml, /data-state="preview"|data-feature="status"/);
 
   const startHtml = readRoute('/start');
   assert.equal((startHtml.match(/data-visitor-journey=/g) ?? []).length, 3, 'expected three purposeful visitor journeys');

@@ -1,5 +1,46 @@
 ---
-import FeaturePreview from '../components/FeaturePreview.astro';
 import Layout from '../layouts/Layout.astro';
+import { loadSiteStatusSnapshot } from '../utils/siteStatusData';
+
+const status = await loadSiteStatusSnapshot();
+const shortSha = status.buildSha?.slice(0, 7) ?? '待核对';
+const displayDate = new Intl.DateTimeFormat('zh-CN', {
+  timeZone: 'Asia/Riyadh', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false,
+}).format(new Date(status.generatedAt));
 ---
-<Layout title="服务状态预览" description="公开服务状态摘要的安全边界"><FeaturePreview feature="status" title="服务状态" purpose="未来可展示经过缓存和脱敏的 SunTBurst 自有服务公开状态摘要。" requirements="需要自有健康检查、缓存、过期规则、脱敏与故障降级，不能暴露内部地址或日志。" privacy="不根据访客位置或第三方活动推断站主在线状态；过期数据必须显示未知。" fallback="当前没有状态数据源，状态为尚未配置，而不是虚构的绿色或在线。" /></Layout>
+
+<Layout title="构建状态" description="当前门户构建与降级边界" hidePageBanner>
+  <div class="mx-auto grid max-w-5xl gap-6" data-build-status={status.buildState} data-build-sha={status.buildSha ?? 'unknown'}>
+    <section class="border-4 border-[#0284c7] bg-white p-5 shadow-[7px_7px_0_0_#f59e0b] dark:bg-slate-800 sm:p-8">
+      <p class="text-xs font-black tracking-[0.16em] text-[#0369a1]">VERIFIED AT BUILD</p>
+      <h1 class="mt-1 text-3xl font-black text-[#075985] dark:text-[#bae6fd]">构建状态</h1>
+      <p class="mt-3 max-w-3xl font-bold leading-7 text-slate-700 dark:text-slate-200">当前页面、公开索引和静态资源在构建时已验证。这是可核对的部署快照，不是 24 小时实时监控，也不会虚构“全部正常”。</p>
+
+      <dl class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="border-3 border-emerald-700 bg-emerald-50 p-4 dark:bg-emerald-950/30"><dt class="text-xs font-black text-emerald-800 dark:text-emerald-200">构建结论</dt><dd class="mt-2 text-xl font-black">已通过</dd></div>
+        <div class="border-3 border-[#075985] bg-sky-50 p-4 dark:bg-sky-950/30"><dt class="text-xs font-black text-[#075985] dark:text-[#bae6fd]">公开路由</dt><dd class="mt-2 text-xl font-black">{status.metrics.indexedRoutes}</dd></div>
+        <div class="border-3 border-violet-700 bg-violet-50 p-4 dark:bg-violet-950/30"><dt class="text-xs font-black text-violet-800 dark:text-violet-200">可用工具</dt><dd class="mt-2 text-xl font-black">{status.metrics.readyTools}</dd></div>
+        <div class="border-3 border-amber-700 bg-amber-50 p-4 dark:bg-amber-950/30"><dt class="text-xs font-black text-amber-800 dark:text-amber-200">构建版本</dt><dd class="mt-2 font-mono text-xl font-black">{shortSha}</dd></div>
+      </dl>
+
+      <p class="mt-4 border-2 border-[#075985] bg-sky-50 p-3 text-sm font-bold leading-6 text-slate-700 dark:bg-sky-950/30 dark:text-slate-200">快照生成：{displayDate}（利雅得时间） · GitHub 公开资料：{status.githubSnapshot === 'build-cache' ? '本次部署已刷新' : '备用快照'}</p>
+    </section>
+
+    <section class="grid gap-4 sm:grid-cols-2">
+      <div class="border-4 border-emerald-700 bg-emerald-50 p-5 shadow-[6px_6px_0_0_#047857] dark:bg-emerald-950/30">
+        <h2 class="text-xl font-black text-emerald-900 dark:text-emerald-100">当前可验证的边界</h2>
+        <ul class="mt-3 grid gap-2 font-bold leading-7 text-slate-700 dark:text-slate-200">
+          <li>· 页面与公开索引已在本次构建中生成。</li>
+          <li>· 天气仅在访客主动点击后请求外部数据。</li>
+          <li>· 随机画片、搜索、收藏和统计页保持本地优先。</li>
+          <li>· <a href="/status.json" class="underline decoration-2 underline-offset-4">机器可读状态 JSON</a> 与本页使用同一数据模型。</li>
+        </ul>
+      </div>
+      <div class="border-4 border-slate-600 bg-slate-100 p-5 shadow-[6px_6px_0_0_#475569] dark:bg-slate-800">
+        <h2 class="text-xl font-black text-slate-900 dark:text-slate-100">尚未声明的状态</h2>
+        <p class="mt-3 font-bold leading-7 text-slate-700 dark:text-slate-200">本页不声明实时在线率、响应时间或站主在线状态。这些数据需要独立健康检查、过期规则和脱敏缓存；在服务实际存在前，它们保持未知。</p>
+        <a href="/changelog" class="mt-4 inline-flex min-h-[44px] items-center border-2 border-slate-600 bg-white px-4 py-2 font-black text-slate-900 shadow-[3px_3px_0_0_#475569] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-slate-500/40 dark:bg-slate-900 dark:text-slate-100">查看建设记录 →</a>
+      </div>
+    </section>
+  </div>
+</Layout>
