@@ -27,7 +27,7 @@ const staticPages: PortalIndexEntry[] = [
   ['weather', '利雅得天气', '主动读取利雅得实时天气', '/weather'],
   ['random-image', '随机画片', '从本站自有的授权画片中随机探索', '/random-image'],
   ['github', 'GitHub 公开活动', '查看构建期生成的公开仓库与活动快照', '/github'],
-  ['ai', 'AI 导览', '了解公开 AI 导览的启用条件和当前替代入口', '/ai'],
+  ['ai', 'AI 导览基础版', '在浏览器本地检索公开知识并返回可核对来源', '/ai'],
   ['music', '声音空间', '播放浏览器本地合成的三种原创声音场景', '/music'],
   ['stats', '站点数据', '查看不追踪访客的内容与建设统计', '/stats'],
   ['status', '构建状态', '查看当前部署快照与降级边界', '/status'],

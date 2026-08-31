@@ -1,5 +1,26 @@
 ---
-import FeaturePreview from '../components/FeaturePreview.astro';
+import KnowledgeGuide from '../components/KnowledgeGuide.svelte';
 import Layout from '../layouts/Layout.astro';
+import { buildPortalIndex } from '../utils/portalIndex';
+
+const entries = (await buildPortalIndex()).filter(({ kind }) => ['knowledge', 'project', 'post', 'talk'].includes(kind));
 ---
-<Layout title="AI 导览预览" description="公开 AI 导览的启用条件与当前无网络回退"><FeaturePreview feature="ai" title="AI 导览" purpose="未来只围绕本站公开内容回答栏目与导航问题，并为回答提供可核对的页面引用。" requirements="需要 SunTBurst 自有的服务、公开索引适配、限流、预算和安全验证；当前没有配置这些能力。" privacy="公开 AI 与私有知识必须隔离，不上传未发布内容，不把访客输入交给未知服务。" fallback="当前保持零网络请求。请使用本地统一搜索和主题地图查找公开内容。" /></Layout>
+
+<Layout title="AI 导览基础版" description="在浏览器本地检索公开知识并返回可核对来源" hidePageBanner>
+  <div class="mx-auto grid max-w-5xl gap-6">
+    <KnowledgeGuide entries={entries} client:load />
+
+    <div class="grid gap-5 md:grid-cols-2">
+      <section class="border-4 border-violet-700 bg-violet-50 p-5 shadow-[6px_6px_0_0_#6d28d9] dark:bg-violet-950/30 sm:p-6">
+        <p class="text-xs font-black tracking-[0.16em] text-violet-800 dark:text-violet-200">WHAT THIS IS</p>
+        <h2 class="mt-1 text-2xl font-black text-slate-900 dark:text-white">先把引用做好</h2>
+        <p class="mt-3 font-bold leading-7 text-slate-700 dark:text-slate-200">当前版本根据问题中的词语对公开资料排序，再摘取最相关的标题和简介。它不会补写资料里没有的事实，也不会把“没有来源”包装成完整答案。</p>
+      </section>
+      <section class="border-4 border-slate-600 bg-slate-100 p-5 shadow-[6px_6px_0_0_#475569] dark:bg-slate-800 sm:p-6">
+        <p class="text-xs font-black tracking-[0.16em] text-slate-600 dark:text-slate-300">WHAT COMES NEXT</p>
+        <h2 class="mt-1 text-2xl font-black text-slate-900 dark:text-white">真实模型仍有门槛</h2>
+        <p class="mt-3 font-bold leading-7 text-slate-700 dark:text-slate-200">未来只有在服务端密钥、调用预算、限流、内容安全和公开/私有索引隔离都可验证后，才会增加模型归纳。即使升级，每条回答仍必须保留来源和“当前未知”。</p>
+      </section>
+    </div>
+  </div>
+</Layout>

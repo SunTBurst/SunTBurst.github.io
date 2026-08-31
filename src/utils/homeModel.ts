@@ -48,7 +48,7 @@ export const portalTools: PortalToolItem[] = [
   { title: '利雅得天气', description: '点击后才读取实时天气，不获取设备定位。', href: '/weather', state: 'ready' },
   { title: '随机画片', description: '从本站自有的授权画片中随机换一张，不连接图片热链。', href: '/random-image', state: 'ready' },
   { title: 'GitHub 公开活动', description: '查看构建时生成的公开仓库和活动快照，浏览时不请求 GitHub API。', href: '/github', state: 'ready' },
-  { title: 'AI 导览', description: '查看公开问答的范围、引用和隐私边界。', href: '/ai', state: 'preview' },
+  { title: 'AI 导览基础版', description: '在浏览器本地检索公开知识，返回可核对来源并诚实说明未知。', href: '/ai', state: 'ready' },
   { title: '站点数据', description: '查看不追踪访客的内容、路由和工具统计。', href: '/stats', state: 'ready' },
   { title: '构建状态', description: '查看当前部署版本、公开路由和降级边界。', href: '/status', state: 'ready' },
   { title: '邮件订阅', description: '查看双重确认、退订和数据删除流程。', href: '/subscribe', state: 'preview' },
