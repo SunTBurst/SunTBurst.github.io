@@ -19,7 +19,10 @@ const { Content } = await render(entry);
     <h1>{entry.data.title}</h1>
     <p><strong>公开状态：</strong><span data-knowledge-status={entry.data.status}>{knowledgeStatusLabel(entry.data.status)}</span> · <strong>更新日期：</strong>{entry.data.updated.toISOString().slice(0, 10)}</p>
     <p>这是公开发布快照；独立私有知识平台尚未启用。</p>
-    <Content />
+    <section aria-labelledby="knowledge-body-title">
+      <h2 id="knowledge-body-title" class="sr-only">知识正文</h2>
+      <Content />
+    </section>
     {entry.data.sources.length > 0 && <section><h2>公开来源</h2><ul>{entry.data.sources.map((source) => <li><a href={source.url} rel="noopener noreferrer">{source.title}</a></li>)}</ul></section>}
   </article>
 </Layout>

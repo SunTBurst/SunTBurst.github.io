@@ -59,15 +59,27 @@ const dateOnly = (value: string) => value.slice(0, 10);
 
 export function buildHomeModel(input: HomeModelInput): HomeModel {
   const projects = input.projects.length > 0 ? input.projects : portalConfig.projects;
-  const recent = [...input.updates, ...input.knowledge, ...input.posts, ...input.talks]
-    .sort((left, right) => right.updatedAt.localeCompare(left.updatedAt))
+  const recentEditorial = [
+    ...input.knowledge.map((entry) => ({ entry, priority: 0 })),
+    ...input.posts.map((entry) => ({ entry, priority: 1 })),
+    ...input.talks.map((entry) => ({ entry, priority: 2 })),
+  ]
+    .sort((left, right) => right.entry.updatedAt.localeCompare(left.entry.updatedAt) || left.priority - right.priority)
+    .slice(0, 6);
+  const recentUpdates = input.updates
+    .map((entry) => ({ entry, priority: 3 }))
+    .sort((left, right) => right.entry.updatedAt.localeCompare(left.entry.updatedAt))
+    .slice(0, 2);
+  const recent = [...recentEditorial, ...recentUpdates]
+    .sort((left, right) => right.entry.updatedAt.localeCompare(left.entry.updatedAt) || left.priority - right.priority)
+    .map(({ entry }) => entry)
     .slice(0, 8);
   const projectUpdated = projects.map(({ updated }) => updated).sort((left, right) => right.localeCompare(left))[0];
   const lastUpdated = dateOnly(recent[0]?.updatedAt ?? projectUpdated ?? portalConfig.projects[0]?.updated ?? '');
   const readyToolCount = portalTools.filter(({ state }) => state === 'ready').length;
   const publishedRecordCount = input.posts.length + input.talks.length + input.knowledge.length + projects.length + input.updates.length;
   const pulse: HomePulseItem[] = [
-    { label: '公开记录', value: String(publishedRecordCount), detail: '文章、知识、项目与更新', href: '/changelog' },
+    { label: '公开记录', value: String(publishedRecordCount), detail: '文章、知识、项目与更新', href: '/timeline' },
     { label: '知识主题', value: String(portalConfig.topics.length), detail: '沿主题继续探索', href: '/topics' },
     { label: '建设项目', value: String(projects.length), detail: '查看正在发生的实践', href: '/projects' },
     { label: '可用工具', value: String(readyToolCount), detail: '搜索、收藏与订阅入口', href: '/lab' },

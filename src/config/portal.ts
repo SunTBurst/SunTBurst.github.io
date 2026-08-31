@@ -8,7 +8,7 @@ export const portalConfig: PortalConfig = {
   },
   startHere: [
     { title: '认识这个空间', description: '先了解这里为什么存在。', href: '/start', nextHref: '/about', accent: 'blue' },
-    { title: '沿着知识地图走', description: '按主题而不是发布时间探索。', href: '/knowledge', nextHref: '/topics/site-building', accent: 'emerald' },
+    { title: '沿着知识地图走', description: '从一个真实问题进入，再沿方法继续。', href: '/knowledge', nextHref: '/knowledge/knowledge-visibility-boundary/', accent: 'emerald' },
     { title: '看看正在建设什么', description: '查看真实项目和更新记录。', href: '/projects', nextHref: '/changelog', accent: 'amber' },
   ],
   journeys: [
@@ -29,11 +29,11 @@ export const portalConfig: PortalConfig = {
       title: '沿知识地图漫游',
       duration: '约 5 分钟',
       description: '从公开知识入口出发，理解主题如何连接、公开与私有为什么分开。',
-      outcome: '看到一条知识从主题框架变成可引用公开快照的路线。',
+      outcome: '掌握内容分层、知识整理和 AI 引用三个可以直接复用的判断框架。',
       stops: [
-        { label: '进入公开知识地图', href: '/knowledge' },
-        { label: '理解知识管理主题', href: '/topics/knowledge-management' },
-        { label: '阅读门户建设地图', href: '/knowledge/personal-portal-map/' },
+        { label: '判断公开与私有边界', href: '/knowledge/knowledge-visibility-boundary/' },
+        { label: '整理一条可复用知识', href: '/knowledge/knowledge-publishing-pipeline/' },
+        { label: '检查 AI 回答约定', href: '/knowledge/ai-answer-contract/' },
       ],
     },
     {
@@ -60,11 +60,11 @@ export const portalConfig: PortalConfig = {
     { title: '外部服务接入', description: '天气已按主动同意和最小数据原则接入；AI、评论、统计和邮件订阅仍需分别确定服务、凭据与隐私策略。', state: 'configuration', href: '/lab' },
     { title: '公开与私有知识联动', description: '独立知识平台需要 GitHub 登录、成员权限、引用溯源和公开发布流程。', state: 'planned', href: '/ai' },
   ],
-  focus: ['建设可长期维护的个人门户', '连接公开博客与隔离的私有知识平台'],
+  focus: ['把公开与私有知识边界写清楚', '让 AI 回答可以核对、可以拒绝'],
   topics: [
     { slug: 'site-building', title: '站点建设', description: '设计、开发、发布与运行记录。', status: 'growing' },
-    { slug: 'knowledge-management', title: '知识管理', description: '收集、整理、连接与公开发布的方法。', status: 'mapping' },
-    { slug: 'ai-knowledge', title: 'AI 与知识库', description: '带权限和引用的检索增强问答。', status: 'mapping' },
+    { slug: 'knowledge-management', title: '知识管理', description: '收集、整理、连接与公开发布的方法。', status: 'growing' },
+    { slug: 'ai-knowledge', title: 'AI 与知识库', description: '带权限和引用的检索增强问答。', status: 'growing' },
   ],
   projects: [
     { slug: 'suntburst-portal', title: 'SunTBurst 个人门户', summary: '把静态博客建设成公开门户和知识入口。', status: 'building', href: '/projects/suntburst-portal/', updated: '2026-08-31' },

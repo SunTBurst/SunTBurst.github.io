@@ -9,8 +9,9 @@ const { entries } = Astro.props;
 ---
 
 <section id="recent-activity" aria-labelledby="recent-activity-title" class="mt-8 border-3 border-[#7c3aed] bg-[#f5f3ff] p-5 shadow-[4px_4px_0_0_#7c3aed] dark:bg-violet-950/40">
-  <p class="text-xs font-black tracking-[0.16em] text-violet-700 dark:text-violet-300">RECENT ACTIVITY</p>
-  <h2 id="recent-activity-title" class="mt-1 text-2xl font-black text-violet-900 dark:text-violet-100">最近活动</h2>
+  <p class="text-xs font-black tracking-[0.16em] text-violet-700 dark:text-violet-300">CURATED RECENT</p>
+  <h2 id="recent-activity-title" class="mt-1 text-2xl font-black text-violet-900 dark:text-violet-100">最近值得看</h2>
+  <p class="mt-2 text-sm font-bold leading-6 text-slate-700 dark:text-slate-200">优先展示可以复用的知识、文章和记录，仅保留少量建设更新。</p>
   {entries.length > 0 ? (
     <ol class="mt-4 space-y-3">
       {entries.map((entry) => (

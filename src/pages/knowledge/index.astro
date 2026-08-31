@@ -6,6 +6,11 @@ import { knowledgeStatusLabel } from '../../utils/portalLabels';
 import { normalizeEntrySlug } from '../../utils/slugify';
 
 const entries = (await getPublishedKnowledge()).sort((a, b) => b.data.updated.getTime() - a.data.updated.getTime());
+const guidedPath = [
+  { step: '01', title: '先划清边界', description: '判断材料应该公开、私有还是暂缓。', href: '/knowledge/knowledge-visibility-boundary/' },
+  { step: '02', title: '再整理成知识', description: '把零散资料变成有依据、有状态的快照。', href: '/knowledge/knowledge-publishing-pipeline/' },
+  { step: '03', title: '最后约束 AI', description: '让回答服从引用、权限和不确定性规则。', href: '/knowledge/ai-answer-contract/' },
+] as const;
 ---
 
 <Layout title="知识地图" description="按真实主题组织的 SunTBurst 公开知识快照" postsCount={entries.length} hidePageBanner>
@@ -16,6 +21,14 @@ const entries = (await getPublishedKnowledge()).sort((a, b) => b.data.updated.ge
       <ul class="mt-5 grid gap-3 sm:grid-cols-3">
         {portalConfig.topics.map((topic) => <li class="border-2 border-emerald-700 bg-white p-3 dark:bg-slate-800"><a class="flex min-h-[44px] items-center font-black text-emerald-900 underline dark:text-emerald-100" href={`/topics/${topic.slug}`}>{topic.title}</a><p class="text-sm font-bold leading-6">{topic.description}</p></li>)}
       </ul>
+    </section>
+    <section class="border-4 border-[#7c3aed] bg-[#f5f3ff] p-5 shadow-[6px_6px_0_0_#7c3aed] dark:bg-violet-950/40 sm:p-8">
+      <p class="text-xs font-black tracking-[0.16em] text-violet-700 dark:text-violet-300">GUIDED PATH</p>
+      <h2 class="mt-1 text-2xl font-black text-violet-900 dark:text-violet-100">第一次来，按这三步读</h2>
+      <p class="mt-2 font-bold leading-7 text-slate-700 dark:text-slate-200">三篇内容前后相连：先决定什么能进入知识库，再决定怎样整理，最后决定 AI 怎样使用。</p>
+      <ol class="mt-5 grid gap-4 lg:grid-cols-3">
+        {guidedPath.map((item) => <li data-knowledge-path-step={item.step} class="border-2 border-violet-700 bg-white p-4 dark:bg-slate-800"><span class="text-2xl font-black text-violet-700 dark:text-violet-300">{item.step}</span><a href={item.href} class="mt-2 flex min-h-[44px] items-center font-black text-violet-900 underline decoration-2 underline-offset-4 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-violet-500/40 dark:text-violet-100">{item.title} →</a><p class="mt-2 text-sm font-bold leading-6">{item.description}</p></li>)}
+      </ol>
     </section>
     <section class="border-4 border-[#0284c7] bg-white p-5 shadow-[6px_6px_0_0_#0284c7] dark:bg-slate-800 sm:p-8">
       <h2 class="text-2xl font-black text-[#075985] dark:text-[#bae6fd]">已发布知识</h2>

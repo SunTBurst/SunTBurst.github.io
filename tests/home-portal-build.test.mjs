@@ -58,7 +58,7 @@ test('homepage is the nine-section SunTBurst portal with continuous two-hop path
   const firstHops = anchorHrefs(html, 'start-current');
   const secondHops = anchorHrefs(html, 'start-next');
   assert.deepEqual(firstHops, ['/start', '/knowledge', '/projects'], 'expected three ordinary first-hop links');
-  assert.deepEqual(secondHops, ['/about', '/topics/site-building', '/changelog'], 'expected three ordinary second-hop links');
+  assert.deepEqual(secondHops, ['/about', '/knowledge/knowledge-visibility-boundary/', '/changelog'], 'expected three ordinary second-hop links');
   for (const href of [...firstHops, ...secondHops]) {
     assert.ok(routeExists(href), `expected homepage hop ${href} to resolve to built HTML`);
   }

@@ -13,6 +13,9 @@ const fixedRoutes = [
   '/start',
   '/knowledge',
   '/knowledge/personal-portal-map/',
+  '/knowledge/knowledge-visibility-boundary/',
+  '/knowledge/knowledge-publishing-pipeline/',
+  '/knowledge/ai-answer-contract/',
   '/projects',
   '/projects/suntburst-portal/',
   '/now',
@@ -138,7 +141,7 @@ test('production build emits every fixed and indexed public HTML route with hone
   const journeyStops = Array.from(startHtml.matchAll(/<a\b(?=[^>]*data-journey-stop)(?=[^>]*href="([^"]+)")[^>]*>/g), (match) => match[1]);
   assert.deepEqual(
     journeyStops,
-    ['/about', '/now', '/changelog', '/knowledge', '/topics/knowledge-management', '/knowledge/personal-portal-map/', '/projects', '/topics/site-building', '/lab'],
+    ['/about', '/now', '/changelog', '/knowledge/knowledge-visibility-boundary/', '/knowledge/knowledge-publishing-pipeline/', '/knowledge/ai-answer-contract/', '/projects', '/topics/site-building', '/lab'],
     'expected each journey to provide three ordinary local stops in editorial order',
   );
   for (const href of journeyStops) readRoute(href);

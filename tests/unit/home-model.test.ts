@@ -25,7 +25,7 @@ test('homepage model stays meaningful with every editorial collection empty', ()
   assert.equal(model.lastUpdated, '2026-08-31');
   assert.equal(model.recent.length, 0);
   assert.deepEqual(model.pulse.map(({ label, value, href }) => ({ label, value, href })), [
-    { label: '公开记录', value: '1', href: '/changelog' },
+    { label: '公开记录', value: '1', href: '/timeline' },
     { label: '知识主题', value: '3', href: '/topics' },
     { label: '建设项目', value: '1', href: '/projects' },
     { label: '可用工具', value: '11', href: '/lab' },
@@ -55,7 +55,7 @@ test('homepage model derives the update label from the newest published entry', 
   assert.equal(model.lastUpdated, '2026-09-02');
 });
 
-test('homepage model sorts recent activity by date, keeps equal dates stable, and limits it to eight entries', () => {
+test('homepage model sorts recent entries by date, prioritizes editorial content on ties, and caps build updates', () => {
   const model = buildHomeModel({
     posts: [entry('post-same-date', '2026-09-03'), entry('post-old', '2026-08-30')],
     talks: [entry('talk-newest', '2026-09-04')],
@@ -74,9 +74,30 @@ test('homepage model sorts recent activity by date, keeps equal dates stable, an
 
   assert.deepEqual(
     model.recent.map(({ id }) => id),
-    ['talk-newest', 'update-same-date', 'knowledge-same-date', 'post-same-date', 'update-seven', 'update-six', 'update-five', 'post-old'],
+    ['talk-newest', 'knowledge-same-date', 'post-same-date', 'update-same-date', 'update-seven', 'post-old'],
   );
-  assert.equal(model.recent.length, 8);
+  assert.equal(model.recent.length, 6);
+});
+
+test('homepage recent stream reserves space for reusable knowledge instead of becoming a build log', () => {
+  const model = buildHomeModel({
+    posts: [],
+    talks: [],
+    knowledge: [
+      entry('knowledge-boundary', '2026-08-31'),
+      entry('knowledge-pipeline', '2026-08-30'),
+      entry('knowledge-ai-contract', '2026-08-29'),
+    ],
+    projects: [],
+    updates: Array.from({ length: 9 }, (_, index) => entry(`update-${index + 1}`, `2026-09-${String(9 - index).padStart(2, '0')}`)),
+  });
+
+  assert.deepEqual(
+    model.recent.filter(({ id }) => id.startsWith('knowledge-')).map(({ id }) => id),
+    ['knowledge-boundary', 'knowledge-pipeline', 'knowledge-ai-contract'],
+  );
+  assert.equal(model.recent.filter(({ id }) => id.startsWith('update-')).length, 2);
+  assert.equal(model.recent.length, 5);
 });
 
 test('homepage pulse counts every published collection entry without inventing traffic data', () => {
