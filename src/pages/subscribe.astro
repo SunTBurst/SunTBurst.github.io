@@ -1,5 +1,59 @@
 ---
-import FeaturePreview from '../components/FeaturePreview.astro';
+import FeedCopy from '../components/FeedCopy.svelte';
+import { siteConfig } from '../config/site';
 import Layout from '../layouts/Layout.astro';
+
+const siteUrl = (Astro.site ?? new URL(siteConfig.url)).toString();
+const feedUrl = new URL('/rss.xml', siteUrl).toString();
+const coverage = [
+  ['文章与说说', '跟踪较长内容和即时记录。'],
+  ['公开知识', '收到知识地图中的新增与修订。'],
+  ['项目', '跟踪真实项目状态和建设说明。'],
+  ['站点更新', '了解新功能、边界和验证结果。'],
+];
 ---
-<Layout title="订阅预览" description="双重确认订阅的启用条件"><FeaturePreview feature="subscribe" title="邮件订阅" purpose="未来可让访客自愿订阅公开更新，并随时退订或删除记录。" requirements="需要 SunTBurst 自有邮件服务、双重确认、签名令牌、限流、退订和删除流程。" privacy="未完成确认前不加入名单，不把邮箱或正文发送到未知服务，不保留多余个人数据。" fallback="当前没有启用订阅服务，也不提供不能提交的假表单；可使用公开 RSS。" /></Layout>
+
+<Layout title="订阅中心" description="使用 RSS 或 OPML 跟踪全部公开内容，查看邮件订阅接入状态" hidePageBanner>
+  <div data-subscription-center class="mx-auto grid max-w-5xl gap-6">
+    <header class="border-4 border-[#0284c7] bg-[#e0f2fe] p-5 shadow-[7px_7px_0_0_#f59e0b] dark:bg-slate-800 sm:p-8">
+      <p class="text-xs font-black tracking-[0.18em] text-[#0369a1] dark:text-[#bae6fd]">FOLLOW · WITHOUT AN ACCOUNT</p>
+      <h1 class="mt-1 text-3xl font-black text-[#075985] dark:text-[#bae6fd]">订阅中心</h1>
+      <p class="mt-3 max-w-3xl font-bold leading-7 text-slate-700 dark:text-slate-200">不必每天手动检查首页。现在可以用 RSS 阅读器跟踪文章、说说、知识、项目和站点更新；整个过程不需要在本站注册账号或留下邮箱。</p>
+    </header>
+
+    <section data-subscription-option="rss" aria-labelledby="rss-subscription-title" class="border-4 border-emerald-700 bg-emerald-50 p-5 shadow-[6px_6px_0_0_#047857] dark:bg-emerald-950/30 sm:p-8">
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <p class="text-xs font-black tracking-[0.16em] text-emerald-800 dark:text-emerald-200">READY NOW</p>
+          <h2 id="rss-subscription-title" class="mt-1 text-2xl font-black text-emerald-900 dark:text-emerald-100">RSS 订阅已经可用</h2>
+        </div>
+        <span class="border-2 border-emerald-700 bg-white px-3 py-2 text-sm font-black text-emerald-900 dark:bg-slate-800 dark:text-emerald-100">无需登录 · 不收集邮箱</span>
+      </div>
+      <p class="mt-3 font-bold leading-7 text-slate-700 dark:text-slate-200">主订阅源已经覆盖文章、说说、知识、项目和站点更新。复制地址后粘贴到你习惯的 RSS 阅读器即可。</p>
+      <div class="mt-5"><FeedCopy feedUrl={feedUrl} client:load /></div>
+      <div class="mt-4 flex flex-wrap gap-3">
+        <a href="/rss.xml" target="_blank" rel="noopener noreferrer" class="inline-flex min-h-[44px] items-center border-2 border-emerald-700 bg-white px-4 py-2 font-black text-emerald-900 shadow-[3px_3px_0_0_#047857] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-500/40 dark:bg-slate-800 dark:text-emerald-100">直接打开 RSS →</a>
+        <a href="/suntburst.opml" download data-subscription-option="opml" class="inline-flex min-h-[44px] items-center border-2 border-emerald-700 bg-white px-4 py-2 font-black text-emerald-900 shadow-[3px_3px_0_0_#047857] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-500/40 dark:bg-slate-800 dark:text-emerald-100">下载 OPML 导入文件 ↓</a>
+      </div>
+    </section>
+
+    <section aria-labelledby="feed-coverage-title" class="border-4 border-violet-700 bg-violet-50 p-5 shadow-[6px_6px_0_0_#6d28d9] dark:bg-violet-950/30 sm:p-8">
+      <p class="text-xs font-black tracking-[0.16em] text-violet-800 dark:text-violet-200">WHAT YOU RECEIVE</p>
+      <h2 id="feed-coverage-title" class="mt-1 text-2xl font-black text-violet-900 dark:text-violet-100">订阅源包含什么</h2>
+      <ul class="mt-5 grid gap-3 sm:grid-cols-2">
+        {coverage.map(([title, description]) => <li class="border-3 border-violet-700 bg-white p-4 dark:bg-slate-900"><h3 class="font-black text-violet-900 dark:text-violet-100">{title}</h3><p class="mt-2 text-sm font-bold leading-6 text-slate-600 dark:text-slate-300">{description}</p></li>)}
+      </ul>
+      <p class="mt-4 text-sm font-bold leading-6 text-slate-600 dark:text-slate-300">OPML 是阅读器之间通用的订阅列表格式。下载后在阅读器中选择“导入 OPML”，即可一次添加本站 RSS。</p>
+    </section>
+
+    <section data-feature="subscribe" data-state="preview" aria-labelledby="email-subscription-title" class="border-4 border-slate-600 bg-slate-100 p-5 shadow-[6px_6px_0_0_#475569] dark:bg-slate-800 sm:p-8">
+      <p class="inline-flex border-2 border-slate-600 bg-white px-3 py-1 text-xs font-black tracking-[0.16em] text-slate-700 dark:bg-slate-900 dark:text-slate-200">EMAIL · NOT ENABLED</p>
+      <h2 id="email-subscription-title" class="mt-3 text-2xl font-black text-slate-900 dark:text-white">邮件订阅仍待接入</h2>
+      <p class="mt-3 font-bold leading-7 text-slate-700 dark:text-slate-200">当前暂不收集邮箱，也不展示不能提交的假表单。启用前必须具备自有邮件服务、双重确认、签名退订、请求限流和数据删除流程。</p>
+      <div class="mt-4 grid gap-3 sm:grid-cols-2">
+        <div class="border-2 border-slate-500 bg-white p-4 dark:bg-slate-900"><h3 class="font-black">加入名单前</h3><p class="mt-2 text-sm font-bold leading-6 text-slate-600 dark:text-slate-300">访客需要点击确认邮件；未确认地址不会进入正式名单。</p></div>
+        <div class="border-2 border-slate-500 bg-white p-4 dark:bg-slate-900"><h3 class="font-black">加入名单后</h3><p class="mt-2 text-sm font-bold leading-6 text-slate-600 dark:text-slate-300">每封邮件必须提供可用退订入口，并允许请求删除邮箱记录。</p></div>
+      </div>
+    </section>
+  </div>
+</Layout>

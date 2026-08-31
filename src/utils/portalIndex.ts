@@ -32,7 +32,7 @@ const staticPages: PortalIndexEntry[] = [
   ['music', '声音空间', '播放浏览器本地合成的三种原创声音场景', '/music'],
   ['stats', '站点数据', '查看不追踪访客的内容与建设统计', '/stats'],
   ['status', '构建状态', '查看当前部署快照与降级边界', '/status'],
-  ['subscribe', '订阅', '了解双重确认订阅的启用条件', '/subscribe'],
+  ['subscribe', '订阅中心', '使用 RSS 或 OPML 跟踪全部公开内容并查看邮件接入状态', '/subscribe'],
   ['talks', '说说', '浏览公开的简短记录', '/talks'],
   ['friends', '友链与书签', '查看真实友链、公开申请入口和精选站外资料', '/friends'],
   ['privacy', '隐私', '了解本站的数据边界', '/privacy'],

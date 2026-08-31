@@ -1,10 +1,12 @@
 import { getPublishedPosts, getPublishedTalks } from '../utils/contentCollections';
+import { getPublishedKnowledge, getPublishedProjects, getPublishedUpdates } from '../utils/portalCollections';
 import { siteConfig } from '../config/site';
 import MarkdownIt from 'markdown-it';
 import sanitizeHtml from 'sanitize-html';
 import type { APIContext } from 'astro';
 import { rssDate } from '../utils/dateFormat';
 import { renderTalkContent } from '../utils/talkContent';
+import { normalizeEntrySlug, postPath, talkPath } from '../utils/slugify';
 
 const parser = new MarkdownIt();
 
@@ -41,10 +43,19 @@ function renderItem(title: string, url: string, desc: string, pubDate: string, c
   ].join('\n');
 }
 
+function renderMarkdownContent(markdown: string): string {
+  return sanitizeHtml(parser.render(stripInvalidXmlChars(markdown)), {
+    allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img']),
+  });
+}
+
 export async function GET(context: APIContext) {
-  const [posts, talks] = await Promise.all([
+  const [posts, talks, knowledge, projects, updates] = await Promise.all([
     getPublishedPosts(),
     getPublishedTalks(),
+    getPublishedKnowledge(),
+    getPublishedProjects(),
+    getPublishedUpdates(),
   ]);
 
   const siteUrl = (context.site ?? new URL(siteConfig.url)).toString().replace(/\/$/, '');
@@ -54,13 +65,11 @@ export async function GET(context: APIContext) {
     ...posts.map((post) => {
       const body = typeof post.body === 'string' ? post.body : '';
       const cleaned = stripInvalidXmlChars(body);
-      const slug = (post.data.slug || post.slug || post.id || '').trim();
+      const slug = normalizeEntrySlug(post);
       const desc = post.data.description || stripMarkdown(body).substring(0, 50);
-      const url = `${siteUrl}/posts/${slug}/`;
+      const url = `${siteUrl}${postPath(slug)}`;
       const pubDate = rssDate(post.data.published);
-      const content = sanitizeHtml(parser.render(cleaned), {
-        allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img']),
-      });
+      const content = renderMarkdownContent(cleaned);
       return {
         pubDate,
         sortTime: new Date(pubDate).getTime(),
@@ -71,8 +80,8 @@ export async function GET(context: APIContext) {
       const body = typeof talk.body === 'string' ? talk.body : '';
       const cleaned = stripInvalidXmlChars(body);
       const rendered = renderTalkContent(cleaned);
-      const slug = (talk.data.slug || talk.slug || talk.id || '').trim();
-      const url = `${siteUrl}/talk/${slug}/`;
+      const slug = normalizeEntrySlug(talk);
+      const url = `${siteUrl}${talkPath(slug)}`;
       const pubDate = rssDate(talk.data.published);
       const desc = rendered.plainText.slice(0, 200);
       const content = rendered.sanitizedHtml;
@@ -80,6 +89,36 @@ export async function GET(context: APIContext) {
         pubDate,
         sortTime: new Date(pubDate).getTime(),
         html: renderItem(`「说说」${talk.data.title || '随手记'}`, url, desc, pubDate, content, author),
+      };
+    }),
+    ...knowledge.map((entry) => {
+      const pubDate = rssDate(entry.data.updated);
+      const slug = encodeURIComponent(normalizeEntrySlug(entry));
+      const url = `${siteUrl}/knowledge/${slug}/`;
+      return {
+        pubDate,
+        sortTime: new Date(pubDate).getTime(),
+        html: renderItem(`「知识」${entry.data.title}`, url, entry.data.summary, pubDate, renderMarkdownContent(entry.body ?? ''), author),
+      };
+    }),
+    ...projects.map((entry) => {
+      const pubDate = rssDate(entry.data.updated);
+      const slug = encodeURIComponent(normalizeEntrySlug(entry));
+      const url = `${siteUrl}/projects/${slug}/`;
+      return {
+        pubDate,
+        sortTime: new Date(pubDate).getTime(),
+        html: renderItem(`「项目」${entry.data.title}`, url, entry.data.summary, pubDate, renderMarkdownContent(entry.body ?? ''), author),
+      };
+    }),
+    ...updates.map((entry) => {
+      const pubDate = rssDate(entry.data.published);
+      const slug = encodeURIComponent(normalizeEntrySlug(entry));
+      const url = `${siteUrl}/changelog#${slug}`;
+      return {
+        pubDate,
+        sortTime: new Date(pubDate).getTime(),
+        html: renderItem(`「更新」${entry.data.title}`, url, entry.data.summary, pubDate, renderMarkdownContent(entry.body ?? ''), author),
       };
     }),
   ]
