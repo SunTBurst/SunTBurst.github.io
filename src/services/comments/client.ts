@@ -16,6 +16,24 @@ export interface BrowserSession {
   [key: string]: unknown;
 }
 
+export interface ModerationQueueItem {
+  id: string;
+  targetKind: 'post' | 'talk' | 'knowledge' | 'project';
+  targetPath: string;
+  parentId: string | null;
+  authorLogin: string;
+  body: string;
+  createdAt: string;
+  reviews: Array<{
+    provider: string;
+    model: string;
+    decision: string;
+    reasonCodes: string[];
+    resultType: string;
+    createdAt: string;
+  }>;
+}
+
 interface FunctionResult {
   data: unknown;
   error: unknown;
@@ -101,6 +119,56 @@ function parseMutation(value: unknown): { id: string; status: BrowserComment['st
   return { id: value.comment.id, status: value.comment.status as BrowserComment['status'] };
 }
 
+function parseQueue(value: unknown): ModerationQueueItem[] {
+  if (!plainObject(value) || !Array.isArray(value.comments)) {
+    throw new CommentClientError('invalid comment response');
+  }
+  return value.comments.map((item) => {
+    if (!plainObject(item)
+      || typeof item.id !== 'string'
+      || !['post', 'talk', 'knowledge', 'project'].includes(String(item.target_kind))
+      || typeof item.target_path !== 'string'
+      || (item.parent_id !== null && typeof item.parent_id !== 'string')
+      || typeof item.author_login_snapshot !== 'string'
+      || typeof item.body !== 'string'
+      || item.status !== 'manual_review'
+      || typeof item.created_at !== 'string'
+      || !Array.isArray(item.comment_reviews)) {
+      throw new CommentClientError('invalid comment response');
+    }
+    const reviews = item.comment_reviews.map((review) => {
+      if (!plainObject(review)
+        || typeof review.provider !== 'string'
+        || typeof review.model !== 'string'
+        || typeof review.decision !== 'string'
+        || !Array.isArray(review.reason_codes)
+        || !review.reason_codes.every((code) => typeof code === 'string')
+        || typeof review.result_type !== 'string'
+        || typeof review.created_at !== 'string') {
+        throw new CommentClientError('invalid comment response');
+      }
+      return {
+        provider: review.provider,
+        model: review.model,
+        decision: review.decision,
+        reasonCodes: review.reason_codes as string[],
+        resultType: review.result_type,
+        createdAt: review.created_at,
+      };
+    });
+    return {
+      id: item.id,
+      targetKind: item.target_kind as ModerationQueueItem['targetKind'],
+      targetPath: item.target_path,
+      parentId: item.parent_id as string | null,
+      authorLogin: item.author_login_snapshot,
+      body: item.body,
+      createdAt: item.created_at,
+      reviews,
+    };
+  });
+}
+
 async function defaultFactory(endpoint: string, publishableKey: string): Promise<SupabaseBrowserLike> {
   const { createClient } = await import('@supabase/supabase-js');
   return createClient(endpoint, publishableKey, {
@@ -148,6 +216,10 @@ export function createCommentsClient(
 
     async list(target: CommentTarget, mode: 'target' | 'queue' = 'target'): Promise<BrowserComment[]> {
       return parseComments(await invoke('list-comments', { target, mode }));
+    },
+
+    async listQueue(): Promise<ModerationQueueItem[]> {
+      return parseQueue(await invoke('list-comments', { mode: 'queue' }));
     },
 
     async submit(input: {

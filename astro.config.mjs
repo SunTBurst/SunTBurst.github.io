@@ -1,4 +1,5 @@
 import { defineConfig } from 'astro/config';
+import { fileURLToPath } from 'node:url';
 import svelte from '@astrojs/svelte';
 import react from '@astrojs/react';
 import mdx from '@astrojs/mdx';
@@ -14,6 +15,12 @@ try {
 } catch (error) {
   if (error?.code !== 'ENOENT') throw error;
 }
+
+const commentsEnabled = process.env.PUBLIC_COMMENTS_STATE === 'enabled';
+const commentIsland = (enabledPath) => fileURLToPath(new URL(
+  commentsEnabled ? enabledPath : './src/components/comments/DisabledClientIsland.astro',
+  import.meta.url,
+));
 
 // https://astro.build/config
 export default defineConfig({
@@ -33,6 +40,12 @@ export default defineConfig({
     },
   },
   vite: {
+    resolve: {
+      alias: {
+        'virtual:comments-enabled-section': commentIsland('./src/components/comments/CommentsSectionEnabled.astro'),
+        'virtual:comments-moderation': commentIsland('./src/components/comments/ModerationEnabled.astro'),
+      },
+    },
     plugins: [tailwindcss({
       lightningcss: {
         targets: {

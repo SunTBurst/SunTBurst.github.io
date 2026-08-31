@@ -1,6 +1,7 @@
 ---
 import { render } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
+import CommentsSection from '../../components/comments/CommentsSection.astro';
 import { getPublishedKnowledge } from '../../utils/portalCollections';
 import { knowledgeStatusLabel } from '../../utils/portalLabels';
 import { normalizeEntrySlug } from '../../utils/slugify';
@@ -12,6 +13,7 @@ export async function getStaticPaths() {
 
 const { entry } = Astro.props;
 const { Content } = await render(entry);
+const entrySlug = normalizeEntrySlug(entry);
 ---
 
 <Layout title={entry.data.title} description={entry.data.summary}>
@@ -25,4 +27,5 @@ const { Content } = await render(entry);
     </section>
     {entry.data.sources.length > 0 && <section><h2>公开来源</h2><ul>{entry.data.sources.map((source) => <li><a href={source.url} rel="noopener noreferrer">{source.title}</a></li>)}</ul></section>}
   </article>
+  <CommentsSection kind="knowledge" path={`/knowledge/${encodeURIComponent(entrySlug)}/`} />
 </Layout>

@@ -31,7 +31,7 @@ test('stats and status expose build facts without visitor analytics', () => {
   assert.equal(status.buildState, 'verified-at-build');
   assert.equal(status.metrics.indexedRoutes, portalIndex.length);
   assert.equal(status.metrics.readyTools, 14);
-  assert.equal(status.metrics.previewTools, 1);
+  assert.equal(status.metrics.previewTools, 2);
   assert.doesNotMatch(JSON.stringify(status), /api\.github\.com|GITHUB_TOKEN|github_pat_|service_role/i);
   assert.doesNotMatch(`${statsHtml}\n${statusHtml}`, /\b(?:fetch|XMLHttpRequest|WebSocket|EventSource)\s*\(/);
 });

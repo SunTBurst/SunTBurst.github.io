@@ -11,8 +11,10 @@
   export let endpoint: string;
   export let publishableKey: string;
   export let target: CommentTarget;
+  export let reviewProvider: 'openai' | 'kimi' | 'deepseek';
 
   const client = createCommentsClient({ endpoint, publishableKey });
+  const providerLabels = { openai: 'OpenAI', kimi: 'Kimi', deepseek: 'DeepSeek' } as const;
   let comments: BrowserComment[] = [];
   let session: BrowserSession | null = null;
   let body = '';
@@ -140,7 +142,7 @@
     <div>
       <p class="text-xs font-black tracking-[0.16em] text-[#0369a1]">GITHUB · PREPUBLICATION REVIEW</p>
       <h2 id="comments-heading" class="mt-1 text-2xl font-black text-[#075985] dark:text-[#bae6fd]">评论与讨论</h2>
-      <p class="mt-2 max-w-2xl text-sm font-bold leading-6 text-slate-600 dark:text-slate-300">评论先经 AI 审核；不能明确通过时转人工审核，不会自动公开。仅支持 GitHub 登录和纯文本。</p>
+      <p class="mt-2 max-w-2xl text-sm font-bold leading-6 text-slate-600 dark:text-slate-300">评论先经 {providerLabels[reviewProvider]} AI 审核；不能明确通过时转人工审核，不会自动公开。仅支持 GitHub 登录和纯文本。</p>
     </div>
     {#if session}
       <button type="button" on:click={logout} class="min-h-[44px] border-2 border-slate-600 bg-white px-4 py-2 text-sm font-black text-slate-800 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-slate-400/50 dark:bg-slate-900 dark:text-white">退出登录</button>

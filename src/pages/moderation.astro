@@ -1,0 +1,20 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { commentPublicConfig } from '../features/comments/config';
+import EnabledModeration from 'virtual:comments-moderation';
+
+const enabled = commentPublicConfig.state === 'enabled';
+---
+
+<Layout title="评论人工审核" description="仅供站点管理员处理评论" robots="noindex,nofollow" hidePageBanner>
+  {enabled ? (
+    <EnabledModeration endpoint={commentPublicConfig.endpoint!} publishableKey={commentPublicConfig.publishableKey!} />
+  ) : (
+    <section data-moderation-state="preview" class="mx-auto max-w-3xl border-4 border-violet-700 bg-white p-6 shadow-[8px_8px_0_0_#7c3aed] dark:bg-slate-800 sm:p-10">
+      <p class="text-xs font-black tracking-[0.16em] text-violet-800 dark:text-violet-200">PRIVATE · PREVIEW</p>
+      <h1 class="mt-2 text-3xl font-black text-violet-950 dark:text-violet-100">人工审核尚未启用</h1>
+      <p class="mt-4 font-bold leading-7 text-slate-700 dark:text-slate-200">评论后端和 GitHub 身份验证完成外部配置前，本页不读取审核队列，也不显示任何审核操作。</p>
+      <a href="/comments-policy" class="mt-4 inline-flex min-h-[44px] items-center font-black text-violet-900 underline decoration-2 underline-offset-4 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-violet-400/50 dark:text-violet-100">查看评论规则</a>
+    </section>
+  )}
+</Layout>

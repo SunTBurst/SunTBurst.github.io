@@ -7,6 +7,7 @@ import { calculateReadingTime } from '../../utils/readingTime';
 
 import LeftSidebar from '../../components/LeftSidebar.astro';
 import ArticleEnhancements from '../../components/ArticleEnhancements.astro';
+import CommentsSection from '../../components/comments/CommentsSection.astro';
 
 export async function getStaticPaths() {
   const posts = await getProcessedPosts();
@@ -122,6 +123,7 @@ const relatedPosts = (() => {
             </div>
           </article>
         <ArticleEnhancements title={post.title} description={post.description} canonicalUrl={Astro.url.href} />
+        <CommentsSection kind="post" path={`/posts/${encodeURIComponent(post.slug)}/`} />
 
         {/* Copyright Metadata block */}
         <div 

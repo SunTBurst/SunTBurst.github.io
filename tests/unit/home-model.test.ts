@@ -36,7 +36,7 @@ test('homepage model stays meaningful with every editorial collection empty', ()
   );
   assert.deepEqual(
     model.tools.filter(({ state }) => state === 'preview').map(({ href }) => href),
-    ['/subscribe'],
+    ['/subscribe', '/comments-policy'],
   );
   assert.equal(new Set(model.tools.map(({ href }) => href)).size, model.tools.length);
   assert.ok(model.tools.every(({ href }) => href.startsWith('/')));

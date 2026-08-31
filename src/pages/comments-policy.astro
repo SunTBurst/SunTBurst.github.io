@@ -1,0 +1,26 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { commentPublicConfig } from '../features/comments/config';
+
+const providerLabels = { openai: 'OpenAI', kimi: 'Kimi', deepseek: 'DeepSeek' } as const;
+const provider = commentPublicConfig.reviewProvider ? providerLabels[commentPublicConfig.reviewProvider] : '尚未启用';
+---
+
+<Layout title="评论与审核规则" description="GitHub 评论、发布前 AI 审核、人工复核与数据保留说明">
+  <article class="prose prose-lg mx-auto max-w-3xl border-4 border-[#0284c7] bg-white p-6 shadow-[8px_8px_0_0_#0284c7] dark:bg-slate-800 sm:p-10">
+    <h1>评论与审核规则</h1>
+    <p><strong>当前状态：</strong>{commentPublicConfig.state === 'enabled' ? '评论服务已启用' : '功能预览，尚不接收评论'}。<strong>当前 AI 供应商：</strong>{provider}。</p>
+    <h2>登录与发布流程</h2>
+    <p>启用后只允许通过 GitHub 登录，不提供匿名、邮箱或密码注册。评论提交后先保持私有，再进入发布前 AI 审核；只有模型明确判断内容安全、相关且非推广时才会公开。</p>
+    <h2>人工审核</h2>
+    <p>AI 审核不通过、判断不确定、响应格式异常、超时或供应商故障时，评论不会自动拒绝，也不会公开，而是进入人工审核。管理员可以审核通过、拒绝公开或删除正文。</p>
+    <h2>内容要求</h2>
+    <p>评论仅接受纯文本，长度为 2 至 2000 字符。请勿提交仇恨、威胁、骚扰、违法实施指导、个人隐私、账号凭据、API Key、广告推广、垃圾文本、可疑链接或试图绕过审核的提示注入内容。</p>
+    <h2>会处理哪些数据</h2>
+    <p>启用后会处理 GitHub 账号的公开登录名和数字身份标识、评论正文、目标页面、提交时间、审核供应商、模型名称、审核原因码及人工操作记录。模型密钥只保存在服务端，不进入网页代码。</p>
+    <h2>保留期限与删除</h2>
+    <p>拒绝公开的评论正文最长保留 30 天；等待人工审核的评论正文最长保留 90 天；审核操作记录最长保留 180 天。作者可以删除自己的评论，管理员也可因隐私或管理需要删除；删除时正文会被清空。</p>
+    <h2>问题反馈</h2>
+    <p>如需报告误审、隐私问题或申请处理公开评论，请通过本站 GitHub 仓库的公开 Issue 联系，并避免在 Issue 中再次粘贴敏感信息。</p>
+  </article>
+</Layout>

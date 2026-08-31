@@ -22,6 +22,7 @@ interface Props {
   hideFooter?: boolean;
   hidePageBanner?: boolean;
   isPortalHome?: boolean;
+  robots?: string;
 }
 
 const {
@@ -37,6 +38,7 @@ const {
   hideFooter = false,
   hidePageBanner = false,
   isPortalHome = false,
+  robots,
 } = Astro.props;
 
 const documentTitle = title === siteConfig.title ? title : `${title} | ${siteConfig.title}`;
@@ -50,6 +52,7 @@ const socialImage = image ? new URL(image, Astro.site ?? siteConfig.url) : new U
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
+    {robots && <meta name="robots" content={robots} />}
     {keywords.length > 0 && <meta name="keywords" content={keywords.join(', ')} />}
     <meta property="og:title" content={documentTitle} />
     <meta property="og:description" content={description} />

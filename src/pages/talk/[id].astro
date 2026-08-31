@@ -3,6 +3,7 @@ import Layout from '../../layouts/Layout.astro';
 import { getProcessedTalks } from '../../utils/postsFetcher';
 import SvelteTalkDetail from '../../components/SvelteTalkDetail.svelte';
 import ArticleEnhancements from '../../components/ArticleEnhancements.astro';
+import CommentsSection from '../../components/comments/CommentsSection.astro';
 import { i18nConfig } from '../../config/site';
 
 export async function getStaticPaths() {
@@ -40,4 +41,5 @@ const seoDescription = talkSeoDescription(talk.plainText || '');
 >
   <SvelteTalkDetail talk={talk} client:load />
   <ArticleEnhancements title={talk.title || i18nConfig.talk.detailFallbackTitle} description={seoDescription} canonicalUrl={Astro.url.href} />
+  <CommentsSection kind="talk" path={`/talk/${encodeURIComponent(talk.slug)}/`} />
 </Layout>

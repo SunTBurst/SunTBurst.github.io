@@ -43,6 +43,7 @@ const fixedRoutes = [
   '/stats',
   '/status',
   '/subscribe',
+  '/comments-policy',
   '/talks',
   '/about',
   '/friends',
@@ -123,7 +124,7 @@ test('production build emits every fixed and indexed public HTML route with hone
   const previewLabHrefs = Array.from(labHtml.matchAll(/<a\b(?=[^>]*data-lab-tool="preview")(?=[^>]*href="([^"]+)")[^>]*>/g), (match) => match[1]);
   assert.deepEqual(
     previewLabHrefs,
-    ['/subscribe'],
+    ['/subscribe', '/comments-policy'],
     'expected the lab to keep every planned external capability discoverable without claiming it is live',
   );
 

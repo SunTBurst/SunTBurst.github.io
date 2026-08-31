@@ -1,0 +1,14 @@
+---
+import ModerationQueue from './ModerationQueue.svelte';
+
+interface Props {
+  endpoint: string;
+  publishableKey: string;
+}
+
+const { endpoint, publishableKey } = Astro.props;
+---
+
+<div data-moderation-state="enabled">
+  <ModerationQueue client:visible {endpoint} {publishableKey} />
+</div>

@@ -63,6 +63,25 @@ test('malformed function payloads fail closed', async () => {
   await assert.rejects(() => client.list({ kind: 'post', path: '/posts/hello/' }), /invalid comment response/);
 });
 
+test('moderation queue parser keeps only bounded review fields', async () => {
+  const client = createCommentsClient(
+    { endpoint: 'https://example.supabase.co', publishableKey: 'public-key' },
+    async () => ({
+      ...fakeSupabase([]),
+      functions: { invoke: async () => ({ data: { comments: [{
+        id: 'comment-1', target_kind: 'post', target_path: '/posts/hello/',
+        parent_id: null, author_login_snapshot: 'visitor', body: '待人工确认',
+        status: 'manual_review', created_at: '2026-08-31T00:00:00Z', comment_reviews: [],
+      }] }, error: null }) },
+    }),
+  );
+  const queue = await client.listQueue();
+  assert.deepEqual(queue[0], {
+    id: 'comment-1', targetKind: 'post', targetPath: '/posts/hello/', parentId: null,
+    authorLogin: 'visitor', body: '待人工确认', createdAt: '2026-08-31T00:00:00Z', reviews: [],
+  });
+});
+
 test('client source contains no model provider endpoint or secret name', async () => {
   const source = await import('node:fs/promises').then(({ readFile }) => readFile(
     new URL('../../src/services/comments/client.ts', import.meta.url),

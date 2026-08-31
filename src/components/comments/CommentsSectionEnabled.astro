@@ -1,0 +1,18 @@
+---
+import CommentsPanel from './CommentsPanel.svelte';
+import type { CommentTarget } from '../../features/comments/domain';
+import type { PublicReviewProvider } from '../../features/comments/config';
+
+interface Props {
+  endpoint: string;
+  publishableKey: string;
+  reviewProvider: PublicReviewProvider;
+  target: CommentTarget;
+}
+
+const { endpoint, publishableKey, reviewProvider, target } = Astro.props;
+---
+
+<div data-comments-state="enabled">
+  <CommentsPanel client:visible {endpoint} {publishableKey} {reviewProvider} {target} />
+</div>

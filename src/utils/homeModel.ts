@@ -53,6 +53,7 @@ export const portalTools: PortalToolItem[] = [
   { title: '站点数据', description: '查看不追踪访客的内容、路由和工具统计。', href: '/stats', state: 'ready' },
   { title: '构建状态', description: '查看当前部署版本、公开路由和降级边界。', href: '/status', state: 'ready' },
   { title: '邮件订阅', description: 'RSS 与 OPML 已可用；邮件仍等待双重确认、退订和删除能力。', href: '/subscribe', state: 'preview' },
+  { title: '评论与审核', description: 'GitHub 登录、发布前 AI 审核和人工复核已完成代码准备，等待安全启用。', href: '/comments-policy', state: 'preview' },
   { title: '声音空间', description: '主动播放浏览器本地合成的原创声音场景，不连接外部音源。', href: '/music', state: 'ready' },
 ];
 
