@@ -9,6 +9,7 @@ dist/
 !.env.example
 *.log
 .cache/
+.worktrees/
 
 # Editor and operating-system files
 .vscode/
