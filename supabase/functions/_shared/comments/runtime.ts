@@ -1,5 +1,5 @@
-import { createCommentReviewProvider } from '../comment-review/providers';
-import type { CommentReviewProvider, CommentReviewProviderConfig } from '../comment-review/types';
+import { createCommentReviewProvider } from '../comment-review/providers.ts';
+import type { CommentReviewProvider, CommentReviewProviderConfig } from '../comment-review/types.ts';
 
 interface DenoRuntime {
   env: { get(name: string): string | undefined };

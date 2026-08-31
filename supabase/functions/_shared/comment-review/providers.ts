@@ -1,4 +1,4 @@
-import { buildCommentReviewMessages } from './policy';
+import { buildCommentReviewMessages } from './policy.ts';
 import {
   REVIEW_REASON_CODES,
   type CommentReviewInput,
@@ -8,7 +8,7 @@ import {
   type CommentReviewResult,
   type CommentReviewResultType,
   type ReviewReasonCode,
-} from './types';
+} from './types.ts';
 
 type FetchLike = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
 

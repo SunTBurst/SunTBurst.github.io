@@ -11,6 +11,7 @@ dist/
 .cache/
 .worktrees/
 supabase/.temp/
+supabase/.branches/
 
 # Editor and operating-system files
 .vscode/

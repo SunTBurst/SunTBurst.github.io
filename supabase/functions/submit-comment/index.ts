@@ -1,9 +1,9 @@
-import type { CommentReviewResult } from '../_shared/comment-review/types';
-import type { CommentSubmissionInput } from '../_shared/comments/contracts';
-import { normalizeSubmission } from '../_shared/comments/contracts';
-import { HttpError, json, readJsonObject, requireActor, serveHttp, serviceClient } from '../_shared/comments/http';
-import { configuredReviewProvider, COMMENT_POLICY_VERSION, reviewTimeoutMs } from '../_shared/comments/runtime';
-import { submitComment, type SubmissionResultStatus, type SubmitCommentDependencies } from '../_shared/comments/submit';
+import type { CommentReviewResult } from '../_shared/comment-review/types.ts';
+import type { CommentSubmissionInput } from '../_shared/comments/contracts.ts';
+import { normalizeSubmission } from '../_shared/comments/contracts.ts';
+import { HttpError, json, readJsonObject, requireActor, serveHttp, serviceClient } from '../_shared/comments/http.ts';
+import { configuredReviewProvider, COMMENT_POLICY_VERSION, reviewTimeoutMs } from '../_shared/comments/runtime.ts';
+import { submitComment, type SubmissionResultStatus, type SubmitCommentDependencies } from '../_shared/comments/submit.ts';
 
 serveHttp(['POST'], async (request, origin) => {
   const client = serviceClient();

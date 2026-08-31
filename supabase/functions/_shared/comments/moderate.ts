@@ -1,4 +1,4 @@
-import { validateStableId } from './contracts';
+import { validateStableId } from './contracts.ts';
 
 export type ModerationAction = 'approve' | 'reject' | 'delete';
 export type ModeratedStatus = 'published' | 'rejected' | 'deleted';

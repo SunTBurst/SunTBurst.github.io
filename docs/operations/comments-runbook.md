@@ -28,6 +28,14 @@ pnpm comments:scan
 
 `comments:test-db` 会执行 `supabase/tests/database` 下的 pgTAP 测试，直接验证迁移后的表、RLS、列级读取授权、服务函数权限、幂等提交、目标校验、审核发布、一层回复和作者删除。确认两个迁移文件与全部数据库测试均成功后，才能继续部署。`supabase db reset --linked` 会清空远程数据库，本项目不使用该命令。官方测试方式见 [Supabase 数据库测试](https://supabase.com/docs/guides/database/testing)。
 
+本地验证 Edge Functions 时，创建一个会被 Git 忽略的 `supabase/functions/.env.local`，只写固定 localhost Origin、选择的供应商名和无效占位密钥，禁止使用真实供应商密钥。然后执行：
+
+```powershell
+pnpm supabase functions serve --no-verify-jwt --env-file supabase/functions/.env.local
+```
+
+逐一验证四个函数的允许 Origin 预检、错误 Origin `403`、未登录写操作 `401`、公开评论读取和匿名审核队列 `403`，完成后删除本地 env 文件。Supabase 本地 Kong 可能把响应的 `Access-Control-Allow-Origin` 改写为 `*`；安全验收必须以函数对未授权 Origin 返回 `403` 为准，不能只检查响应头。服务端 Origin 白名单仍是访问控制边界。
+
 ## 3. 连接并部署数据库
 
 以下命令只使用已经登录的 CLI 会话和交互式数据库密码，不在命令中写密钥：

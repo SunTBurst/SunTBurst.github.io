@@ -2,7 +2,7 @@ import type {
   CommentReviewInput,
   CommentReviewProvider,
   CommentReviewResult,
-} from '../comment-review/types';
+} from '../comment-review/types.ts';
 import {
   normalizeSubmission,
   sameTarget,
@@ -11,7 +11,7 @@ import {
   type CommentSubmissionInput,
   type CommentTarget,
   type NormalizedCommentSubmission,
-} from './contracts';
+} from './contracts.ts';
 
 export type SubmissionResultStatus =
   | 'pending'

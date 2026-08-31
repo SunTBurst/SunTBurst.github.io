@@ -1,6 +1,6 @@
-import { moderateComment, type ModerationAction, type ModeratedStatus } from '../_shared/comments/moderate';
-import { json, readJsonObject, requireActor, serveHttp, serviceClient } from '../_shared/comments/http';
-import { COMMENT_MODERATOR_GITHUB_IDS } from '../_shared/comments/runtime';
+import { moderateComment, type ModerationAction, type ModeratedStatus } from '../_shared/comments/moderate.ts';
+import { json, readJsonObject, requireActor, serveHttp, serviceClient } from '../_shared/comments/http.ts';
+import { COMMENT_MODERATOR_GITHUB_IDS } from '../_shared/comments/runtime.ts';
 
 serveHttp(['POST'], async (request, origin) => {
   const client = serviceClient();

@@ -1,6 +1,6 @@
-import { normalizeTarget } from '../_shared/comments/contracts';
-import { HttpError, json, optionalActor, readJsonObject, serveHttp, serviceClient } from '../_shared/comments/http';
-import { COMMENT_MODERATOR_GITHUB_IDS } from '../_shared/comments/runtime';
+import { normalizeTarget } from '../_shared/comments/contracts.ts';
+import { HttpError, json, optionalActor, readJsonObject, serveHttp, serviceClient } from '../_shared/comments/http.ts';
+import { COMMENT_MODERATOR_GITHUB_IDS } from '../_shared/comments/runtime.ts';
 
 const PUBLIC_FIELDS = 'id,parent_id,author_login_snapshot,body,status,published_at,created_at';
 

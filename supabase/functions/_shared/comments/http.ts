@@ -1,5 +1,5 @@
 import { createClient, type SupabaseClient, type User } from '@supabase/supabase-js';
-import { env, optionalEnv, serve } from './runtime';
+import { env, optionalEnv, serve } from './runtime.ts';
 
 export interface AuthenticatedCommentActor {
   userId: string;
