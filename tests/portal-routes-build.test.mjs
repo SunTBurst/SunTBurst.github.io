@@ -85,6 +85,20 @@ test('production build emits every fixed and indexed public HTML route with hone
   assert.ok(resultLinks.length > 0, 'expected focusable ordinary links with stable result identities');
   assert.ok(resultLinks.every((link) => /min-h-\[44px\]/.test(link)), 'expected every search result link to keep a 44px target');
 
+  const labHtml = readRoute('/lab');
+  const readyLabHrefs = Array.from(labHtml.matchAll(/<a\b(?=[^>]*data-lab-tool="ready")(?=[^>]*href="([^"]+)")[^>]*>/g), (match) => match[1]);
+  assert.deepEqual(
+    readyLabHrefs,
+    ['/search', '/explore', '/favorites', '/calendar', '/timeline', '/rss.xml'],
+    'expected the lab to explain every tool counted as available on the homepage',
+  );
+  const previewLabHrefs = Array.from(labHtml.matchAll(/<a\b(?=[^>]*data-lab-tool="preview")(?=[^>]*href="([^"]+)")[^>]*>/g), (match) => match[1]);
+  assert.deepEqual(
+    previewLabHrefs,
+    ['/ai', '/stats', '/status', '/subscribe', '/music'],
+    'expected the lab to keep every planned external capability discoverable without claiming it is live',
+  );
+
   for (const unknownRoute of ['/knowledge/not-published/', '/projects/not-published/', '/topics/not-configured/']) {
     assert.equal(existsSync(hrefToHtmlPath(unknownRoute)), false, `expected unknown route ${unknownRoute} not to be generated`);
   }

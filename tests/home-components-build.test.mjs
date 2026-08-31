@@ -16,13 +16,14 @@ const touchHarnessOutput = path.join(projectRoot, 'dist', '__portal-home-touch-t
 const longUnbrokenToken = 'UNBROKENHOMEPAGELINKTITLEANDPATHFORNARROWSCREENWRAPPINGCHECK';
 const sectionIds = [
   'identity',
+  'portal-pulse',
   'start-here',
   'knowledge-map',
   'current-focus',
   'project-shelf',
   'recent-activity',
   'random-explore',
-  'environment',
+  'portal-tools',
 ];
 
 function assertTouchTarget(html, marker, expectedCount) {
@@ -102,9 +103,14 @@ export function getStaticPaths() {
     assert.match(html, /SunTBurst 个人门户/);
     assert.match(html, /href=(?:"\/posts"|\/posts)/);
     assert.match(html, /文章集合/);
-    for (const preview of ['天气预览尚未配置。', '音乐预览尚未配置。', '服务状态仅展示本地配置说明。', '访问统计预览尚未配置。', '订阅方式将在本地配置后显示。']) {
-      assert.match(html, new RegExp(preview));
+    for (const href of ['/search', '/explore', '/favorites', '/calendar', '/timeline', '/rss.xml', '/ai', '/stats', '/status', '/subscribe', '/music']) {
+      assert.match(html, new RegExp(`href=(?:"${href}"|${href})`), `expected homepage tool link ${href}`);
     }
+    assert.equal((html.match(/data-knowledge-topic=/g) ?? []).length, 3, 'expected every knowledge topic to be a link');
+    assert.equal((html.match(/data-portal-tool=/g) ?? []).length, 11, 'expected all ready and preview tools to remain discoverable');
+    assert.match(html, /公开记录/);
+    assert.match(html, /可用工具/);
+    assert.doesNotMatch(html, /预览尚未配置|尚未配置。/);
     assert.doesNotMatch(html, /(?:访问|在线|用户|文章)[^<\n]{0,16}\d+/);
     assert.doesNotMatch(html, /upxuu|private|service_role/i);
     assert.doesNotMatch(html, /(?:fetch|XMLHttpRequest|WebSocket)\s*\(/);

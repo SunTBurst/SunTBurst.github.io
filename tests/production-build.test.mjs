@@ -49,7 +49,8 @@ test('production build emits the local SunTBurst portal with network-free featur
   assert.match(home, /SunTBurst 个人门户/, 'expected the built homepage to carry the SunTBurst identity');
   assert.match(home, /https:\/\/tsun\.test\//, 'expected PUBLIC_SITE_URL to control generated absolute URLs');
   assert.match(home, /id="identity"/, 'expected the portal identity section');
-  assert.match(home, /id="environment"/, 'expected the honest environment preview section');
+  assert.match(home, /id="portal-pulse"/, 'expected the factual portal pulse section');
+  assert.match(home, /id="portal-tools"/, 'expected the honest portal toolbox section');
 
   const welcomePost = readDist('posts/hello-world/index.html');
   assert.match(welcomePost, /欢迎来到 SunTBurst 个人门户/, 'expected the local welcome post route under the product identity');

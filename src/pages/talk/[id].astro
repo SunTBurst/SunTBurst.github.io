@@ -2,6 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import { getProcessedTalks } from '../../utils/postsFetcher';
 import SvelteTalkDetail from '../../components/SvelteTalkDetail.svelte';
+import ArticleEnhancements from '../../components/ArticleEnhancements.astro';
 import { i18nConfig } from '../../config/site';
 
 export async function getStaticPaths() {
@@ -38,4 +39,5 @@ const seoDescription = talkSeoDescription(talk.plainText || '');
   keywords={[talk.title || '说说', ...(talk.tags || []), '博客说说']}
 >
   <SvelteTalkDetail talk={talk} client:load />
+  <ArticleEnhancements title={talk.title || i18nConfig.talk.detailFallbackTitle} description={seoDescription} canonicalUrl={Astro.url.href} />
 </Layout>

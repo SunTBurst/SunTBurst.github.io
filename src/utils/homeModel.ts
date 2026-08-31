@@ -9,9 +9,18 @@ export interface HomeModelInput {
   updates: PortalIndexEntry[];
 }
 
-export interface EnvironmentPreviewItem {
+export interface PortalToolItem {
   title: string;
-  preview: string;
+  description: string;
+  href: `/${string}`;
+  state: 'ready' | 'preview';
+}
+
+export interface HomePulseItem {
+  label: string;
+  value: string;
+  detail: string;
+  href: `/${string}`;
 }
 
 export interface HomeModel {
@@ -23,17 +32,24 @@ export interface HomeModel {
   posts: PortalIndexEntry[];
   recent: PortalIndexEntry[];
   exploreEntries: PortalIndexEntry[];
-  environment: EnvironmentPreviewItem[];
+  pulse: HomePulseItem[];
+  tools: PortalToolItem[];
   lastUpdated: string;
   randomFallback: '/start';
 }
 
-const environment: EnvironmentPreviewItem[] = [
-  { title: '天气', preview: '天气预览尚未配置。' },
-  { title: '音乐', preview: '音乐预览尚未配置。' },
-  { title: '服务状态', preview: '服务状态仅展示本地配置说明。' },
-  { title: '访问统计', preview: '访问统计预览尚未配置。' },
-  { title: '订阅', preview: '订阅方式将在本地配置后显示。' },
+export const portalTools: PortalToolItem[] = [
+  { title: '全站搜索', description: '在浏览器内搜索公开内容，不上传关键词。', href: '/search', state: 'ready' },
+  { title: '随机探索', description: '从已发布页面里随机发现一个入口。', href: '/explore', state: 'ready' },
+  { title: '收藏与足迹', description: '只在当前浏览器保存你的浏览线索。', href: '/favorites', state: 'ready' },
+  { title: '内容日历', description: '按日期回看文章、说说与更新。', href: '/calendar', state: 'ready' },
+  { title: '时间线', description: '沿时间顺序浏览全部公开记录。', href: '/timeline', state: 'ready' },
+  { title: 'RSS 订阅', description: '用你熟悉的阅读器跟踪公开更新。', href: '/rss.xml', state: 'ready' },
+  { title: 'AI 导览', description: '查看公开问答的范围、引用和隐私边界。', href: '/ai', state: 'preview' },
+  { title: '访问统计', description: '查看匿名化、访客同意和启用条件。', href: '/stats', state: 'preview' },
+  { title: '服务状态', description: '查看公开状态摘要与故障降级原则。', href: '/status', state: 'preview' },
+  { title: '邮件订阅', description: '查看双重确认、退订和数据删除流程。', href: '/subscribe', state: 'preview' },
+  { title: '音乐空间', description: '查看自有音源接入与版权边界。', href: '/music', state: 'preview' },
 ];
 
 const dateOnly = (value: string) => value.slice(0, 10);
@@ -45,6 +61,14 @@ export function buildHomeModel(input: HomeModelInput): HomeModel {
     .slice(0, 8);
   const projectUpdated = projects.map(({ updated }) => updated).sort((left, right) => right.localeCompare(left))[0];
   const lastUpdated = dateOnly(recent[0]?.updatedAt ?? projectUpdated ?? portalConfig.projects[0]?.updated ?? '');
+  const readyToolCount = portalTools.filter(({ state }) => state === 'ready').length;
+  const publishedRecordCount = input.posts.length + input.talks.length + input.knowledge.length + projects.length + input.updates.length;
+  const pulse: HomePulseItem[] = [
+    { label: '公开记录', value: String(publishedRecordCount), detail: '文章、知识、项目与更新', href: '/changelog' },
+    { label: '知识主题', value: String(portalConfig.topics.length), detail: '沿主题继续探索', href: '/topics' },
+    { label: '建设项目', value: String(projects.length), detail: '查看正在发生的实践', href: '/projects' },
+    { label: '可用工具', value: String(readyToolCount), detail: '搜索、收藏与订阅入口', href: '/lab' },
+  ];
 
   return {
     identity: portalConfig.identity,
@@ -55,7 +79,8 @@ export function buildHomeModel(input: HomeModelInput): HomeModel {
     posts: input.posts,
     recent,
     exploreEntries: [...input.posts, ...input.talks, ...input.knowledge, ...input.updates],
-    environment,
+    pulse,
+    tools: portalTools,
     lastUpdated,
     randomFallback: '/start',
   };

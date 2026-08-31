@@ -1,0 +1,250 @@
+---
+import ReadingProgress from './ReadingProgress.astro';
+import BackToTop from './BackToTop.astro';
+import ShareMenu from './ShareMenu.svelte';
+
+interface Props {
+  title?: string;
+  description?: string;
+  canonicalUrl?: string;
+}
+
+const { title = '', description = '', canonicalUrl = '' } = Astro.props as Props;
+---
+
+<ReadingProgress />
+<BackToTop />
+<div class="mt-4">
+  <ShareMenu client:load title={title} description={description} canonicalUrl={canonicalUrl} />
+</div>
+
+<script>
+  const article = document.querySelector('.article-paper');
+  const prose = document.querySelector('.prose');
+  const articleRoot = (article as HTMLElement | null) || (prose as HTMLElement | null);
+
+  function updateReadingProgress() {
+    const progressHost = document.getElementById('reading-progress');
+    const progressFill = document.getElementById('reading-progress-fill');
+    if (!progressHost || !progressFill || !articleRoot) {
+      return;
+    }
+
+    const articleRect = articleRoot.getBoundingClientRect();
+    const articleStart = window.scrollY + articleRect.top;
+    const articleEnd = articleStart + articleRoot.scrollHeight - window.innerHeight;
+
+    if (articleRoot.scrollHeight <= window.innerHeight * 1.1) {
+      progressHost.classList.add('hidden');
+      return;
+    }
+
+    progressHost.classList.remove('hidden');
+    const raw = ((window.scrollY - articleStart) / Math.max(1, articleEnd - articleStart)) * 100 + 0;
+    const progress = Math.max(0, Math.min(100, raw));
+    progressFill.style.width = `${progress.toFixed(2)}%`;
+    progressHost.setAttribute('aria-valuenow', `${Math.round(progress)}`);
+  }
+
+  function setupBackToTop() {
+    const button = document.getElementById('back-to-top');
+    if (!button) return;
+    const onScroll = () => {
+      if (window.scrollY > window.innerHeight * 0.8) {
+        button.classList.remove('hidden');
+      } else {
+        button.classList.add('hidden');
+      }
+    };
+
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    button.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    });
+  }
+
+  function setupTocHighlight() {
+    const tocLinks = Array.from(document.querySelectorAll('.toc-nav-link'));
+    const headings = Array.from(document.querySelectorAll('.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6'));
+    if (tocLinks.length === 0 || headings.length === 0) return;
+
+    let activeId = '';
+    const observer = new IntersectionObserver((entries) => {
+      const activeEntry = entries.find((entry) => entry.isIntersecting);
+      if (!activeEntry) return;
+      const nextId = (activeEntry.target as HTMLElement).id;
+      if (!nextId || nextId === activeId) return;
+      activeId = nextId;
+      tocLinks.forEach((link) => {
+        const target = (link as HTMLElement).getAttribute('data-id');
+        if (target === activeId) {
+          link.classList.add('active-toc-link');
+        } else {
+          link.classList.remove('active-toc-link');
+        }
+      });
+    }, {
+      rootMargin: '-12% 0px -72% 0px',
+      threshold: 0.05,
+    });
+
+    headings.forEach((heading) => {
+      if ((heading as HTMLElement).id) observer.observe(heading);
+    });
+  }
+
+  function setupImageLightbox() {
+    if (!articleRoot) return;
+    const images = Array.from(articleRoot.querySelectorAll('img'))
+      .filter((img) => {
+        const src = img.getAttribute('src') ?? '';
+        return src && (src.startsWith('/') || src.startsWith(location.origin));
+      })
+      .map((img) => img.getAttribute('src') || '');
+
+    if (images.length === 0) return;
+
+      const sourceImages = Array.from(articleRoot.querySelectorAll('img')).filter((img) => {
+        const src = img.getAttribute('src') ?? '';
+        return src && (src.startsWith('/') || src.startsWith(location.origin));
+      });
+
+    let currentIndex = 0;
+    let overlay: HTMLDivElement | null = null;
+    let indicator: HTMLDivElement | null = null;
+
+    function closeOverlay() {
+      if (overlay) {
+        overlay.remove();
+      }
+      overlay = null;
+      indicator = null;
+      document.body.classList.remove('overflow-hidden');
+    }
+
+    function renderOverlay() {
+      if (!overlay || !indicator) return;
+      indicator.textContent = `${currentIndex + 1} / ${images.length}`;
+      const image = overlay.querySelector<HTMLImageElement>('[data-lightbox-image]');
+      if (image) {
+        image.src = images[currentIndex] || '';
+      }
+    }
+
+    function openOverlay(index: number) {
+      const imageUrl = images[index];
+      if (!imageUrl) return;
+      currentIndex = index;
+
+      overlay = document.createElement('div');
+      overlay.className = 'fixed inset-0 z-[300] flex items-center justify-center bg-slate-900/90 backdrop-blur-sm p-4';
+      overlay.tabIndex = -1;
+      overlay.setAttribute('role', 'dialog');
+      overlay.setAttribute('aria-modal', 'true');
+
+      overlay.innerHTML = `
+        <button type="button" aria-label="关闭图片查看器" class="absolute top-4 right-4 z-[310] rounded-sm border-2 border-white/20 bg-white/10 p-2 text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,0.45)] transition-all hover:bg-white/30">✕</button>
+        <button type="button" aria-label="上一张" class="lightbox-nav-prev absolute left-4 top-1/2 z-[310] -translate-y-1/2 rounded-sm border-2 border-white/20 bg-white/10 p-3 text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,0.45)] transition-all hover:bg-white/30">‹</button>
+        <button type="button" aria-label="下一张" class="lightbox-nav-next absolute right-4 top-1/2 z-[310] -translate-y-1/2 rounded-sm border-2 border-white/20 bg-white/10 p-3 text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,0.45)] transition-all hover:bg-white/30">›</button>
+        <img src="${imageUrl}" data-lightbox-image alt="文章图片预览" class="relative z-[300] max-h-[88vh] max-w-[90vw] rounded-sm border-4 border-white object-contain shadow-[6px_6px_0px_0px_rgba(0,0,0,0.5)]" />
+        <div class="absolute bottom-6 left-1/2 z-[310] -translate-x-1/2 rounded-sm border-2 border-white/20 bg-black/65 px-4 py-1 text-sm font-mono font-black tracking-widest text-white shadow" data-lightbox-indicator>${index + 1} / ${images.length}</div>
+      `;
+
+      overlay.querySelector('button[aria-label="关闭图片查看器"]')?.addEventListener('click', (event) => {
+        event.stopPropagation();
+        closeOverlay();
+      });
+
+      overlay.addEventListener('click', closeOverlay);
+      overlay.querySelector('img')?.addEventListener('click', (event) => {
+        event.stopPropagation();
+      });
+      overlay.querySelector('.lightbox-nav-prev')?.addEventListener('click', (event) => {
+        event.stopPropagation();
+        currentIndex = (currentIndex - 1 + images.length) % images.length;
+        renderOverlay();
+      });
+      overlay.querySelector('.lightbox-nav-next')?.addEventListener('click', (event) => {
+        event.stopPropagation();
+        currentIndex = (currentIndex + 1) % images.length;
+        renderOverlay();
+      });
+
+      document.body.appendChild(overlay);
+      indicator = overlay.querySelector<HTMLDivElement>('[data-lightbox-indicator]');
+      document.body.classList.add('overflow-hidden');
+
+      overlay.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+          closeOverlay();
+        }
+        if (event.key === 'ArrowLeft') {
+          event.preventDefault();
+          currentIndex = (currentIndex - 1 + images.length) % images.length;
+          renderOverlay();
+        }
+        if (event.key === 'ArrowRight') {
+          event.preventDefault();
+          currentIndex = (currentIndex + 1) % images.length;
+          renderOverlay();
+        }
+      });
+      overlay.focus?.();
+    }
+
+      sourceImages.forEach((img, index) => {
+      img.classList.add('cursor-zoom-in');
+      img.setAttribute('tabindex', '0');
+      img.setAttribute('aria-label', `打开图片预览 第 ${index + 1} 张`);
+      img.setAttribute('role', 'button');
+      img.addEventListener('click', () => openOverlay(index));
+      img.addEventListener('keydown', (event: KeyboardEvent) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          openOverlay(index);
+        }
+      });
+    });
+  }
+
+  function setupReadMore() {
+    if (!articleRoot) return;
+    const codeBlocks = Array.from(articleRoot.querySelectorAll('pre'));
+    codeBlocks.forEach((pre) => {
+      if (pre.querySelector('.code-copy-btn')) return;
+      const copyBtn = document.createElement('button');
+      copyBtn.type = 'button';
+      copyBtn.className = 'code-copy-btn absolute right-3 top-3 z-10 rounded-sm border-2 border-[#1e293b] bg-[#0ea5e9] px-2 py-1 text-[10px] font-black text-white';
+      copyBtn.textContent = '复制';
+      copyBtn.addEventListener('click', () => {
+        navigator.clipboard.writeText(pre.textContent || '').then(() => {
+          copyBtn.textContent = '已复制';
+          window.setTimeout(() => (copyBtn.textContent = '复制'), 1000);
+        });
+      });
+      pre.classList.add('relative');
+      pre.appendChild(copyBtn);
+    });
+  }
+
+  function setupReadability() {
+    updateReadingProgress();
+    setupBackToTop();
+    setupImageLightbox();
+    setupTocHighlight();
+    setupReadMore();
+    window.addEventListener('scroll', updateReadingProgress, { passive: true });
+    window.addEventListener('resize', updateReadingProgress);
+    document.addEventListener('astro:after-swap', updateReadingProgress);
+  }
+
+  if (articleRoot) {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', setupReadability);
+    } else {
+      setupReadability();
+    }
+  }
+
+</script>

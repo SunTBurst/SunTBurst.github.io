@@ -1,0 +1,42 @@
+<div
+  id="portal-effects"
+  aria-hidden="true"
+  class="pointer-events-none fixed inset-0 z-[99] overflow-hidden"
+></div>
+
+<style>
+  @keyframes portal-star {
+    0% { transform: translate3d(0, -0.75rem, 0) scale(0.45); opacity: 0.85; }
+    100% { transform: translate3d(0, 120vh, 0) scale(1.1); opacity: 0; }
+  }
+</style>
+
+<script>
+  const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const finePointer = window.matchMedia('(pointer: fine)');
+  const container = document.getElementById('portal-effects');
+  if (!media.matches && finePointer.matches && container) {
+    const spawnStar = () => {
+      const star = document.createElement('span');
+      const left = Math.random() * 100;
+      const duration = 1400 + Math.random() * 1900;
+      star.className = 'absolute w-1.5 h-1.5 rounded-full bg-yellow-300/80';
+      star.style.left = `${left}%`;
+      star.style.top = '-8px';
+      star.style.animation = `portal-star ${duration}ms linear forwards`;
+      container.appendChild(star);
+      star.addEventListener('animationend', () => star.remove(), { once: true });
+    };
+
+    const timer = window.setInterval(() => {
+      if (document.hidden || document.visibilityState !== 'visible') return;
+      if (Math.random() < 0.2) spawnStar();
+    }, 450);
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        clearInterval(timer);
+      }
+    });
+  }
+</script>

@@ -1,11 +1,12 @@
 ---
 import type { HomeModel } from '../../utils/homeModel';
 import ActivityStream from './ActivityStream.astro';
-import EnvironmentPreview from './EnvironmentPreview.astro';
 import ExploreDock from './ExploreDock.svelte';
 import FocusPanel from './FocusPanel.astro';
 import HomeHero from './HomeHero.astro';
 import KnowledgeMap from './KnowledgeMap.astro';
+import PortalPulse from './PortalPulse.astro';
+import PortalToolbox from './PortalToolbox.astro';
 import ProjectShelf from './ProjectShelf.astro';
 import StartHereGrid from './StartHereGrid.astro';
 
@@ -18,6 +19,7 @@ const { model } = Astro.props;
 
 <div aria-label="个人门户首页" class="mx-auto w-full max-w-6xl px-1 py-3 sm:px-4 sm:py-8">
   <HomeHero identity={model.identity} lastUpdated={model.lastUpdated} />
+  <PortalPulse items={model.pulse} />
   <StartHereGrid paths={model.startHere} />
   <KnowledgeMap topics={model.topics} />
   <FocusPanel focus={model.focus} />
@@ -45,5 +47,5 @@ const { model } = Astro.props;
     </section>
   )}
   <ExploreDock entries={model.exploreEntries} client:load />
-  <EnvironmentPreview items={model.environment} />
+  <PortalToolbox items={model.tools} />
 </div>

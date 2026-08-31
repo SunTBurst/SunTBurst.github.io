@@ -22,6 +22,9 @@ const { entries } = Astro.props;
       ))}
     </ol>
   ) : (
-    <p class="mt-4 text-sm font-bold leading-6 text-slate-700 dark:text-slate-200">公开内容准备好后，最近活动会在这里按更新时间出现；现在可以先从上面的入口开始。</p>
+    <div class="mt-4">
+      <p class="text-sm font-bold leading-6 text-slate-700 dark:text-slate-200">公开内容准备好后，最近活动会在这里按更新时间出现；现在可以先看看站点建设过程。</p>
+      <a href="/changelog" class="mt-3 inline-flex min-h-[44px] items-center border-2 border-violet-700 bg-white px-4 py-2 text-sm font-black text-violet-900 shadow-[3px_3px_0_0_#7c3aed] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-violet-500/40 dark:bg-slate-800 dark:text-violet-100">查看更新记录 →</a>
+    </div>
   )}
 </section>

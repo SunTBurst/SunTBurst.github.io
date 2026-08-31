@@ -2,6 +2,7 @@
 import NavBar from '../components/NavBar.astro';
 import IntentPrefetch from '../components/IntentPrefetch.astro';
 import ReadingFootprint from '../components/ReadingFootprint.astro';
+import PortalEffects from '../components/PortalEffects.astro';
 import { PageBanner } from '../components/PageBanner';
 import { siteConfig } from '../config/site';
 import '../index.css';
@@ -58,6 +59,7 @@ const socialImage = image ? new URL(image, Astro.site ?? siteConfig.url) : new U
     <title>{documentTitle}</title>
   </head>
   <body class="bg-[#f8fafc] text-slate-800 dark:bg-slate-900 dark:text-slate-100">
+    <PortalEffects />
     <ReadingFootprint />
     <IntentPrefetch />
     <NavBar />

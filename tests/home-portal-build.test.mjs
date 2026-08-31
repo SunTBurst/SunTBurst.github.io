@@ -24,20 +24,21 @@ function anchorHrefs(html, touchTarget) {
     .map((tag) => tag.match(/\bhref="([^"]+)"/)?.[1]);
 }
 
-test('homepage is the eight-section SunTBurst portal with continuous two-hop paths', () => {
+test('homepage is the nine-section SunTBurst portal with continuous two-hop paths', () => {
   const result = buildProject(projectRoot);
   assert.equal(result.status, 0, `expected homepage portal build to succeed:\n${result.output}`);
 
   const html = readFileSync(path.join(distDir, 'index.html'), 'utf8');
   const sectionIds = [
     'identity',
+    'portal-pulse',
     'start-here',
     'knowledge-map',
     'current-focus',
     'project-shelf',
     'recent-activity',
     'random-explore',
-    'environment',
+    'portal-tools',
   ];
   let previousIndex = -1;
   for (const id of sectionIds) {

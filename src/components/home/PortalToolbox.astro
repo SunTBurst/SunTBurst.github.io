@@ -1,0 +1,49 @@
+---
+import type { PortalToolItem } from '../../utils/homeModel';
+
+interface Props {
+  items: PortalToolItem[];
+}
+
+const { items } = Astro.props;
+const readyItems = items.filter(({ state }) => state === 'ready');
+const previewItems = items.filter(({ state }) => state === 'preview');
+---
+
+<section id="portal-tools" aria-labelledby="portal-tools-title" class="mt-8 border-3 border-slate-500 bg-slate-100 p-5 shadow-[4px_4px_0_0_#475569] dark:bg-slate-800">
+  <div class="flex flex-wrap items-end justify-between gap-3">
+    <div>
+      <p class="text-xs font-black tracking-[0.16em] text-slate-600 dark:text-slate-300">PORTAL TOOLBOX</p>
+      <h2 id="portal-tools-title" class="mt-1 text-2xl font-black text-slate-800 dark:text-slate-100">门户工具箱</h2>
+    </div>
+    <a href="/lab" class="inline-flex min-h-[44px] items-center border-2 border-slate-600 bg-white px-4 py-2 text-sm font-black text-slate-800 shadow-[3px_3px_0_0_#475569] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-slate-500/40 dark:bg-slate-900 dark:text-slate-100">进入实验室 →</a>
+  </div>
+
+  <h3 class="mt-5 text-sm font-black tracking-[0.12em] text-emerald-800 dark:text-emerald-200">现在可用</h3>
+  <ul class="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+    {readyItems.map((item) => (
+      <li class="min-w-0 border-2 border-emerald-700 bg-white dark:bg-slate-900">
+        <a href={item.href} data-portal-tool={item.state} class="group flex min-h-[132px] flex-col p-4 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-500/40">
+          <span class="text-xs font-black text-emerald-700 dark:text-emerald-300">可用</span>
+          <strong class="mt-2 text-lg font-black text-slate-900 underline decoration-2 underline-offset-4 group-hover:text-emerald-800 dark:text-slate-100 dark:group-hover:text-emerald-200">{item.title}</strong>
+          <span class="mt-2 text-sm font-bold leading-6 text-slate-600 dark:text-slate-300">{item.description}</span>
+        </a>
+      </li>
+    ))}
+  </ul>
+
+  <details class="mt-5 border-2 border-dashed border-slate-500 bg-white p-4 dark:bg-slate-900">
+    <summary class="min-h-[44px] cursor-pointer py-2 font-black text-slate-800 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-slate-500/40 dark:text-slate-100">查看后续接入能力（{previewItems.length}）</summary>
+    <ul class="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      {previewItems.map((item) => (
+        <li class="min-w-0 border-2 border-slate-400 bg-slate-50 dark:bg-slate-800">
+          <a href={item.href} data-portal-tool={item.state} class="group flex min-h-[124px] flex-col p-4 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-slate-500/40">
+            <span class="text-xs font-black text-slate-500 dark:text-slate-400">接入说明</span>
+            <strong class="mt-2 font-black text-slate-800 underline decoration-2 underline-offset-4 dark:text-slate-100">{item.title}</strong>
+            <span class="mt-2 text-sm font-bold leading-6 text-slate-600 dark:text-slate-300">{item.description}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </details>
+</section>
