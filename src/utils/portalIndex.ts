@@ -20,6 +20,7 @@ const staticPages: PortalIndexEntry[] = [
   ['calendar', '日历', '按日期回看公开更新', '/calendar'],
   ['timeline', '时间线', '沿时间查看站点内容', '/timeline'],
   ['explore', '随机探索', '从真实公开路由中随机发现', '/explore'],
+  ['today', '今日漫游', '按利雅得日期每天轮换一条三站公开路线', '/today'],
   ['topics', '主题', '按主题连接不同类型的公开内容', '/topics'],
   ['search', '搜索', '搜索全部公开内容和页面', '/search'],
   ['lab', '实验室', '查看可控的小工具和实验', '/lab'],

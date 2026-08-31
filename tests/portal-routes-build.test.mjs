@@ -27,6 +27,7 @@ const fixedRoutes = [
   '/calendar',
   '/timeline',
   '/explore',
+  '/today',
   '/topics',
   '/topics/site-building',
   '/topics/knowledge-management',
@@ -95,7 +96,7 @@ test('production build emits every fixed and indexed public HTML route with hone
   const readyLabHrefs = Array.from(labHtml.matchAll(/<a\b(?=[^>]*data-lab-tool="ready")(?=[^>]*href="([^"]+)")[^>]*>/g), (match) => match[1]);
   assert.deepEqual(
     readyLabHrefs,
-    ['/search', '/explore', '/favorites', '/calendar', '/timeline', '/rss.xml', '/weather', '/random-image', '/github', '/ai', '/stats', '/status', '/music'],
+    ['/search', '/explore', '/today', '/favorites', '/calendar', '/timeline', '/rss.xml', '/weather', '/random-image', '/github', '/ai', '/stats', '/status', '/music'],
     'expected the lab to explain every tool counted as available on the homepage',
   );
 

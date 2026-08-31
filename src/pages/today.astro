@@ -1,0 +1,37 @@
+---
+import DailyTrail from '../components/DailyTrail.svelte';
+import Layout from '../layouts/Layout.astro';
+import { portalTools } from '../utils/homeModel';
+import { riyadhDateKey, type DailyTrailCandidate } from '../utils/dailyTrail';
+import { buildPortalIndex } from '../utils/portalIndex';
+
+const entries = await buildPortalIndex();
+const toCandidate = ({ id, title, description, href }: typeof entries[number]): DailyTrailCandidate => ({ id, title, description, href });
+const pools = {
+  knowledge: entries.filter(({ kind }) => kind === 'knowledge').map(toCandidate),
+  practice: entries.filter(({ kind }) => ['project', 'post', 'talk'].includes(kind)).map(toCandidate),
+  tools: portalTools
+    .filter(({ state, href }) => state === 'ready' && !['/today', '/rss.xml'].includes(href))
+    .map(({ title, description, href }) => ({ id: `tool:${href}`, title, description, href })),
+};
+const initialDateKey = riyadhDateKey(new Date());
+---
+
+<Layout title="今日漫游" description="按利雅得日期每天轮换的一条三站公开路线" hidePageBanner>
+  <div class="mx-auto grid max-w-5xl gap-6">
+    <DailyTrail pools={pools} initialDateKey={initialDateKey} client:load />
+
+    <div class="grid gap-5 md:grid-cols-2">
+      <section class="border-4 border-violet-700 bg-violet-50 p-5 shadow-[6px_6px_0_0_#6d28d9] dark:bg-violet-950/30 sm:p-6">
+        <p class="text-xs font-black tracking-[0.16em] text-violet-800 dark:text-violet-200">WHY DAILY</p>
+        <h2 class="mt-1 text-2xl font-black text-slate-900 dark:text-white">给回访留一个理由</h2>
+        <p class="mt-3 font-bold leading-7 text-slate-700 dark:text-slate-200">随机探索适合当下随便走走；今日漫游则在一天内保持稳定，让你可以稍后回来接着走，不会因为刷新页面而丢掉路线。</p>
+      </section>
+      <section class="border-4 border-emerald-700 bg-emerald-50 p-5 shadow-[6px_6px_0_0_#047857] dark:bg-emerald-950/30 sm:p-6">
+        <p class="text-xs font-black tracking-[0.16em] text-emerald-800 dark:text-emerald-200">DATA BOUNDARY</p>
+        <h2 class="mt-1 text-2xl font-black text-slate-900 dark:text-white">这不是个性化推荐</h2>
+        <p class="mt-3 font-bold leading-7 text-slate-700 dark:text-slate-200">路线只由利雅得日期和公开候选列表计算，不读取设备定位，不保存浏览记录，也不根据个人行为画像。同一天的所有访客看到同一条路线。</p>
+      </section>
+    </div>
+  </div>
+</Layout>

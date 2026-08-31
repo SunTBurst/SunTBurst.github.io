@@ -26,6 +26,7 @@ export async function GET(context: any) {
   const urls: Array<{ loc: string; priority: string; changefreq: string; lastmod?: string | null }> = [
     { loc: `${domain}`, priority: '1.0', changefreq: 'daily' },
     { loc: `${domain}/talks/`, priority: '0.8', changefreq: 'daily' },
+    { loc: `${domain}/today/`, priority: '0.8', changefreq: 'daily' },
     { loc: `${domain}/posts/`, priority: '0.5', changefreq: 'weekly' },
     { loc: `${domain}/tags/`, priority: '0.5', changefreq: 'weekly' },
     { loc: `${domain}/about/`, priority: '0.4', changefreq: 'monthly' },

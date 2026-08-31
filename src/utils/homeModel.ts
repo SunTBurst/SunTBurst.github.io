@@ -41,6 +41,7 @@ export interface HomeModel {
 export const portalTools: PortalToolItem[] = [
   { title: '全站搜索', description: '在浏览器内搜索公开内容，不上传关键词。', href: '/search', state: 'ready' },
   { title: '随机探索', description: '从已发布页面里随机发现一个入口。', href: '/explore', state: 'ready' },
+  { title: '今日漫游', description: '按利雅得日期每天轮换一条知识、实践与工具路线。', href: '/today', state: 'ready' },
   { title: '收藏与足迹', description: '只在当前浏览器保存你的浏览线索。', href: '/favorites', state: 'ready' },
   { title: '内容日历', description: '按日期回看文章、说说与更新。', href: '/calendar', state: 'ready' },
   { title: '时间线', description: '沿时间顺序浏览全部公开记录。', href: '/timeline', state: 'ready' },

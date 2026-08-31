@@ -28,11 +28,11 @@ test('homepage model stays meaningful with every editorial collection empty', ()
     { label: '公开记录', value: '1', href: '/timeline' },
     { label: '知识主题', value: '3', href: '/topics' },
     { label: '建设项目', value: '1', href: '/projects' },
-    { label: '可用工具', value: '13', href: '/lab' },
+    { label: '可用工具', value: '14', href: '/lab' },
   ]);
   assert.deepEqual(
     model.tools.filter(({ state }) => state === 'ready').map(({ href }) => href),
-    ['/search', '/explore', '/favorites', '/calendar', '/timeline', '/rss.xml', '/weather', '/random-image', '/github', '/ai', '/stats', '/status', '/music'],
+    ['/search', '/explore', '/today', '/favorites', '/calendar', '/timeline', '/rss.xml', '/weather', '/random-image', '/github', '/ai', '/stats', '/status', '/music'],
   );
   assert.deepEqual(
     model.tools.filter(({ state }) => state === 'preview').map(({ href }) => href),
