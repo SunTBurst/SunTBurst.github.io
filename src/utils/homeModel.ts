@@ -52,7 +52,7 @@ export const portalTools: PortalToolItem[] = [
   { title: '站点数据', description: '查看不追踪访客的内容、路由和工具统计。', href: '/stats', state: 'ready' },
   { title: '构建状态', description: '查看当前部署版本、公开路由和降级边界。', href: '/status', state: 'ready' },
   { title: '邮件订阅', description: '查看双重确认、退订和数据删除流程。', href: '/subscribe', state: 'preview' },
-  { title: '音乐空间', description: '查看自有音源接入与版权边界。', href: '/music', state: 'preview' },
+  { title: '声音空间', description: '主动播放浏览器本地合成的原创声音场景，不连接外部音源。', href: '/music', state: 'ready' },
 ];
 
 const dateOnly = (value: string) => value.slice(0, 10);

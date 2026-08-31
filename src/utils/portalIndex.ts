@@ -28,7 +28,7 @@ const staticPages: PortalIndexEntry[] = [
   ['random-image', '随机画片', '从本站自有的授权画片中随机探索', '/random-image'],
   ['github', 'GitHub 公开活动', '查看构建期生成的公开仓库与活动快照', '/github'],
   ['ai', 'AI 导览', '了解公开 AI 导览的启用条件和当前替代入口', '/ai'],
-  ['music', '音乐', '了解自有音乐配置和当前静态状态', '/music'],
+  ['music', '声音空间', '播放浏览器本地合成的三种原创声音场景', '/music'],
   ['stats', '站点数据', '查看不追踪访客的内容与建设统计', '/stats'],
   ['status', '构建状态', '查看当前部署快照与降级边界', '/status'],
   ['subscribe', '订阅', '了解双重确认订阅的启用条件', '/subscribe'],

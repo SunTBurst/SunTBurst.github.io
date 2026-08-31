@@ -1,5 +1,23 @@
 ---
-import FeaturePreview from '../components/FeaturePreview.astro';
+import SoundscapePlayer from '../components/SoundscapePlayer.svelte';
 import Layout from '../layouts/Layout.astro';
 ---
-<Layout title="音乐预览" description="自有音乐配置的启用边界"><FeaturePreview feature="music" title="音乐" purpose="未来可播放 SunTBurst 自有或明确授权的音频与歌单。" requirements="需要确认音频授权、由 SunTBurst 控制的资源配置、跨页状态和失败降级。" privacy="不自动播放，不代理未知或无授权音源，不用访客行为暗中生成画像。" fallback="当前没有配置歌单，也不加载任何音频或外部播放器。" /></Layout>
+
+<Layout title="声音空间" description="由浏览器本地生成的三种原创声音场景" hidePageBanner>
+  <div class="mx-auto grid max-w-5xl gap-6">
+    <SoundscapePlayer client:load />
+
+    <div class="grid gap-5 md:grid-cols-2">
+      <section class="border-4 border-amber-600 bg-amber-50 p-5 shadow-[6px_6px_0_0_#d97706] dark:bg-amber-950/30 sm:p-6">
+        <p class="text-xs font-black tracking-[0.16em] text-amber-800 dark:text-amber-200">HOW IT WORKS</p>
+        <h2 class="mt-1 text-2xl font-black text-slate-900 dark:text-white">它如何发出声音</h2>
+        <p class="mt-3 font-bold leading-7 text-slate-700 dark:text-slate-200">点击开始后，浏览器使用 Web Audio 生成低频长音与简短音点；旋律参数随页面代码一起发布，没有远程播放器、音频热链或版权不明的素材。</p>
+      </section>
+      <section class="border-4 border-emerald-700 bg-emerald-50 p-5 shadow-[6px_6px_0_0_#047857] dark:bg-emerald-950/30 sm:p-6">
+        <p class="text-xs font-black tracking-[0.16em] text-emerald-800 dark:text-emerald-200">DATA BOUNDARY</p>
+        <h2 class="mt-1 text-2xl font-black text-slate-900 dark:text-white">只存在于当前页面</h2>
+        <p class="mt-3 font-bold leading-7 text-slate-700 dark:text-slate-200">切换场景和调节音量都不会发送网络请求，也不写入本地存储。离开页面时声音引擎会停止，本站不记录你播放了什么或播放了多久。</p>
+      </section>
+    </div>
+  </div>
+</Layout>

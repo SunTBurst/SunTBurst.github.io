@@ -78,7 +78,7 @@ test('production build emits every fixed and indexed public HTML route with hone
   assert.ok(detailEntries.length >= 2, 'expected published knowledge and project details in the portal index');
   for (const entry of detailEntries) readRoute(entry.href);
 
-  for (const feature of ['ai', 'music', 'subscribe']) {
+  for (const feature of ['ai', 'subscribe']) {
     const html = readRoute(`/${feature}`);
     assert.match(html, new RegExp(`data-feature="${feature}"`), `expected ${feature} feature identity`);
     assert.match(html, /data-state="preview"/, `expected ${feature} to remain an honest preview`);
@@ -95,7 +95,7 @@ test('production build emits every fixed and indexed public HTML route with hone
   const readyLabHrefs = Array.from(labHtml.matchAll(/<a\b(?=[^>]*data-lab-tool="ready")(?=[^>]*href="([^"]+)")[^>]*>/g), (match) => match[1]);
   assert.deepEqual(
     readyLabHrefs,
-    ['/search', '/explore', '/favorites', '/calendar', '/timeline', '/rss.xml', '/weather', '/random-image', '/github', '/stats', '/status'],
+    ['/search', '/explore', '/favorites', '/calendar', '/timeline', '/rss.xml', '/weather', '/random-image', '/github', '/stats', '/status', '/music'],
     'expected the lab to explain every tool counted as available on the homepage',
   );
 
@@ -122,7 +122,7 @@ test('production build emits every fixed and indexed public HTML route with hone
   const previewLabHrefs = Array.from(labHtml.matchAll(/<a\b(?=[^>]*data-lab-tool="preview")(?=[^>]*href="([^"]+)")[^>]*>/g), (match) => match[1]);
   assert.deepEqual(
     previewLabHrefs,
-    ['/ai', '/subscribe', '/music'],
+    ['/ai', '/subscribe'],
     'expected the lab to keep every planned external capability discoverable without claiming it is live',
   );
 
