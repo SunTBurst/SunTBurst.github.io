@@ -15,17 +15,18 @@
 
 ## 2. 本地验证数据库迁移
 
-安装 Supabase CLI 并启动 Docker Desktop，然后在仓库根目录执行：
+仓库已经把 Supabase CLI `2.116.0` 固定为开发依赖。Windows 需要先启用 WSL 2，并确认 Docker Desktop 的 Linux 容器引擎能够正常响应；仅安装 `docker.exe` 但后台引擎未启动，不能作为数据库验收依据。然后在仓库根目录执行：
 
 ```powershell
-supabase start
-supabase db reset
+pnpm supabase start
+pnpm comments:db-reset
+pnpm comments:test-db
 pnpm test
 pnpm build
 pnpm comments:scan
 ```
 
-确认两个迁移文件全部执行成功，RLS、列级读取授权、状态约束、限流和原子审核函数存在。`supabase db reset --linked` 会清空远程数据库，本项目不使用该命令。
+`comments:test-db` 会执行 `supabase/tests/database` 下的 pgTAP 测试，直接验证迁移后的表、RLS、列级读取授权、服务函数权限、幂等提交、目标校验、审核发布、一层回复和作者删除。确认两个迁移文件与全部数据库测试均成功后，才能继续部署。`supabase db reset --linked` 会清空远程数据库，本项目不使用该命令。官方测试方式见 [Supabase 数据库测试](https://supabase.com/docs/guides/database/testing)。
 
 ## 3. 连接并部署数据库
 

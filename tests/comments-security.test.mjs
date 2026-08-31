@@ -9,6 +9,20 @@ import { buildProject } from './helpers/build-project.mjs';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = (...parts) => readFileSync(path.join(root, ...parts), 'utf8');
 
+test('project provides the pinned Supabase CLI used by database verification', () => {
+  const packagePath = path.join(root, 'node_modules', 'supabase', 'package.json');
+  assert.equal(existsSync(packagePath), true, 'expected a project-scoped Supabase CLI dependency');
+  const packageJson = JSON.parse(readFileSync(packagePath, 'utf8'));
+  assert.equal(packageJson.version, '2.116.0');
+  const result = spawnSync(process.execPath, [path.join(path.dirname(packagePath), packageJson.bin.supabase), '--version'], {
+    cwd: root,
+    encoding: 'utf8',
+  });
+
+  assert.equal(result.status, 0, `${result.stdout ?? ''}\n${result.stderr ?? result.error ?? ''}`);
+  assert.equal(result.stdout.trim(), '2.116.0');
+});
+
 test('preview build passes the path-only public secret scanner', () => {
   const build = buildProject(root);
   assert.equal(build.status, 0, build.output);

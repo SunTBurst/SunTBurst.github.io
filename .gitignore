@@ -10,6 +10,7 @@ dist/
 *.log
 .cache/
 .worktrees/
+supabase/.temp/
 
 # Editor and operating-system files
 .vscode/

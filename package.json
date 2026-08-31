@@ -14,6 +14,8 @@
     "profile:refresh": "tsx scripts/generate-public-profiles.ts",
     "comments:scan": "tsx scripts/check-public-secrets.ts",
     "comments:sync-targets": "tsx scripts/sync-comment-targets.ts",
+    "comments:db-reset": "supabase db reset",
+    "comments:test-db": "supabase test db",
     "test:unit": "tsx --test tests/unit/*.test.ts",
     "test:node": "node --test --test-concurrency=1 tests/*.test.mjs",
     "test": "pnpm test:unit && pnpm test:node",
@@ -51,6 +53,7 @@
     "@types/node": "^22.14.0",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.5",
+    "supabase": "2.116.0",
     "tailwindcss": "^4.1.14",
     "tsx": "4.20.5",
     "typescript": "~5.8.2"
