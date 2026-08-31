@@ -103,11 +103,11 @@ export function getStaticPaths() {
     assert.match(html, /SunTBurst 个人门户/);
     assert.match(html, /href=(?:"\/posts"|\/posts)/);
     assert.match(html, /文章集合/);
-    for (const href of ['/search', '/explore', '/favorites', '/calendar', '/timeline', '/rss.xml', '/ai', '/stats', '/status', '/subscribe', '/music']) {
+    for (const href of ['/search', '/explore', '/favorites', '/calendar', '/timeline', '/rss.xml', '/weather', '/ai', '/stats', '/status', '/subscribe', '/music']) {
       assert.match(html, new RegExp(`href=(?:"${href}"|${href})`), `expected homepage tool link ${href}`);
     }
     assert.equal((html.match(/data-knowledge-topic=/g) ?? []).length, 3, 'expected every knowledge topic to be a link');
-    assert.equal((html.match(/data-portal-tool=/g) ?? []).length, 11, 'expected all ready and preview tools to remain discoverable');
+    assert.equal((html.match(/data-portal-tool=/g) ?? []).length, 12, 'expected all ready and preview tools to remain discoverable');
     assert.match(html, /公开记录/);
     assert.match(html, /可用工具/);
     assert.doesNotMatch(html, /预览尚未配置|尚未配置。/);

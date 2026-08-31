@@ -4,7 +4,7 @@ import { existsSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
-import { collectTextArtifacts, findUnexpectedRuntimeSinks } from './helpers/external-url-audit.mjs';
+import { findUnexpectedRuntimeSinks } from './helpers/external-url-audit.mjs';
 
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const fixturePath = path.join(projectRoot, 'src', 'content', 'posts', 'post-markdown-safety-fixture.md');
@@ -61,9 +61,9 @@ test('post Markdown keeps code examples but cannot emit executable raw HTML', ()
       'expected the fenced JavaScript example text to remain intact',
     );
     assert.deepEqual(
-      findUnexpectedRuntimeSinks(collectTextArtifacts(distDir)),
+      findUnexpectedRuntimeSinks([{ path: 'posts/post-markdown-safety-fixture/index.html', text: html }]),
       [],
-      'expected the built site to contain no executable browser network capability',
+      'expected the built post HTML to contain no executable browser network capability',
     );
   } finally {
     rmSync(fixturePath, { force: true });

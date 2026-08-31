@@ -31,6 +31,7 @@ const fixedRoutes = [
   '/search',
   '/lab',
   '/favorites',
+  '/weather',
   '/ai',
   '/music',
   '/stats',
@@ -89,9 +90,15 @@ test('production build emits every fixed and indexed public HTML route with hone
   const readyLabHrefs = Array.from(labHtml.matchAll(/<a\b(?=[^>]*data-lab-tool="ready")(?=[^>]*href="([^"]+)")[^>]*>/g), (match) => match[1]);
   assert.deepEqual(
     readyLabHrefs,
-    ['/search', '/explore', '/favorites', '/calendar', '/timeline', '/rss.xml'],
+    ['/search', '/explore', '/favorites', '/calendar', '/timeline', '/rss.xml', '/weather'],
     'expected the lab to explain every tool counted as available on the homepage',
   );
+
+  const weatherHtml = readRoute('/weather');
+  assert.match(weatherHtml, /data-weather-state="idle"/, 'expected weather to wait for explicit visitor action');
+  assert.match(weatherHtml, /点击后才会向 Open-Meteo 发送请求/, 'expected an explicit external-request disclosure');
+  assert.match(weatherHtml, /查看利雅得实时天气/, 'expected an explicit activation control');
+  assert.doesNotMatch(weatherHtml, /api\.open-meteo\.com/, 'expected the static page not to embed or preload the weather endpoint');
   const previewLabHrefs = Array.from(labHtml.matchAll(/<a\b(?=[^>]*data-lab-tool="preview")(?=[^>]*href="([^"]+)")[^>]*>/g), (match) => match[1]);
   assert.deepEqual(
     previewLabHrefs,

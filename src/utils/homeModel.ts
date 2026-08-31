@@ -45,6 +45,7 @@ export const portalTools: PortalToolItem[] = [
   { title: '内容日历', description: '按日期回看文章、说说与更新。', href: '/calendar', state: 'ready' },
   { title: '时间线', description: '沿时间顺序浏览全部公开记录。', href: '/timeline', state: 'ready' },
   { title: 'RSS 订阅', description: '用你熟悉的阅读器跟踪公开更新。', href: '/rss.xml', state: 'ready' },
+  { title: '利雅得天气', description: '点击后才读取实时天气，不获取设备定位。', href: '/weather', state: 'ready' },
   { title: 'AI 导览', description: '查看公开问答的范围、引用和隐私边界。', href: '/ai', state: 'preview' },
   { title: '访问统计', description: '查看匿名化、访客同意和启用条件。', href: '/stats', state: 'preview' },
   { title: '服务状态', description: '查看公开状态摘要与故障降级原则。', href: '/status', state: 'preview' },

@@ -57,7 +57,7 @@ export const portalConfig: PortalConfig = {
   ],
   roadmap: [
     { title: '门户内容结构', description: '首页、知识、项目、动态、更新与本地工具已经形成连续访问路径。', state: 'completed', href: '/changelog' },
-    { title: '外部服务接入', description: 'AI、评论、统计、天气和邮件订阅需要分别确定服务、凭据与隐私策略。', state: 'configuration', href: '/lab' },
+    { title: '外部服务接入', description: '天气已按主动同意和最小数据原则接入；AI、评论、统计和邮件订阅仍需分别确定服务、凭据与隐私策略。', state: 'configuration', href: '/lab' },
     { title: '公开与私有知识联动', description: '独立知识平台需要 GitHub 登录、成员权限、引用溯源和公开发布流程。', state: 'planned', href: '/ai' },
   ],
   focus: ['建设可长期维护的个人门户', '连接公开博客与隔离的私有知识平台'],

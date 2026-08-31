@@ -1,0 +1,21 @@
+---
+import Layout from '../layouts/Layout.astro';
+import WeatherPanel from '../components/WeatherPanel.svelte';
+---
+
+<Layout title="利雅得天气" description="访客主动启用的利雅得实时天气" hidePageBanner>
+  <div class="mx-auto grid max-w-5xl gap-6">
+    <WeatherPanel client:load />
+
+    <section class="grid gap-4 sm:grid-cols-2">
+      <div class="border-3 border-emerald-700 bg-emerald-50 p-5 dark:bg-emerald-950/30">
+        <h2 class="text-xl font-black text-emerald-900 dark:text-emerald-100">这个工具会做什么</h2>
+        <p class="mt-2 font-bold leading-7 text-slate-700 dark:text-slate-200">它只读取利雅得的当前温度、体感温度、湿度、风速、降水和天气代码。每次刷新都需要你主动点击。</p>
+      </div>
+      <div class="border-3 border-slate-600 bg-slate-100 p-5 dark:bg-slate-800">
+        <h2 class="text-xl font-black text-slate-900 dark:text-slate-100">数据与边界</h2>
+        <p class="mt-2 font-bold leading-7 text-slate-700 dark:text-slate-200">数据由 <a href="https://open-meteo.com/en/docs" rel="noreferrer" class="underline"><span lang="en">Open-Meteo</span></a> 提供。本站不获取设备定位，不把天气结果当作实地观测记录，外部服务不可用时会明确降级。</p>
+      </div>
+    </section>
+  </div>
+</Layout>

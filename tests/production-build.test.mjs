@@ -28,7 +28,7 @@ function readTextArtifacts(directory) {
   });
 }
 
-test('production build emits the local SunTBurst portal with network-free feature previews', () => {
+test('production build emits the local SunTBurst portal with one consent-based weather integration', () => {
   rmSync(distDir, { recursive: true, force: true });
 
   const result = spawnSync(process.execPath, [astroCli, 'build'], {
@@ -81,20 +81,22 @@ test('production build emits the local SunTBurst portal with network-free featur
     'function',
     'expected the artifact audit to expose the zero-network-sink check',
   );
-  assert.deepEqual(
-    externalUrlAudit.findUnexpectedRuntimeSinks(artifacts),
-    [],
-    'expected emitted JavaScript to contain no browser network capabilities',
-  );
+  const builtRuntimeFindings = externalUrlAudit.findUnexpectedRuntimeSinks(artifacts);
+  assert.equal(builtRuntimeFindings.length, 1, 'expected one emitted browser network capability');
+  assert.equal(builtRuntimeFindings[0]?.sink, 'fetch');
+  assert.match(builtRuntimeFindings[0]?.path ?? '', /^_astro\/WeatherPanel\..+\.js$/);
+
   assert.deepEqual(
     externalUrlAudit.findUnexpectedRuntimeSinks(collectTextArtifacts(srcDir)),
-    [],
-    'expected browser source to contain no network capabilities',
+    [{ path: 'components/WeatherPanel.svelte', sink: 'fetch' }],
+    'expected weather to be the only browser source with a network capability',
   );
-  assert.deepEqual(
-    findUnexpectedExternalUrls(artifacts, 'https://tsun.test'),
-    [],
-    'expected every built text artifact to contain no unknown external runtime URLs',
+
+  const externalUrls = findUnexpectedExternalUrls(artifacts, 'https://tsun.test');
+  assert.ok(externalUrls.length >= 1, 'expected the weather endpoint to stay visible to the external URL audit');
+  assert.ok(
+    externalUrls.every(({ path: artifactPath, url }) => artifactPath === builtRuntimeFindings[0]?.path && url.startsWith('https://api.open-meteo.com/v1/forecast')),
+    `expected no unknown external runtime URL, got ${JSON.stringify(externalUrls)}`,
   );
 
   for (const disabledRoute of ['api', 'comments', 'server-status', 'statistics']) {

@@ -4,7 +4,7 @@ import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { buildProject } from './helpers/build-project.mjs';
-import { collectTextArtifacts, findUnexpectedRuntimeSinks } from './helpers/external-url-audit.mjs';
+import { findUnexpectedRuntimeSinks } from './helpers/external-url-audit.mjs';
 
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const distDir = path.join(projectRoot, 'dist');
@@ -66,5 +66,6 @@ test('homepage is the nine-section SunTBurst portal with continuous two-hop path
   assert.equal((html.match(/<main\b/g) ?? []).length, 1, 'expected exactly one main landmark');
   assert.doesNotMatch(html, /PageBanner/, 'expected the portal homepage not to ship the collection PageBanner island');
   assert.doesNotMatch(html, /(?:访问量|在线人数|在线状态)[^<\n]{0,20}\d+/, 'expected no fabricated traffic or online values');
-  assert.deepEqual(findUnexpectedRuntimeSinks(collectTextArtifacts(distDir)), [], 'expected the homepage build to keep a zero-network browser bundle');
+  assert.deepEqual(findUnexpectedRuntimeSinks([{ path: 'index.html', text: html }]), [], 'expected the homepage HTML to remain network-free');
+  assert.doesNotMatch(html, /WeatherPanel|api\.open-meteo\.com/, 'expected the homepage not to load the opt-in weather runtime');
 });
