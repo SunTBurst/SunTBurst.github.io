@@ -1,5 +1,13 @@
 <script lang="ts">
-  import { browsePosts, type PublicPostBrowseEntry } from '../utils/postBrowserCore';
+  import { onMount } from 'svelte';
+  import {
+    activatePostBrowseLink,
+    browsePosts,
+    buildPostBrowseHref,
+    parsePostBrowseSearch,
+    type PostBrowseState,
+    type PublicPostBrowseEntry,
+  } from '../utils/postBrowserCore';
 
   export let posts: PublicPostBrowseEntry[] = [];
 
@@ -7,6 +15,8 @@
   let category = '';
   let tag = '';
   let currentPage = 1;
+  let currentHref = '/posts';
+  let initialized = false;
   let categorySelect: HTMLSelectElement;
   let tagSelect: HTMLSelectElement;
 
@@ -14,18 +24,56 @@
   $: tags = Array.from(new Set(posts.flatMap((post) => post.tags))).sort((a, b) => a.localeCompare(b, 'zh-CN'));
   $: model = browsePosts(posts, { query, category, tag, page: currentPage }, 6);
 
-  function resetPage() {
+  function state(page = currentPage): PostBrowseState {
+    return { query, category, tag, page };
+  }
+
+  function pageHref(page: number): string {
+    return buildPostBrowseHref(currentHref, state(page));
+  }
+
+  function applyState(nextState: PostBrowseState) {
+    query = nextState.query;
+    category = nextState.category;
+    tag = nextState.tag;
+    currentPage = browsePosts(posts, nextState, 6).page;
+    if (categorySelect) categorySelect.value = category;
+    if (tagSelect) tagSelect.value = tag;
+  }
+
+  function applyLocation() {
+    currentHref = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+    applyState(parsePostBrowseSearch(window.location.search, categories, tags));
+    const canonicalHref = buildPostBrowseHref(currentHref, state());
+    if (canonicalHref !== currentHref) window.history.replaceState(null, '', canonicalHref);
+    currentHref = canonicalHref;
+  }
+
+  function syncHistory(mode: 'push' | 'replace') {
+    if (!initialized) return;
+    const nextHref = buildPostBrowseHref(currentHref, state());
+    if (nextHref === currentHref) return;
+    if (mode === 'push') window.history.pushState(null, '', nextHref);
+    else window.history.replaceState(null, '', nextHref);
+    currentHref = nextHref;
+  }
+
+  function setQuery(event: Event) {
+    query = (event.currentTarget as HTMLInputElement).value;
     currentPage = 1;
+    syncHistory('replace');
   }
 
   function setCategory(event: Event) {
     category = (event.currentTarget as HTMLSelectElement).value;
-    resetPage();
+    currentPage = 1;
+    syncHistory('push');
   }
 
   function setTag(event: Event) {
     tag = (event.currentTarget as HTMLSelectElement).value;
-    resetPage();
+    currentPage = 1;
+    syncHistory('push');
   }
 
   function clearFilters() {
@@ -35,14 +83,30 @@
     currentPage = 1;
     if (categorySelect) categorySelect.value = '';
     if (tagSelect) tagSelect.value = '';
+    syncHistory('push');
   }
+
+  function selectPage(event: MouseEvent, page: number) {
+    activatePostBrowseLink(event, () => {
+      currentPage = page;
+      syncHistory('push');
+    });
+  }
+
+  onMount(() => {
+    applyLocation();
+    initialized = true;
+    const restoreFromHistory = () => applyLocation();
+    window.addEventListener('popstate', restoreFromHistory);
+    return () => window.removeEventListener('popstate', restoreFromHistory);
+  });
 </script>
 
 <div data-post-browser class="mt-6">
   <div class="grid gap-3 border-3 border-[#0284c7] bg-[#f8fafc] p-3 dark:bg-slate-900 sm:grid-cols-3 sm:p-4">
     <label class="min-w-0 font-black text-[#075985] dark:text-[#bae6fd]">
       <span class="block text-sm">搜索文章</span>
-      <input bind:value={query} on:input={resetPage} name="q" type="search" placeholder="标题、简介、分类或标签" class="mt-1 min-h-[44px] w-full min-w-0 border-2 border-[#0284c7] bg-white px-3 font-bold text-slate-800 focus:outline-none focus:ring-4 focus:ring-[#0ea5e9]/40 dark:bg-slate-800 dark:text-slate-100" />
+      <input value={query} on:input={setQuery} name="q" type="search" placeholder="标题、简介、分类或标签" class="mt-1 min-h-[44px] w-full min-w-0 border-2 border-[#0284c7] bg-white px-3 font-bold text-slate-800 focus:outline-none focus:ring-4 focus:ring-[#0ea5e9]/40 dark:bg-slate-800 dark:text-slate-100" />
     </label>
     <label class="min-w-0 font-black text-[#075985] dark:text-[#bae6fd]">
       <span class="block text-sm">分类</span>
@@ -91,11 +155,15 @@
 
     {#if model.totalPages > 1}
       <nav aria-label="文章分页" class="mt-6 flex flex-wrap items-center justify-center gap-2">
-        <button type="button" disabled={!model.hasPrevious} on:click={() => currentPage = model.page - 1} class="min-h-[44px] min-w-[44px] border-2 border-[#0284c7] bg-white px-3 font-black text-[#075985] disabled:cursor-not-allowed disabled:opacity-40 dark:bg-slate-800 dark:text-[#bae6fd]">上一页</button>
+        {#if model.hasPrevious}
+          <a data-post-page-link href={pageHref(model.page - 1)} on:click={(event) => selectPage(event, model.page - 1)} class="flex min-h-[44px] min-w-[44px] items-center justify-center border-2 border-[#0284c7] bg-white px-3 font-black text-[#075985] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#0ea5e9]/40 dark:bg-slate-800 dark:text-[#bae6fd]">上一页</a>
+        {/if}
         {#each model.pageNumbers as page}
-          <button type="button" aria-current={page === model.page ? 'page' : undefined} on:click={() => currentPage = page} class={`min-h-[44px] min-w-[44px] border-2 border-[#0284c7] px-3 font-black ${page === model.page ? 'bg-[#0284c7] text-white' : 'bg-[#fde68a] text-[#075985]'}`}>{page}</button>
+          <a data-post-page-link href={pageHref(page)} aria-current={page === model.page ? 'page' : undefined} on:click={(event) => selectPage(event, page)} class={`flex min-h-[44px] min-w-[44px] items-center justify-center border-2 border-[#0284c7] px-3 font-black focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#0ea5e9]/40 ${page === model.page ? 'bg-[#0284c7] text-white' : 'bg-[#fde68a] text-[#075985]'}`}>{page}</a>
         {/each}
-        <button type="button" disabled={!model.hasNext} on:click={() => currentPage = model.page + 1} class="min-h-[44px] min-w-[44px] border-2 border-[#0284c7] bg-white px-3 font-black text-[#075985] disabled:cursor-not-allowed disabled:opacity-40 dark:bg-slate-800 dark:text-[#bae6fd]">下一页</button>
+        {#if model.hasNext}
+          <a data-post-page-link href={pageHref(model.page + 1)} on:click={(event) => selectPage(event, model.page + 1)} class="flex min-h-[44px] min-w-[44px] items-center justify-center border-2 border-[#0284c7] bg-white px-3 font-black text-[#075985] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#0ea5e9]/40 dark:bg-slate-800 dark:text-[#bae6fd]">下一页</a>
+        {/if}
       </nav>
     {/if}
   {/if}

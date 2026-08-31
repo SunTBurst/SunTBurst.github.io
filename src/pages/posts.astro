@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import PostBrowser from '../components/PostBrowser.svelte';
+import PostNoscriptList from '../components/PostNoscriptList.astro';
 import { getProcessedPosts } from '../utils/postsFetcher';
 import { postPath } from '../utils/slugify';
 const posts = await getProcessedPosts();
@@ -21,5 +22,6 @@ const publicPosts = posts.map((post) => ({
     <p class="mt-3 font-bold leading-7">文章按公开 Markdown 内容生成，可在本页按关键词、分类和标签筛选。</p>
     <nav class="mt-4 flex flex-wrap gap-3"><a class="flex min-h-[44px] items-center border-2 border-[#0284c7] px-4 font-black" href="/categories">分类</a><a class="flex min-h-[44px] items-center border-2 border-[#0284c7] px-4 font-black" href="/tags">标签</a><a class="flex min-h-[44px] items-center border-2 border-[#0284c7] px-4 font-black" href="/search">搜索</a><a class="flex min-h-[44px] items-center border-2 border-[#0284c7] px-4 font-black" href="/archive">时间归档</a></nav>
     <PostBrowser posts={publicPosts} client:load />
+    <PostNoscriptList posts={publicPosts} />
   </section>
 </Layout>

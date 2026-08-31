@@ -1,6 +1,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { activatePortalTool } from '../../src/utils/portalToolActivation';
+import {
+  activatePortalTool,
+  shouldLayoutConsumePortalSearch,
+  tryFocusPortalSearch,
+} from '../../src/utils/portalToolActivation';
 
 function click(overrides: Partial<{
   button: number;
@@ -64,4 +68,23 @@ test('portal tool enhancement leaves modified, non-primary, and already-cancelle
     assert.equal(dispatches, 0);
     assert.equal(activation.wasPrevented(), false);
   }
+});
+
+test('layout consumes search only when it can perform a route transition', () => {
+  assert.equal(shouldLayoutConsumePortalSearch('/posts'), true);
+  assert.equal(shouldLayoutConsumePortalSearch('/search'), false);
+  assert.equal(shouldLayoutConsumePortalSearch('/search/'), false);
+});
+
+test('search focus consumes the event only after the input really owns focus', () => {
+  assert.equal(tryFocusPortalSearch(null, () => null), false);
+
+  const unfocused = { focus() {} };
+  assert.equal(tryFocusPortalSearch(unfocused, () => null), false);
+
+  const throwing = { focus() { throw new Error('focus unavailable'); } };
+  assert.equal(tryFocusPortalSearch(throwing, () => throwing), false);
+
+  const focused = { focus() {} };
+  assert.equal(tryFocusPortalSearch(focused, () => focused), true);
 });

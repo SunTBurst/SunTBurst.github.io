@@ -5,9 +5,23 @@ export interface SearchKeyboardInput {
 }
 
 export type SearchKeyboardDecision = {
-  action: 'none' | 'focus' | 'navigate';
+  action: 'none' | 'focus';
   index: number;
 };
+
+function validResultIndex(index: number, resultCount: number): boolean {
+  return Number.isInteger(index) && index >= 0 && index < resultCount;
+}
+
+export function resolveSearchActiveIndex(
+  focusedIndex: number,
+  hoveredIndex: number,
+  resultCount: number,
+): number {
+  if (validResultIndex(focusedIndex, resultCount)) return focusedIndex;
+  if (validResultIndex(hoveredIndex, resultCount)) return hoveredIndex;
+  return -1;
+}
 
 export function decideUnifiedSearchKey(
   keyboard: SearchKeyboardInput,
@@ -27,9 +41,6 @@ export function decideUnifiedSearchKey(
   }
   if (keyboard.key === 'ArrowUp') {
     return { action: 'focus', index: currentIndex < 0 ? resultCount - 1 : (currentIndex - 1 + resultCount) % resultCount };
-  }
-  if (keyboard.key === 'Enter') {
-    return { action: 'navigate', index: currentIndex < 0 ? 0 : currentIndex };
   }
   return { action: 'none', index: currentIndex };
 }

@@ -80,16 +80,17 @@ const socialImage = image ? new URL(image, Astro.site ?? siteConfig.url) : new U
       )}
     </div>
     <script>
+      import { shouldLayoutConsumePortalSearch } from '../utils/portalToolActivation';
+
       function installPortalToolConsumers() {
         const state = window as Window & { __portalToolConsumersInstalled?: boolean };
         if (state.__portalToolConsumersInstalled) return;
         state.__portalToolConsumersInstalled = true;
 
         window.addEventListener('portal:open-search', (event) => {
+          if (!shouldLayoutConsumePortalSearch(window.location.pathname)) return;
           event.preventDefault();
-          if (window.location.pathname !== '/search' && window.location.pathname !== '/search/') {
-            window.location.assign('/search');
-          }
+          window.location.assign('/search');
         });
         window.addEventListener('portal:random-explore', (event) => {
           event.preventDefault();

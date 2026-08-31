@@ -1,6 +1,12 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { browsePosts, type PublicPostBrowseEntry } from '../../src/utils/postBrowserCore';
+import {
+  activatePostBrowseLink,
+  browsePosts,
+  buildPostBrowseHref,
+  parsePostBrowseSearch,
+  type PublicPostBrowseEntry,
+} from '../../src/utils/postBrowserCore';
 
 const posts: PublicPostBrowseEntry[] = [
   { id: '1', title: 'Astro 门户', description: '公开站点实践', href: '/posts/1/', date: '2026-08-07', category: '工程', tags: ['Astro', '公开'] },
@@ -48,4 +54,57 @@ test('post browser clamps requested pages and limits the visible page window', (
   const middle = browsePosts(manyPosts, { query: '', category: '', tag: '', page: 6 }, 2);
   assert.equal(middle.totalPages, 11);
   assert.deepEqual(middle.pageNumbers, [4, 5, 6, 7, 8]);
+});
+
+test('post browser parses and sanitizes URL state against public filter options', () => {
+  assert.deepEqual(
+    parsePostBrowseSearch('?q=%20Astro%20&category=%E5%B7%A5%E7%A8%8B&tag=%E5%85%AC%E5%BC%80&page=99', ['工程', '笔记'], ['公开', '知识']),
+    { query: 'Astro', category: '工程', tag: '公开', page: 99 },
+  );
+  assert.deepEqual(
+    parsePostBrowseSearch('?q=%20%20&category=%E7%A7%81%E6%9C%89&tag=%E9%9A%90%E8%97%8F&page=2.5', ['工程'], ['公开']),
+    { query: '', category: '', tag: '', page: 1 },
+  );
+});
+
+test('post browser builds encoded local URLs while preserving unrelated params and hash', () => {
+  assert.equal(
+    buildPostBrowseHref('/posts?keep=yes#articles', { query: ' Astro 与 AI ', category: '工程', tag: '公开 标签', page: 3 }),
+    '/posts?keep=yes&q=Astro+%E4%B8%8E+AI&category=%E5%B7%A5%E7%A8%8B&tag=%E5%85%AC%E5%BC%80+%E6%A0%87%E7%AD%BE&page=3#articles',
+  );
+  assert.equal(
+    buildPostBrowseHref('/posts?q=old&category=old&tag=old&page=7#articles', { query: '', category: '', tag: '', page: 1 }),
+    '/posts#articles',
+  );
+});
+
+test('post browser enhances only an unblocked unmodified primary pagination activation', () => {
+  function activation(overrides = {}) {
+    let prevented = false;
+    return {
+      event: {
+        button: 0,
+        defaultPrevented: false,
+        altKey: false,
+        ctrlKey: false,
+        metaKey: false,
+        shiftKey: false,
+        preventDefault: () => { prevented = true; },
+        ...overrides,
+      },
+      prevented: () => prevented,
+    };
+  }
+
+  const plain = activation();
+  let applications = 0;
+  assert.equal(activatePostBrowseLink(plain.event, () => { applications += 1; }), true);
+  assert.equal(plain.prevented(), true);
+  assert.equal(applications, 1);
+
+  for (const modified of [activation({ ctrlKey: true }), activation({ metaKey: true }), activation({ shiftKey: true }), activation({ altKey: true }), activation({ button: 1 }), activation({ defaultPrevented: true })]) {
+    assert.equal(activatePostBrowseLink(modified.event, () => { applications += 1; }), false);
+    assert.equal(modified.prevented(), false);
+  }
+  assert.equal(applications, 1);
 });
