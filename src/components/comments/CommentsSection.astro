@@ -1,0 +1,36 @@
+---
+import CommentsPanel from './CommentsPanel.svelte';
+import { commentPublicConfig } from '../../features/comments/config';
+import { canonicalCommentTarget, type CommentTargetKind } from '../../features/comments/domain';
+
+interface Props {
+  kind: CommentTargetKind;
+  path: string;
+}
+
+const { kind, path } = Astro.props;
+const target = canonicalCommentTarget({ kind, path });
+const enabled = commentPublicConfig.state === 'enabled';
+---
+
+<div data-comments-target={`${target.kind}:${target.path}`} class="mx-auto mt-8 max-w-3xl">
+  {enabled ? (
+    <div data-comments-state="enabled">
+      <CommentsPanel
+        client:visible
+        endpoint={commentPublicConfig.endpoint!}
+        publishableKey={commentPublicConfig.publishableKey!}
+        target={target}
+      />
+    </div>
+  ) : (
+    <section data-comments-state="preview" aria-labelledby="comments-preview-title" class="border-4 border-[#0284c7] bg-white p-5 shadow-[7px_7px_0_0_#0284c7] dark:bg-slate-800 sm:p-7">
+      <p class="inline-block border-2 border-[#0284c7] bg-[#fde68a] px-3 py-1 text-xs font-black tracking-[0.16em] text-[#075985]">COMMENTS · PREVIEW</p>
+      <h2 id="comments-preview-title" class="mt-3 text-2xl font-black text-[#075985] dark:text-[#bae6fd]">评论功能正在准备</h2>
+      <p class="mt-3 font-bold leading-7 text-slate-700 dark:text-slate-200">计划仅允许 GitHub 登录。评论会在发布前经过 AI 审核；无法明确通过的内容交由人工审核。</p>
+      <p class="mt-2 font-bold leading-7 text-slate-600 dark:text-slate-300">当前没有评论输入框，也不会连接评论服务。正文阅读不受影响。</p>
+      <a href="/comments-policy" class="mt-3 inline-flex min-h-[44px] items-center font-black text-[#075985] underline decoration-2 underline-offset-4 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#0ea5e9]/40 dark:text-[#bae6fd]">查看拟采用的评论规则</a>
+      <span data-comments-preview-end class="sr-only">预览边界</span>
+    </section>
+  )}
+</div>

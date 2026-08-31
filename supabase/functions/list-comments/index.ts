@@ -1,15 +1,20 @@
 import { normalizeTarget } from '../_shared/comments/contracts';
-import { HttpError, json, optionalActor, serveHttp, serviceClient } from '../_shared/comments/http';
+import { HttpError, json, optionalActor, readJsonObject, serveHttp, serviceClient } from '../_shared/comments/http';
 import { COMMENT_MODERATOR_GITHUB_IDS } from '../_shared/comments/runtime';
 
 const PUBLIC_FIELDS = 'id,parent_id,author_login_snapshot,body,status,published_at,created_at';
 
-serveHttp(['GET'], async (request, origin) => {
+serveHttp(['GET', 'POST'], async (request, origin) => {
   const client = serviceClient();
   const actor = await optionalActor(request, client);
   const url = new URL(request.url);
+  const body = request.method === 'POST' ? await readJsonObject(request) : null;
+  const bodyTarget = body?.target && typeof body.target === 'object' && !Array.isArray(body.target)
+    ? body.target as Record<string, unknown>
+    : null;
+  const mode = body?.mode ?? url.searchParams.get('mode');
 
-  if (url.searchParams.get('mode') === 'queue') {
+  if (mode === 'queue') {
     if (!actor || !COMMENT_MODERATOR_GITHUB_IDS.has(actor.githubId)) throw new HttpError(403, 'forbidden');
     const { data, error } = await client
       .from('comments')
@@ -22,8 +27,8 @@ serveHttp(['GET'], async (request, origin) => {
   }
 
   const target = normalizeTarget({
-    kind: url.searchParams.get('kind') ?? '',
-    path: url.searchParams.get('path') ?? '',
+    kind: typeof bodyTarget?.kind === 'string' ? bodyTarget.kind : url.searchParams.get('kind') ?? '',
+    path: typeof bodyTarget?.path === 'string' ? bodyTarget.path : url.searchParams.get('path') ?? '',
   });
   const { data: published, error: publicError } = await client
     .from('comments')
@@ -43,14 +48,15 @@ serveHttp(['GET'], async (request, origin) => {
       .eq('target_kind', target.kind)
       .eq('target_path', target.path)
       .eq('author_id', actor.userId)
-      .in('status', ['pending', 'ai_reviewing', 'manual_review', 'rejected'])
+      .neq('status', 'deleted')
       .order('created_at', { ascending: true })
       .limit(50);
     if (error) throw new Error('own_comment_read_failed');
-    own = data ?? [];
+    own = (data ?? []).map((row) => ({ ...row, own: true }));
   }
 
   const combined = new Map<string, unknown>();
-  for (const row of [...(published ?? []), ...own] as Array<{ id: string }>) combined.set(row.id, row);
+  for (const row of (published ?? []).map((item) => ({ ...item, own: false }))) combined.set(row.id, row);
+  for (const row of own as Array<{ id: string }>) combined.set(row.id, row);
   return json(origin, { comments: [...combined.values()] });
 });
