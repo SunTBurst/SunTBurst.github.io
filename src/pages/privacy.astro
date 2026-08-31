@@ -1,11 +1,22 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { commentPublicConfig } from '../features/comments/config';
+
+const providerLabels = { openai: 'OpenAI', kimi: 'Kimi', deepseek: 'DeepSeek' } as const;
+const commentsEnabled = commentPublicConfig.state === 'enabled';
+const commentProvider = commentPublicConfig.reviewProvider ? providerLabels[commentPublicConfig.reviewProvider] : null;
 ---
 
 <Layout title="隐私说明" description="本站的隐私与数据使用说明">
   <article class="prose prose-lg mx-auto max-w-3xl border-4 border-[#0284c7] bg-white p-6 shadow-[8px_8px_0_0_#0284c7] dark:bg-slate-800 sm:p-10">
     <h1>隐私说明</h1>
-    <p>本站是静态个人博客，当前不提供账户、评论或在线表单，也不接入访问统计和广告服务。</p>
+    <p>本站以静态个人博客为主体，不接入访客分析和广告服务。评论模块已完成代码准备，但只有在本页明确显示“已启用”时才会提供 GitHub 登录和评论输入。</p>
+    <h2>GitHub 评论与审核</h2>
+    {commentsEnabled ? (
+      <p>评论服务当前已启用。登录由 GitHub 和 Supabase Auth 处理；本站会保存 GitHub 公开登录名、数字身份标识、评论正文、目标页面、时间和审核记录。评论在公开前由 {commentProvider} 审核，不能明确通过时转人工审核。拒绝公开正文最长保留 30 天，等待人工审核正文最长保留 90 天，操作记录最长保留 180 天；作者或管理员删除时正文会被清空。详情见<a href="/comments-policy">评论与审核规则</a>。</p>
+    ) : (
+      <p>评论服务当前处于预览状态。页面不显示登录和输入框，不下载 Supabase 评论客户端，不连接评论端点，也不会把 GitHub 身份、评论文字或页面信息发送给 Supabase、OpenAI、Kimi 或 DeepSeek。公开规则页仅说明未来启用条件。</p>
+    )}
     <h2>天气工具</h2>
     <p>利雅得天气页面只在你主动点击“查看利雅得实时天气”后，向 Open-Meteo 发送一次请求。请求包含固定的利雅得坐标、时区和所需天气字段，不读取你的设备定位，不发送邮箱、搜索词或浏览内容。外部服务可能依其政策处理 IP 地址和常规请求信息；本站不保存该请求或返回结果。</p>
     <h2>本地浏览器数据</h2>
