@@ -111,7 +111,17 @@ revoke all on table public.comments from anon, authenticated;
 revoke all on table public.comment_reviews from anon, authenticated;
 revoke all on table public.comment_moderation_actions from anon, authenticated;
 
-grant select on table public.comments to anon, authenticated;
+grant select (
+  id,
+  target_kind,
+  target_path,
+  parent_id,
+  author_login_snapshot,
+  body,
+  status,
+  published_at,
+  created_at
+) on table public.comments to anon, authenticated;
 
 create policy comments_public_read
 on public.comments

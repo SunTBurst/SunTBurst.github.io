@@ -30,7 +30,9 @@ test('comment migration exposes reads through RLS but no browser writes', () => 
   assert.match(sql, /status = 'published'/i);
   assert.match(sql, /author_id = auth\.uid\(\)/i);
   assert.match(sql, /revoke all on table public\.comments from anon, authenticated/i);
-  assert.match(sql, /grant select on table public\.comments to anon, authenticated/i);
+  assert.match(sql, /grant select \([^)]+author_login_snapshot[^)]+body[^)]+\) on table public\.comments to anon, authenticated/is);
+  const publicGrant = sql.match(/grant select \(([^)]+)\) on table public\.comments to anon, authenticated/is)?.[1] ?? '';
+  assert.doesNotMatch(publicGrant, /author_id|author_github_id|idempotency_key|policy_version/i);
   assert.doesNotMatch(sql, /create policy[^;]+for insert/is);
   assert.doesNotMatch(sql, /grant (?:insert|update|delete)[^;]+comments[^;]+(?:anon|authenticated)/is);
   assert.doesNotMatch(sql, /grant [^;]+comment_reviews[^;]+(?:anon|authenticated)/is);

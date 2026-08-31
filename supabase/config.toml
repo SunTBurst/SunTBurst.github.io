@@ -20,3 +20,15 @@ enable_signup = true
 [auth.email]
 enable_signup = false
 enable_confirmations = true
+
+[functions.submit-comment]
+verify_jwt = false
+
+[functions.list-comments]
+verify_jwt = false
+
+[functions.delete-comment]
+verify_jwt = false
+
+[functions.moderate-comment]
+verify_jwt = false
