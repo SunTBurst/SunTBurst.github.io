@@ -25,4 +25,8 @@
 
 未修改实际文章、随记、依赖、锁文件或发布工作流。原 TS 标志文件 SHA-256 仍为 `63CF8F9826D8ED4CB51E949C8AFB88EA094A9A0E3479FE4A66992C3DC762CE18`。沿用既有 GitHub Pages / Actions，不新增服务或费用。
 
-本记录说明发布前的本地验收结果；线上完成状态须以实际发布记录和线上版本核对为准。
+## 发布结果
+
+应用提交 `e8b96b2cd90c7b4a8526b4ed70e8baf10b2d1d9d` 已快进合入主分支并推送。[发布记录](https://github.com/SunTBurst/SunTBurst.github.io/actions/runs/34285106678)的 build 与 deploy 均成功；线上 `status.json` 返回相同提交，生成时间为 `2026-09-08T22:17:40.588Z`。
+
+已在正式网站核对新外观选项、跨页记忆、原标志加载、旧文章及真实文件编辑链接、随记及日历、写作模板与 GitHub 操作入口。搜索仅出现在文章正文中的“脉络”，正确返回原欢迎文章。浏览器无控制台错误。当前使用入口为 [博客首页](https://suntburst.github.io/)和[写作工具](https://suntburst.github.io/write)。

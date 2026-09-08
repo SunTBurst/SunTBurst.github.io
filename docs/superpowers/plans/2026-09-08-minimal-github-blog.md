@@ -1,6 +1,6 @@
 # SunTBurst 免费 GitHub 博客精简优化实施方案（Implementation Plan）
 
-**实施状态（2026-09-09）：Tasks 1–5 已完成；用户已确认发布，并追加五套配色、三种版式，扩展已通过本地验收。Task 6 按下列步骤执行。** 原改版结果见 [本地改版验收记录](../../reviews/2026-09-08-blog-implementation.md)，主题扩展见 [主题验收记录](../../reviews/2026-09-09-theme-extension.md)。
+**实施状态（2026-09-09）：Tasks 1–6 已完成。** 用户确认的精简改版及追加的五套配色、三种版式已上线；应用提交 `e8b96b2` 的构建与部署均成功，线上版本及首页、旧文章、正文搜索、随记、写作工具已核对。原改版结果见 [本地改版验收记录](../../reviews/2026-09-08-blog-implementation.md)，扩展与发布结果见 [主题验收记录](../../reviews/2026-09-09-theme-extension.md)。
 
 > **For agentic workers:** REQUIRED SUB-SKILL: 使用 `subagent-driven-development` 或 `executing-plans` 按任务实施。独立文件可并行处理；共享文件、构建测试、集成与发布顺序执行。任务前读取本方案及下面的 Spec。复用现有组件，不根据历史调研另起 CMS 项目。
 
@@ -568,10 +568,10 @@ node node_modules/astro/bin/astro.mjs preview --host 127.0.0.1 --port 3000
 **Files:** 不预设新的工作流文件；使用 `.github/workflows/deploy-pages.yml`。
 
 - [x] **Step 1：在最终本地结果可审阅后，确认是否将这批修改发布到当前博客。** 用户在确认发布时追加“配色预设和版式风格都增加”，已纳入本轮。
-- [ ] **Step 2：检查当前分支、远端 main 和待发布提交，按既有仓库流程提交/合并并推送。**不覆盖远端新提交，不强推；如有分支保护，使用相应 PR 流程。
-- [ ] **Step 3：等待本次 Deploy to GitHub Pages 的构建与部署均完成。**成功推送不等于成功部署，失败时报告实际阶段。
-- [ ] **Step 4：打开线上首页、旧文章、搜索和写作工具；核对页面功能、图片与当前部署版本。**新页面可能有缓存，核对实际版本后再宣称上线。
-- [ ] **Step 5：交付线上链接和日常使用步骤。**说明该轮真实启用的功能及仍未启用的外部功能；完成必要验证后停止，不继续添加新模块。
+- [x] **Step 2：检查当前分支、远端 main 和待发布提交，按既有仓库流程提交/合并并推送。** 已核对远端并快进合并，没有强推；原本地规划文档已做摘要一致的备份。
+- [x] **Step 3：等待本次 Deploy to GitHub Pages 的构建与部署均完成。** [应用发布记录](https://github.com/SunTBurst/SunTBurst.github.io/actions/runs/34285106678)的 build 与 deploy 均成功。
+- [x] **Step 4：打开线上首页、旧文章、搜索和写作工具；核对页面功能、图片与当前部署版本。** 线上 `status.json` 返回应用提交 `e8b96b2`；外观切换、旧文章、随记及日历、正文词“脉络”搜索、写作模板和链接均核对通过。
+- [x] **Step 5：交付线上链接和日常使用步骤。** [博客首页](https://suntburst.github.io/)顶部“外观”选择配色与版式，旁边“明暗”独立切换；[写作工具](https://suntburst.github.io/write)复制模板后进入 GitHub 保存，现有 Actions 自动发布。
 
 **发布验收结果：**免费 GitHub 上的现有博客已呈现确认过的改版，写作入口可用、正文搜索有效、旧内容仍能访问，用户无需维护新服务。
 
