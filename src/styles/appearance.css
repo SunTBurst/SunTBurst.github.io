@@ -1,0 +1,140 @@
+/* The palette tokens are generated in the document head before first paint.
+   These exact utility mappings keep existing components on the same palette.
+   No dimensions or image pixels are changed here. */
+:root[data-palette] { color-scheme: light; }
+:root[data-palette].dark { color-scheme: dark; }
+:root[data-palette] body { color: var(--site-text); }
+:root[data-palette] ::selection { background: var(--site-highlight); color: var(--site-highlight-text); }
+
+/* Solid accents carry their own foreground into nested text utilities. Neutral
+   surfaces reset it, so a dark surface never inherits a pale highlight's ink. */
+:root[data-palette] :where(.site-surface, .site-background, .article-paper, .article-paper-shell) {
+  --appearance-fill-text: initial;
+}
+:root[data-palette] .site-background,
+:root[data-palette] .article-paper-shell { background-color: var(--site-background); }
+:root[data-palette] .site-surface { background-color: var(--site-surface); }
+:root[data-palette] .article-paper { background-color: var(--article-background); }
+
+:root[data-palette] :where(.text-slate-700, .text-slate-800, .text-slate-900, .text-slate-950) {
+  color: var(--appearance-fill-text, var(--site-text));
+}
+:root[data-palette] :where(.text-slate-400, .text-slate-500, .text-slate-600) {
+  color: var(--appearance-fill-text, var(--site-text-muted));
+}
+:root[data-palette] :where([class~="text-[#0284c7]"], [class~="text-[#0369a1]"], [class~="text-[#075985]"], [class~="text-[#0ea5e9]"], .text-sky-700, .text-sky-800, .text-sky-900) {
+  color: var(--appearance-fill-text, var(--site-link));
+}
+:root[data-palette] :where([class~="text-[#f59e0b]"]) { color: var(--appearance-fill-text, var(--site-accent-text)); }
+:root[data-palette] :where([class~="text-[#0284c7]/80"]) { color: var(--appearance-fill-text, var(--site-link)); }
+:root[data-palette] :where([class~="text-[#0284c7]/5"]) { color: color-mix(in srgb, var(--site-border) 5%, transparent); }
+
+:root[data-palette] :where(.bg-white, .bg-slate-50, .bg-slate-100, [class~="bg-slate-50/30"], [class~="bg-[#f8fafc]"], [class~="bg-[#f1f5f9]"], [class~="bg-[rgba(250,248,245,0.55)]"]) {
+  --appearance-fill-text: initial;
+  background-color: var(--site-surface);
+}
+:root[data-palette] :where([class~="bg-[#fdfbf7]"]) {
+  --appearance-fill-text: initial;
+  background-color: var(--site-background);
+}
+:root[data-palette] :where([class~="bg-[#e0f2fe]"], [class~="bg-[#e0f2fe]/80"], .bg-sky-50, .bg-sky-100) {
+  --appearance-fill-text: initial;
+  background-color: var(--site-tint);
+}
+:root[data-palette] :where([class~="bg-[#fde68a]"], [class~="bg-[#fef9c3]"], [class~="bg-[#fffbeb]"], [class~="bg-[#f59e0b]"]) {
+  --appearance-fill-text: var(--site-highlight-text);
+  background-color: var(--site-highlight);
+  color: var(--appearance-fill-text, var(--site-text));
+}
+:root[data-palette] :where([class~="bg-[#0284c7]"], [class~="bg-[#0369a1]"], [class~="bg-[#075985]"], [class~="bg-[#0ea5e9]"]) {
+  --appearance-fill-text: var(--site-primary-text);
+  background-color: var(--site-primary);
+  color: var(--appearance-fill-text, var(--site-text));
+}
+
+:root[data-palette]:where(.dark) :where([class~="dark:text-white"], [class~="dark:text-slate-100"], [class~="dark:text-slate-200"]) {
+  color: var(--appearance-fill-text, var(--site-text));
+}
+:root[data-palette]:where(.dark) :where([class~="dark:text-slate-300"], [class~="dark:text-slate-400"], [class~="dark:text-slate-500"]) {
+  color: var(--appearance-fill-text, var(--site-text-muted));
+}
+:root[data-palette]:where(.dark) :where([class~="dark:text-[#0ea5e9]"], [class~="dark:text-[#7dd3fc]"], [class~="dark:text-[#bae6fd]"], [class~="dark:text-sky-100"], [class~="dark:text-sky-200"], [class~="dark:text-sky-300"]) {
+  color: var(--appearance-fill-text, var(--site-link));
+}
+:root[data-palette]:where(.dark) :where([class~="dark:text-[#fde68a]"]) { color: var(--appearance-fill-text, var(--site-accent-text)); }
+:root[data-palette]:where(.dark) :where([class~="dark:bg-slate-600"], [class~="dark:bg-slate-700"], [class~="dark:bg-slate-700/30"], [class~="dark:bg-slate-800"], .bg-slate-700, .bg-slate-800) {
+  --appearance-fill-text: initial;
+  background-color: var(--site-surface);
+}
+:root[data-palette]:where(.dark) :where([class~="dark:bg-slate-900"], [class~="dark:bg-slate-950"], .bg-slate-900) {
+  --appearance-fill-text: initial;
+  background-color: var(--site-background);
+}
+:root[data-palette]:where(.dark) :where([class~="dark:bg-sky-950/30"], [class~="dark:bg-sky-950/40"]) {
+  --appearance-fill-text: initial;
+  background-color: var(--site-tint);
+}
+
+/* Interaction rules follow base and dark utilities so state colors stay paired. */
+@media (hover: hover) {
+  :root[data-palette] :where([class~="hover:text-[#0284c7]"]:hover, [class~="hover:text-[#0369a1]"]:hover, [class~="hover:text-[#0ea5e9]"]:hover) { color: var(--appearance-fill-text, var(--site-link)); }
+  :root[data-palette] :where(.group:hover [class~="group-hover:text-[#0ea5e9]"]) { color: var(--appearance-fill-text, var(--site-link)); }
+  :root[data-palette] :where([class~="hover:bg-[#fde68a]"]:hover, [class~="hover:bg-[#fcd34d]"]:hover, [class~="hover:bg-[#fffbeb]"]:hover) {
+    --appearance-fill-text: var(--site-highlight-text);
+    background-color: var(--site-highlight);
+    color: var(--appearance-fill-text);
+  }
+  :root[data-palette] :where([class~="hover:bg-[#e0f2fe]"]:hover, [class~="hover:bg-[#ebf3ff]"]:hover, [class~="hover:bg-slate-100"]:hover) {
+    --appearance-fill-text: var(--site-link);
+    background-color: var(--site-tint);
+    color: var(--appearance-fill-text);
+  }
+  :root[data-palette]:where(.dark) :where([class~="dark:hover:bg-slate-600"]:hover, [class~="dark:hover:bg-slate-700"]:hover, [class~="dark:hover:bg-slate-800"]:hover) {
+    --appearance-fill-text: var(--site-link);
+    background-color: var(--site-tint);
+    color: var(--appearance-fill-text);
+  }
+  :root[data-palette] :where([class~="hover:bg-[#0284c7]"]:hover, [class~="hover:bg-[#0369a1]"]:hover, [class~="hover:bg-[#0ea5e9]"]:hover) {
+    --appearance-fill-text: var(--site-primary-text);
+    background-color: var(--site-primary);
+    color: var(--appearance-fill-text);
+  }
+  :root[data-palette] :where([class~="hover:border-[#0284c7]"]):hover { border-color: var(--site-border); }
+  :root[data-palette] :where([class~="hover:border-[#f59e0b]"]):hover { border-color: var(--site-accent); }
+}
+
+:root[data-palette] :where([class~="border-[#0284c7]"], [class~="border-[#075985]"], [class~="border-[#1e293b]"]) { border-color: var(--site-border); }
+:root[data-palette] :where([class~="border-[#0284c7]/20"], [class~="border-[#0ea5e9]/20"]) { border-color: color-mix(in srgb, var(--site-border) 20%, transparent); }
+:root[data-palette] :where([class~="border-[#0284c7]/25"]) { border-color: color-mix(in srgb, var(--site-border) 25%, transparent); }
+:root[data-palette] :where([class~="border-[#0284c7]/30"]) { border-color: color-mix(in srgb, var(--site-border) 30%, transparent); }
+:root[data-palette] :where([class~="border-[#f59e0b]"]) { border-color: var(--site-accent); }
+:root[data-palette] :where([class~="border-[#fde68a]"], .border-sky-200) { border-color: var(--site-highlight); }
+:root[data-palette] :where([class~="decoration-[#0284c7]/40"]) { text-decoration-color: color-mix(in srgb, var(--site-border) 40%, transparent); }
+:root[data-palette] :where([class~="decoration-[#0284c7]/50"]) { text-decoration-color: color-mix(in srgb, var(--site-border) 50%, transparent); }
+:root[data-palette] :where([class~="accent-[#075985]"]) { accent-color: var(--site-primary); }
+:root[data-palette] :where([class~="ring-[#0ea5e9]"]) { --tw-ring-color: var(--site-border); }
+:root[data-palette] :where([class~="focus:ring-[#0ea5e9]/40"]:focus, [class~="focus-visible:ring-[#0ea5e9]/40"]:focus-visible) {
+  --tw-ring-color: var(--site-border);
+  --tw-ring-offset-color: var(--site-surface);
+}
+
+/* Tailwind owns each shadow's geometry; only its color variable is replaced. */
+:root[data-palette] :where(
+  [class~="shadow-[1px_1px_0px_0px_#0284c7]"], [class~="shadow-[2px_2px_0_0_#0284c7]"], [class~="shadow-[2px_2px_0px_0px_#0284c7]"],
+  [class~="shadow-[3px_3px_0_0_#0284c7]"], [class~="shadow-[3px_3px_0px_0px_#0284c7]"], [class~="shadow-[3px_3px_0_0_#075985]"],
+  [class~="shadow-[4px_4px_0_0_#0284c7]"], [class~="shadow-[4px_4px_0px_0px_#0284c7]"], [class~="shadow-[4px_4px_0_0_#075985]"],
+  [class~="shadow-[6px_6px_0_0_#0284c7]"], [class~="shadow-[6px_6px_0px_0px_#0284c7]"], [class~="shadow-[7px_7px_0_0_#0284c7]"],
+  [class~="shadow-[7px_7px_0px_0px_#0284c7]"], [class~="shadow-[8px_8px_0_0_#0284c7]"], [class~="shadow-[8px_8px_0px_0px_#0284c7]"]
+) { --tw-shadow-color: var(--site-border); }
+:root[data-palette] :where(
+  [class~="shadow-[2px_2px_0px_0px_#f59e0b]"], [class~="shadow-[2.5px_2.5px_0px_0px_#f59e0b]"], [class~="shadow-[4px_4px_0px_0px_#fde68a]"],
+  [class~="shadow-[6px_6px_0px_0px_#f59e0b]"], [class~="shadow-[7px_7px_0_0_#f59e0b]"], [class~="shadow-[10px_10px_0px_0px_#f59e0b]"]
+) { --tw-shadow-color: var(--site-accent); }
+@media (min-width: 640px) {
+  :root[data-palette] :where([class~="sm:shadow-[4px_4px_0px_0px_#0284c7]"], [class~="sm:shadow-[8px_8px_0px_0px_#0284c7]"]) { --tw-shadow-color: var(--site-border); }
+}
+@media (hover: hover) {
+  :root[data-palette] :where([class~="hover:shadow-[2px_2px_0px_0px_#0284c7]"]:hover, [class~="hover:shadow-[3px_3px_0px_0px_#0284c7]"]:hover, [class~="hover:shadow-[4px_4px_0px_0px_#0284c7]"]:hover, [class~="hover:shadow-[5px_5px_0_0_#075985]"]:hover) { --tw-shadow-color: var(--site-border); }
+  :root[data-palette] :where([class~="hover:shadow-[10px_10px_0px_0px_#f59e0b]"]:hover) { --tw-shadow-color: var(--site-accent); }
+}
+:root[data-palette] :where([class~="focus:shadow-[2px_2px_0px_0px_#0284c7]"]:focus, [class~="focus:shadow-[6px_6px_0px_0px_#0284c7]"]:focus) { --tw-shadow-color: var(--site-border); }

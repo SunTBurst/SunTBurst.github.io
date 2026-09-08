@@ -1,4 +1,7 @@
 export const appearanceConfig = {
+  // 新访客默认外观。配色：paper/ocean/forest/coffee/graphite；版式：paper/compact/cards。
+  defaultPalette: 'paper',
+  defaultLayout: 'paper',
   // 页面浅色背景、普通卡片背景、文章阅读区背景。
   backgroundColor: '#f7f5ef',
   surfaceColor: '#fffdf8',

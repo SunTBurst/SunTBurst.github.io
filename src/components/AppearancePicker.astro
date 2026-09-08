@@ -1,0 +1,119 @@
+---
+import { layoutPresets, palettePresets } from '../config/appearance';
+import { appearanceConfig } from '../config/site';
+---
+
+<details class="appearance-picker" data-appearance-picker>
+  <summary aria-label="选择配色和版式" title="选择配色和版式">
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8.5" /><path d="M12 3.5a8.5 8.5 0 0 0 0 17c2.2 0 1-2.5 2.5-3.5s6 .4 6-5" /><circle cx="8" cy="9" r=".8" /><circle cx="12" cy="7" r=".8" /><circle cx="16" cy="9" r=".8" /></svg>
+    <span class="appearance-label">外观</span>
+  </summary>
+  <div class="appearance-panel">
+    <div class="appearance-heading"><h2>选择你的阅读风格</h2><button type="button" data-close-appearance aria-label="关闭外观面板">×</button></div>
+    <fieldset>
+      <legend>配色</legend>
+      <div class="palette-options">
+        {palettePresets.map((palette) => (
+          <label class="palette-option">
+            <input type="radio" name="appearance-palette" value={palette.id} checked={palette.id === appearanceConfig.defaultPalette} />
+            <span class="palette-swatch" style={`--swatch: ${palette.swatch}`} aria-hidden="true"></span>
+            <span>{palette.label}</span>
+          </label>
+        ))}
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend>版式</legend>
+      <div class="layout-options">
+        {layoutPresets.map((layout) => (
+          <label class="layout-option">
+            <input type="radio" name="appearance-layout" value={layout.id} checked={layout.id === appearanceConfig.defaultLayout} />
+            <span class={`layout-symbol layout-symbol-${layout.id}`} aria-hidden="true"><i></i><i></i><i></i></span>
+            <span>{layout.label}</span>
+            <small>{layout.description}</small>
+          </label>
+        ))}
+      </div>
+    </fieldset>
+    <p class="appearance-note">点击即预览。配色与版式分别选择，只保存在当前浏览器。</p>
+    <button type="button" class="appearance-reset" data-reset-appearance>恢复默认配色和版式</button>
+    <p class="appearance-status" data-appearance-status role="status" aria-live="polite">明暗模式可用旁边的月亮 / 太阳按钮切换。</p>
+  </div>
+</details>
+
+<script>
+  import { normalizeAppearanceSelection, persistAppearancePreference } from '../utils/appearancePreference';
+  const picker = document.querySelector<HTMLDetailsElement>('[data-appearance-picker]');
+  if (picker) {
+    const root = document.documentElement;
+    const paletteInputs = [...picker.querySelectorAll<HTMLInputElement>('[name="appearance-palette"]')];
+    const layoutInputs = [...picker.querySelectorAll<HTMLInputElement>('[name="appearance-layout"]')];
+    const options = {
+      palettes: paletteInputs.map((input) => input.value),
+      layouts: layoutInputs.map((input) => input.value),
+      defaults: { palette: root.dataset.defaultPalette || 'paper', layout: root.dataset.defaultLayout || 'paper' },
+    };
+    const status = picker.querySelector<HTMLElement>('[data-appearance-status]');
+    const current = () => normalizeAppearanceSelection({ palette: root.dataset.palette, layout: root.dataset.layout }, options);
+    const syncInputs = () => {
+      const selected = current();
+      paletteInputs.forEach((input) => { input.checked = input.value === selected.palette; });
+      layoutInputs.forEach((input) => { input.checked = input.value === selected.layout; });
+    };
+    const apply = (selection: unknown) => {
+      const selected = normalizeAppearanceSelection(selection, options);
+      root.dataset.palette = selected.palette;
+      root.dataset.layout = selected.layout;
+      syncInputs();
+      const saved = persistAppearancePreference(selected, options);
+      if (status) status.textContent = saved ? '已应用并记住，下次打开仍使用这套外观。' : '已应用；浏览器未允许保存，下次打开会恢复默认。';
+      window.dispatchEvent(new CustomEvent('portal:appearance-change', { detail: { ...selected, mode: root.classList.contains('dark') ? 'dark' : 'light' } }));
+    };
+    paletteInputs.forEach((input) => input.addEventListener('change', () => { if (input.checked) apply({ ...current(), palette: input.value }); }));
+    layoutInputs.forEach((input) => input.addEventListener('change', () => { if (input.checked) apply({ ...current(), layout: input.value }); }));
+    const close = (returnFocus = false) => {
+      picker.open = false;
+      if (returnFocus) picker.querySelector('summary')?.focus();
+    };
+    picker.querySelector('[data-close-appearance]')?.addEventListener('click', () => close(true));
+    picker.querySelector('[data-reset-appearance]')?.addEventListener('click', () => apply(options.defaults));
+    document.addEventListener('click', (event) => { if (event.target instanceof Node && !picker.contains(event.target)) close(); });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && picker.open) { event.preventDefault(); event.stopPropagation(); close(true); }
+    });
+    syncInputs();
+  }
+</script>
+
+<style>
+  .appearance-picker { position: relative; color: var(--site-link, #075985); }
+  summary { display: flex; min-width: 44px; min-height: 44px; gap: .35rem; align-items: center; justify-content: center; padding: 0 .5rem; list-style: none; border-radius: .4rem; cursor: pointer; font-size: .875rem; font-weight: 600; }
+  summary::-webkit-details-marker { display: none; }
+  summary svg { width: 20px; height: 20px; }
+  summary:hover, details[open] summary { background: var(--site-tint, #e0f2fe); }
+  .appearance-panel { position: fixed; top: 70px; right: max(8px, calc((100% - 1152px) / 2)); width: min(360px, calc(100% - 16px)); max-height: calc(100dvh - 86px); overflow-y: auto; overscroll-behavior: contain; border: 1px solid var(--site-border, #0284c7); border-radius: .8rem; padding: 1rem; background: var(--site-surface, #fffdf8); color: var(--site-text, #334155); box-shadow: 0 12px 35px rgb(0 0 0 / .18); z-index: 120; }
+  .appearance-heading { display: flex; align-items: center; justify-content: space-between; gap: .5rem; }
+  h2 { font-size: 1rem; font-weight: 700; margin: 0; }
+  .appearance-heading button { min-width: 44px; min-height: 44px; border-radius: .3rem; font-size: 1.5rem; cursor: pointer; }
+  fieldset { min-width: 0; border: 0; margin: .6rem 0 1rem; padding: 0; }
+  legend { font-size: .85rem; font-weight: 700; margin-bottom: .55rem; }
+  .palette-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .45rem; }
+  .palette-option, .layout-option { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .4rem; min-width: 0; min-height: 66px; border: 1px solid color-mix(in srgb, var(--site-border) 25%, transparent); border-radius: .5rem; padding: .55rem .25rem; cursor: pointer; font-size: .75rem; text-align: center; }
+  input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+  label:has(input:checked) { border-color: var(--site-primary); background: var(--site-tint); box-shadow: inset 0 0 0 1px var(--site-primary); }
+  label:has(input:focus-visible), summary:focus-visible, button:focus-visible { outline: 3px solid var(--site-link); outline-offset: 3px; }
+  .palette-swatch { width: 27px; height: 27px; border-radius: 50%; background: var(--swatch); border: 2px solid color-mix(in srgb, var(--site-text) 20%, transparent); }
+  .layout-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .45rem; }
+  small { color: var(--site-text-muted); font-size: .65rem; line-height: 1.4; }
+  .layout-symbol { display: grid; align-content: center; gap: 3px; width: 28px; height: 24px; }
+  .layout-symbol i { display: block; height: 5px; border: 1px solid currentColor; border-radius: 1px; }
+  .layout-symbol-compact { gap: 2px; }
+  .layout-symbol-compact i { height: 3px; }
+  .layout-symbol-cards { grid-template-columns: 1fr 1fr; gap: 3px; }
+  .layout-symbol-cards i { height: 9px; }
+  .appearance-note, .appearance-status { color: var(--site-text-muted); font-size: .75rem; line-height: 1.65; }
+  .appearance-reset { width: 100%; min-height: 44px; margin-top: .65rem; border: 1px solid var(--site-border); border-radius: .4rem; font-size: .8rem; font-weight: 600; color: var(--site-link); cursor: pointer; }
+  .appearance-reset:hover, .appearance-heading button:hover { background: var(--site-tint); }
+  .appearance-status { min-height: 2.5em; margin: .65rem 0 0; }
+  @media (max-width: 639px) { .appearance-label { display: none; } }
+</style>

@@ -6,7 +6,11 @@ import PortalEffects from '../components/PortalEffects.astro';
 import PortalFooter from '../components/PortalFooter.astro';
 import { PageBanner } from '../components/PageBanner';
 import { appearanceConfig, siteConfig } from '../config/site';
+import { buildAppearanceCss, layoutPresets, palettePresets } from '../config/appearance';
+import { buildAppearanceBootstrap } from '../utils/appearancePreference';
 import '../index.css';
+import '../styles/appearance.css';
+import '../styles/layout-presets.css';
 
 interface Props {
   title?: string;
@@ -41,14 +45,16 @@ const {
   robots,
 } = Astro.props;
 
-const colors = [appearanceConfig.backgroundColor, appearanceConfig.surfaceColor, appearanceConfig.articleColor];
-if (colors.some((value) => !/^#[0-9a-f]{6}$/i.test(value))) {
-  throw new Error('外观颜色必须填写 # 加六位十六进制颜色值');
-}
 if (appearanceConfig.homeImage && !appearanceConfig.homeImage.startsWith('/images/')) {
   throw new Error('首页图片必须使用本站 /images/ 路径');
 }
-const appearanceStyle = `--site-background: ${colors[0]}; --site-surface: ${colors[1]}; --article-background: ${colors[2]}`;
+const appearanceOptions = {
+  palettes: palettePresets.map((preset) => preset.id),
+  layouts: layoutPresets.map((preset) => preset.id),
+  defaults: { palette: appearanceConfig.defaultPalette, layout: appearanceConfig.defaultLayout },
+};
+const appearanceCss = buildAppearanceCss(appearanceConfig);
+const appearanceBootstrap = buildAppearanceBootstrap(appearanceOptions);
 
 const documentTitle = title === siteConfig.title ? title : `${title} | ${siteConfig.title}`;
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site ?? siteConfig.url);
@@ -56,10 +62,12 @@ const socialImage = image ? new URL(image, Astro.site ?? siteConfig.url) : new U
 ---
 
 <!doctype html>
-<html lang="zh-CN" style={appearanceStyle}>
+<html lang="zh-CN" data-palette={appearanceOptions.defaults.palette} data-layout={appearanceOptions.defaults.layout} data-default-palette={appearanceOptions.defaults.palette} data-default-layout={appearanceOptions.defaults.layout}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style is:global set:html={appearanceCss}></style>
+    <script is:inline data-appearance-bootstrap set:html={appearanceBootstrap}></script>
     <meta name="description" content={description} />
     {robots && <meta name="robots" content={robots} />}
     {keywords.length > 0 && <meta name="keywords" content={keywords.join(', ')} />}

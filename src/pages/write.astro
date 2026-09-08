@@ -64,7 +64,7 @@ const templates = [
         <a href={links.images} target="_blank" rel="noopener noreferrer">上传图片 ↗</a>
         <a href={links.appearance} target="_blank" rel="noopener noreferrer">修改站点与外观设置 ↗</a>
       </div>
-      <p class="muted">外观设置在 GitHub 中编辑并保存，发布后对所有访客生效。</p>
+      <p class="muted">这里修改站点默认外观，发布后对新访客生效。顶部“外观”面板可以随时选择配色和版式，只影响当前浏览器。</p>
     </section>
 
     <section aria-labelledby="publication-title">
@@ -114,33 +114,28 @@ const templates = [
 <style>
   .writing-tools { max-width: 62rem; margin: 0 auto; line-height: 1.8; }
   header { max-width: 52rem; margin-bottom: 2rem; }
-  h1 { margin: 0; font-size: clamp(1.8rem, 4vw, 2.5rem); font-weight: 750; color: #075985; line-height: 1.3; }
+  h1 { margin: 0; font-size: clamp(1.8rem, 4vw, 2.5rem); font-weight: 750; color: var(--site-link); line-height: 1.3; }
   h2 { margin: 0; font-size: 1.35rem; font-weight: 700; }
   p { margin: .75rem 0; }
-  .eyebrow { margin: 0 0 .4rem; color: #0369a1; font-size: .85rem; }
+  .eyebrow { margin: 0 0 .4rem; color: var(--site-link); font-size: .85rem; }
   .intro { font-size: 1.1rem; }
-  .muted { color: #64748b; font-size: .9rem; }
-  section { background: var(--site-surface, #fff); border: 1px solid #cbd5e1; border-radius: .65rem; padding: clamp(1rem, 3vw, 1.8rem); margin-bottom: 1.25rem; }
+  .muted { color: var(--site-text-muted); font-size: .9rem; }
+  section { background: var(--site-surface); border: 1px solid color-mix(in srgb, var(--site-border) 30%, transparent); border-radius: .65rem; padding: clamp(1rem, 3vw, 1.8rem); margin-bottom: 1.25rem; }
   .section-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem 1rem; }
   .text-links, .actions { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem .75rem; }
-  a { color: #0369a1; text-underline-offset: .2rem; }
+  a { color: var(--site-link); text-underline-offset: .2rem; }
   .text-links a { display: inline-flex; align-items: center; min-height: 44px; font-size: .9rem; text-decoration: underline; }
   .template-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; margin: 1.25rem 0; }
   .template-card { min-width: 0; }
   label { display: block; font-weight: 650; margin-bottom: .5rem; }
-  textarea { display: block; width: 100%; height: 17rem; padding: .9rem; border: 1px solid #94a3b8; border-radius: .35rem; resize: vertical; font-family: ui-monospace, monospace; font-size: .85rem; line-height: 1.65; background: var(--site-background, #faf9f6); color: inherit; margin-bottom: .75rem; }
-  button, .actions a { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; border: 1px solid #94a3b8; border-radius: .35rem; padding: .45rem .85rem; font: inherit; font-size: .9rem; background: var(--site-surface, #fff); cursor: pointer; text-decoration: none; }
-  .actions .primary-action { border-color: #0284c7; background: #e0f2fe; color: #075985; }
+  textarea { display: block; width: 100%; height: 17rem; padding: .9rem; border: 1px solid var(--site-border); border-radius: .35rem; resize: vertical; font-family: ui-monospace, monospace; font-size: .85rem; line-height: 1.65; background: var(--site-background); color: var(--site-text); margin-bottom: .75rem; }
+  button, .actions a { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; border: 1px solid var(--site-border); border-radius: .35rem; padding: .45rem .85rem; font: inherit; font-size: .9rem; background: var(--site-surface); cursor: pointer; text-decoration: none; }
+  .actions .primary-action { background: var(--site-tint); color: var(--site-link); }
   a:hover { text-decoration: underline; }
-  button:hover { border-color: #0284c7; }
-  a:focus-visible, button:focus-visible, textarea:focus-visible { outline: 3px solid #0284c7; outline-offset: 3px; }
+  button:hover { border-color: var(--site-accent); }
+  a:focus-visible, button:focus-visible, textarea:focus-visible { outline: 3px solid var(--site-accent); outline-offset: 3px; }
   .copy-status { min-height: 1.8em; margin-bottom: 0; }
   code { overflow-wrap: anywhere; }
-  :global(.dark) .writing-tools { --site-surface: #1e293b; --site-background: #0f172a; }
-  :global(.dark) h1, :global(.dark) .eyebrow, :global(.dark) a { color: #bae6fd; }
-  :global(.dark) .muted { color: #cbd5e1; }
-  :global(.dark) section { border-color: #475569; }
-  :global(.dark) .actions .primary-action { background: #0c4a6e; color: #e0f2fe; }
   @media (max-width: 640px) {
     .template-grid { grid-template-columns: 1fr; }
     textarea { height: 15rem; }

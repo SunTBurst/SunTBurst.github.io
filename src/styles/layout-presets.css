@@ -1,0 +1,254 @@
+/* Layouts share content and palette tokens. Paper keeps the existing spacing.
+   Every selector is scoped to home/list hooks; article reading widths are untouched. */
+[data-layout-home],
+[data-layout-home-sections],
+[data-layout-home-posts],
+[data-layout-home-talks],
+[data-layout-page],
+[data-layout-talks-main],
+[data-layout-talks-sidebar],
+[data-layout-talk-list],
+[data-layout-talk-card] {
+  min-width: 0;
+}
+
+[data-layout-talk-card] {
+  overflow-wrap: anywhere;
+}
+
+[data-talk-content] {
+  position: relative;
+}
+
+[data-talk-feed] .talk-fold-overlay {
+  position: absolute;
+  inset: auto 0 0;
+  z-index: 10;
+  display: flex;
+  height: 8rem;
+  align-items: end;
+  justify-content: center;
+  padding-bottom: 1rem;
+  background: linear-gradient(to top, var(--talk-fold-surface, var(--site-surface)), transparent);
+  pointer-events: none;
+}
+
+[data-talk-feed] .talk-fold-control {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--site-border);
+  border-radius: 0.35rem;
+  padding: 0.5rem 1rem;
+  background: var(--site-highlight);
+  color: var(--site-highlight-text);
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+[data-talk-feed] .talk-fold-control:focus-visible {
+  outline: 3px solid var(--site-link);
+  outline-offset: 3px;
+}
+
+[data-talk-feed] .talk-collapse-wrap {
+  display: flex;
+  justify-content: center;
+  padding-top: 0.75rem;
+}
+
+/* Compact: complete titles and summaries in quieter, denser rows. */
+html[data-layout="compact"] [data-layout-home] {
+  max-width: 860px;
+  padding-block: 0.75rem;
+}
+
+html[data-layout="compact"] [data-layout-hero] {
+  padding-block: 0.5rem 1.5rem;
+}
+
+html[data-layout="compact"] [data-layout-hero] h1 {
+  font-size: clamp(2rem, 4vw, 2.75rem);
+}
+
+html[data-layout="compact"] [data-layout-hero-tagline],
+html[data-layout="compact"] [data-layout-hero-actions] {
+  margin-top: 0.75rem;
+}
+
+html[data-layout="compact"] [data-layout-home-posts],
+html[data-layout="compact"] [data-layout-home-talks] {
+  margin-top: 1.5rem;
+}
+
+html[data-layout="compact"] [data-layout-home-talks] {
+  padding-top: 1.5rem;
+}
+
+html[data-layout="compact"] [data-layout-home-post-list],
+html[data-layout="compact"] [data-layout-home-talk-list],
+html[data-layout="compact"] [data-layout-post-list],
+html[data-layout="compact"] [data-layout-talk-list] {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+}
+
+html[data-layout="compact"] [data-layout-home-post-card],
+html[data-layout="compact"] [data-layout-home-talk-card],
+html[data-layout="compact"] [data-layout-post-card],
+html[data-layout="compact"] [data-layout-talk-card] {
+  --talk-fold-surface: var(--site-background);
+  margin: 0;
+  border: 0;
+  border-bottom: 1px solid var(--site-border);
+  border-radius: 0;
+  padding: 1rem 0.25rem;
+  background-color: transparent !important;
+  box-shadow: none;
+}
+
+html[data-layout="compact"] [data-layout-talk-card]:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+html[data-layout="compact"] [data-layout-page="posts"] {
+  max-width: 960px;
+  border-width: 1px;
+  padding: clamp(1rem, 3vw, 1.5rem);
+  box-shadow: none;
+}
+
+html[data-layout="compact"] [data-layout-post-filters] {
+  border-width: 1px;
+  padding: 0.75rem;
+}
+
+html[data-layout="compact"] [data-layout-post-summary],
+html[data-layout="compact"] [data-layout-post-tags] {
+  margin-top: 0.375rem;
+}
+
+html[data-layout="compact"] [data-layout-page="talks"] {
+  max-width: 1180px;
+  margin-inline: auto;
+}
+
+html[data-layout="compact"] [data-layout-talk-header] {
+  margin-bottom: 0.5rem;
+}
+
+/* Cards: independent panels with a wider overview on desktop. */
+html[data-layout="cards"] [data-layout-home] {
+  max-width: 1180px;
+}
+
+html[data-layout="cards"] [data-layout-hero] {
+  border: 0;
+  padding-block: 1.5rem 2rem;
+  text-align: center;
+}
+
+html[data-layout="cards"] [data-layout-hero-tagline] {
+  margin-inline: auto;
+}
+
+html[data-layout="cards"] [data-layout-hero-actions] {
+  justify-content: center;
+}
+
+html[data-layout="cards"] [data-layout-home-sections] {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.5rem;
+}
+
+html[data-layout="cards"] [data-layout-home-posts],
+html[data-layout="cards"] [data-layout-home-talks] {
+  margin: 0;
+  border: 0;
+  padding: 0;
+}
+
+html[data-layout="cards"] [data-layout-home-talk-list],
+html[data-layout="cards"] [data-layout-post-list],
+html[data-layout="cards"] [data-layout-talk-list] {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: 1.25rem;
+}
+
+html[data-layout="cards"] [data-layout-home-post-card],
+html[data-layout="cards"] [data-layout-home-talk-card],
+html[data-layout="cards"] [data-layout-post-card],
+html[data-layout="cards"] [data-layout-talk-card] {
+  margin: 0;
+  border: 1px solid var(--site-border);
+  border-radius: 0.75rem;
+  padding: clamp(1rem, 2vw, 1.5rem);
+  background-color: var(--site-surface) !important;
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--site-text) 6%, transparent);
+}
+
+html[data-layout="cards"] [data-layout-page="posts"] {
+  max-width: 1240px;
+  border: 0;
+  padding: clamp(1rem, 3vw, 2rem);
+  background-color: transparent !important;
+  box-shadow: none;
+}
+
+html[data-layout="cards"] [data-layout-post-card] {
+  height: 100%;
+}
+
+html[data-layout="cards"] [data-layout-page="talks"] {
+  max-width: 1360px;
+  margin-inline: auto;
+}
+
+html[data-layout="cards"] [data-layout-talks-main] {
+  order: 1;
+}
+
+html[data-layout="cards"] [data-layout-talks-sidebar] {
+  order: 2;
+}
+
+html[data-layout="cards"] [data-talk-content] {
+  padding-left: 0;
+}
+
+@media (min-width: 760px) {
+  html[data-layout="cards"] [data-layout-post-list],
+  html[data-layout="cards"] [data-layout-talk-list] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 900px) {
+  html[data-layout="cards"] [data-layout-home-sections] {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    gap: 2rem;
+    align-items: start;
+  }
+}
+
+@media (min-width: 1100px) {
+  html[data-layout="cards"] [data-layout-post-list] {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 639px) {
+  html[data-layout] [data-layout-post-list],
+  html[data-layout] [data-layout-talk-list],
+  html[data-layout] [data-layout-home-sections] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

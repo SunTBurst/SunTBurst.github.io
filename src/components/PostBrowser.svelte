@@ -103,7 +103,7 @@
 </script>
 
 <div data-post-browser class="mt-6">
-  <div class="grid gap-3 border-3 border-[#0284c7] bg-[#f8fafc] p-3 dark:bg-slate-900 sm:grid-cols-3 sm:p-4">
+  <div data-layout-post-filters class="grid gap-3 border-3 border-[#0284c7] bg-[#f8fafc] p-3 dark:bg-slate-900 sm:grid-cols-3 sm:p-4">
     <label class="min-w-0 font-black text-[#075985] dark:text-[#bae6fd]">
       <span class="block text-sm">搜索文章</span>
       <input value={query} on:input={setQuery} name="q" type="search" placeholder="搜索标题、正文、分类或标签" class="mt-1 min-h-[44px] w-full min-w-0 border-2 border-[#0284c7] bg-white px-3 font-bold text-slate-800 focus:outline-none focus:ring-4 focus:ring-[#0ea5e9]/40 dark:bg-slate-800 dark:text-slate-100" />
@@ -142,13 +142,13 @@
       <p class="mt-2 font-bold leading-7">请调整关键词、分类或标签；公开文章没有被删除。</p>
     </div>
   {:else}
-    <ul class="mt-5 grid gap-4 sm:grid-cols-2">
+    <ul data-layout-post-list class="mt-5 grid gap-4 sm:grid-cols-2">
       {#each model.items as post}
-        <li class="min-w-0 border-3 border-[#0284c7] bg-[#e0f2fe] p-4 dark:bg-slate-900">
+        <li data-layout-post-card class="min-w-0 border-3 border-[#0284c7] bg-[#e0f2fe] p-4 dark:bg-slate-900">
           <a data-post-link href={post.href} class="flex min-h-[44px] min-w-0 max-w-full items-center break-all font-black text-[#075985] underline decoration-2 underline-offset-4 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#0ea5e9]/40 dark:text-[#bae6fd]">{post.title}</a>
-          <p class="mt-2 text-sm font-black">{post.date}{post.category ? ` · ${post.category}` : ''}</p>
-          <p class="mt-2 break-words font-bold leading-6">{post.description}</p>
-          {#if post.tags.length > 0}<p class="mt-2 break-words text-sm font-bold text-slate-600 dark:text-slate-300">{post.tags.map((item) => `#${item}`).join(' ')}</p>{/if}
+          <p data-layout-post-meta class="mt-2 text-sm font-black">{post.date}{post.category ? ` · ${post.category}` : ''}</p>
+          <p data-layout-post-summary class="mt-2 break-words font-bold leading-6">{post.description}</p>
+          {#if post.tags.length > 0}<p data-layout-post-tags class="mt-2 break-words text-sm font-bold text-slate-600 dark:text-slate-300">{post.tags.map((item) => `#${item}`).join(' ')}</p>{/if}
         </li>
       {/each}
     </ul>

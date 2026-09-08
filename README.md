@@ -86,7 +86,9 @@ draft: false
 - 关于页内容：修改 `src/config/about.md`。
 - 头像：替换 `public/images/avatar.svg`，或同时修改 `src/config/site.ts` 中的头像路径。
 
-“写作工具”中的“调整外观”会打开 `src/config/site.ts`。文件顶部的 `appearanceConfig` 集中设置页面背景、卡片/文章纸面颜色和可选的首页图片，并附中文注释。不设置首页图片也可以正常展示。
+顶部“外观”面板提供原色纸面、海盐蓝、森林绿、暖咖、石墨五套配色，以及纸面、紧凑、卡片三种版式。配色、版式和明暗模式可以分别选择，切换即时生效，并在当前浏览器保存。版式调整首页、文章列表和随记列表；文章详情保留稳定的阅读宽度。
+
+“写作工具”中的外观设置会打开 `src/config/site.ts`。文件顶部 `appearanceConfig.defaultPalette` 和 `defaultLayout` 设置新访客的默认选择；原色纸面的三个背景色及可选首页图片仍可单独调整。已有个人选择优先，访客可在“外观”面板恢复站点默认配色和版式。配色具体参数集中在 `src/config/appearance.ts`，不设置首页图片也可以正常展示。
 
 ## 构建网站
 

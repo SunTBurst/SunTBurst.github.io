@@ -142,7 +142,7 @@ export function PageBanner({
       <div 
         className="absolute top-0 left-0 w-full h-full pointer-events-none" 
         style={{ 
-          backgroundImage: "linear-gradient(45deg, #fde68a 25%, transparent 25%, transparent 75%, #fde68a 75%, #fde68a), linear-gradient(45deg, #fde68a 25%, transparent 25%, transparent 75%, #fde68a 75%, #fde68a)", 
+          backgroundImage: "linear-gradient(45deg, var(--site-highlight) 25%, transparent 25%, transparent 75%, var(--site-highlight) 75%, var(--site-highlight)), linear-gradient(45deg, var(--site-highlight) 25%, transparent 25%, transparent 75%, var(--site-highlight) 75%, var(--site-highlight))",
           backgroundSize: "20px 20px", 
           backgroundPosition: "0 0, 10px 10px", 
           opacity: infoConfig.banner.gridPatternOpacity 

@@ -69,7 +69,9 @@ test('article layouts show a single title, heading-based TOCs and safe original-
     assert.match(longHtml, /data-desktop-toc/);
     assert.equal((longHtml.match(/<h1\b/g) ?? []).length, 1);
     assert.match(longHtml, /max-w-\[780px\]/);
-    assert.match(longHtml, /--site-background: #f7f5ef; --site-surface: #fffdf8; --article-background: #fffdf8/);
+    assert.match(longHtml, /data-palette="paper" data-layout="paper"/);
+    assert.match(longHtml, /--site-background:\s*#f7f5ef/);
+    assert.match(longHtml, /--article-background:\s*#fffdf8/);
     const mobileToc = longHtml.match(/<details\b[^>]*data-mobile-toc[^>]*>([\s\S]*?)<\/details>/)?.[1] ?? '';
     const desktopToc = longHtml.match(/<aside\b[^>]*data-desktop-toc[^>]*>([\s\S]*?)<\/aside>/)?.[1] ?? '';
     const hrefs = (value) => [...value.matchAll(/href="#([^" ]+)"/g)].map((match) => match[1]);

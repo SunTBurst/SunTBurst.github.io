@@ -8,13 +8,13 @@ interface Props {
 const { entries, title = '最近值得看', description = '优先展示可以复用的知识、文章和记录，仅保留少量建设更新。' } = Astro.props;
 ---
 
-<section id="recent-activity" aria-labelledby="recent-activity-title" class="mt-8 border-t border-[#0284c7]/20 pt-8 sm:mt-10">
+<section id="recent-activity" data-layout-home-talks aria-labelledby="recent-activity-title" class="mt-8 border-t border-[#0284c7]/20 pt-8 sm:mt-10">
   <h2 id="recent-activity-title" class="text-xl font-semibold text-[#075985] dark:text-[#bae6fd]">{title}</h2>
   <p class="mt-2 text-sm leading-6 text-slate-500 dark:text-slate-400">{description}</p>
   {entries.length > 0 ? (
-    <ol class="mt-5 space-y-5">
+    <ol data-layout-home-talk-list class="mt-5 space-y-5">
       {entries.map((entry) => (
-        <li class="min-w-0 border-l-2 border-[#fde68a] pl-4 text-sm">
+        <li data-layout-home-talk-card class="min-w-0 border-l-2 border-[#fde68a] pl-4 text-sm">
           <time datetime={entry.updatedAt} class="text-xs text-slate-500 dark:text-slate-400">{entry.updatedAt.slice(0, 10)}</time>
           <h3><a href={entry.href} data-touch-target="activity-entry" class="inline-flex min-h-[44px] min-w-0 max-w-full items-center break-all px-1 py-2 font-semibold text-[#075985] underline decoration-[#0284c7]/40 underline-offset-4 transition hover:text-[#0369a1] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#0ea5e9]/40 focus-visible:ring-offset-2 motion-reduce:transition-none dark:text-[#bae6fd]">{entry.title}</a></h3>
           <p class="mt-1 leading-7 text-slate-600 dark:text-slate-300">{entry.description}</p>

@@ -21,7 +21,9 @@ test('friends page stays useful before the first real reciprocal link exists', (
   assert.equal((html.match(/data-bookmark-category=/g) ?? []).length, 3);
   assert.match(html, /href="https:\/\/github\.com\/SunTBurst\/SunTBurst\.github\.io\/issues\/new\?template=friend-link\.yml"/);
   assert.match(html, /GitHub Issue 是公开页面/);
-  assert.doesNotMatch(html, /<form\b|<input\b|<textarea\b/i, 'expected no fake local application form');
+  const mainContent = html.match(/<main\b[^>]*>([\s\S]*?)<\/main>/)?.[1];
+  assert.ok(mainContent, 'expected the friend directory content area');
+  assert.doesNotMatch(mainContent, /<form\b|<input\b|<textarea\b/i, 'expected no fake friend application form inside the directory');
 
   const externalCards = Array.from(html.matchAll(/<a\b(?=[^>]*data-curated-bookmark)(?=[^>]*href="https:\/\/)(?=[^>]*target="_blank")(?=[^>]*rel="noopener noreferrer")[^>]*>/g));
   assert.equal(externalCards.length, 6, 'expected every curated bookmark to open safely as an external resource');

@@ -1,3 +1,6 @@
+---
+import AppearancePicker from './AppearancePicker.astro';
+---
 <div aria-label="全局工具" class="flex items-center gap-1">
   <a href="/search" aria-label="搜索" data-portal-tool="search" class="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md px-2 text-sm font-semibold text-[#075985] hover:bg-[#e0f2fe] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#0ea5e9]/40 dark:text-[#bae6fd] dark:hover:bg-slate-800">
     <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-5 w-5"><circle cx="10.5" cy="10.5" r="6.5" /><path stroke-linecap="round" d="m16 16 4.5 4.5" /></svg>
@@ -6,8 +9,9 @@
   <button type="button" aria-label="切换深色主题" data-portal-tool="theme" aria-pressed="false" class="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md px-2 text-sm font-semibold text-[#075985] hover:bg-[#e0f2fe] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#0ea5e9]/40 dark:text-[#fde68a] dark:hover:bg-slate-800">
     <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="theme-moon h-5 w-5"><path stroke-linejoin="round" d="M20.5 14A8.5 8.5 0 0 1 10 3.5 8.5 8.5 0 1 0 20.5 14Z" /></svg>
     <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="theme-sun h-5 w-5"><circle cx="12" cy="12" r="4" /><path stroke-linecap="round" d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5" /></svg>
-    <span class="ml-1.5 hidden sm:inline">主题</span>
+    <span class="ml-1.5 hidden sm:inline">明暗</span>
   </button>
+  <AppearancePicker />
 </div>
 
 <script>
@@ -18,18 +22,16 @@
     activatePortalTool(event, 'portal:open-search', (portalEvent) => window.dispatchEvent(portalEvent));
   });
   const themeButton = document.querySelector<HTMLButtonElement>('[data-portal-tool="theme"]');
-  let storedTheme: string | null = null;
-  try {
-    storedTheme = window.localStorage.getItem('theme');
-  } catch {
-    storedTheme = null;
-  }
-  const initialDark = storedTheme ? storedTheme === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
-  document.documentElement.classList.toggle('dark', initialDark);
+  const initialDark = document.documentElement.classList.contains('dark');
   themeButton?.setAttribute('aria-pressed', String(initialDark));
   themeButton?.addEventListener('click', () => {
     const dark = document.documentElement.classList.toggle('dark');
     themeButton.setAttribute('aria-pressed', String(dark));
     persistThemePreference(dark ? 'dark' : 'light');
+    window.dispatchEvent(new CustomEvent('portal:appearance-change', { detail: {
+      palette: document.documentElement.dataset.palette,
+      layout: document.documentElement.dataset.layout,
+      mode: dark ? 'dark' : 'light',
+    } }));
   });
 </script>
