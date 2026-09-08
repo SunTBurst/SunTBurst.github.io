@@ -11,7 +11,7 @@ import {
 const posts: PublicPostBrowseEntry[] = [
   { id: '1', title: 'Astro 门户', description: '公开站点实践', href: '/posts/1/', date: '2026-08-07', category: '工程', tags: ['Astro', '公开'] },
   { id: '2', title: '知识整理', description: '本地知识地图', href: '/posts/2/', date: '2026-08-06', category: '笔记', tags: ['知识'] },
-  { id: '3', title: '构建检查', description: 'Astro 生产输出', href: '/posts/3/', date: '2026-08-05', category: '工程', tags: ['测试', '公开'] },
+  { id: '3', title: '构建检查', description: 'Astro 生产输出', href: '/posts/3/', date: '2026-08-05', category: '工程', tags: ['测试', '公开'], searchText: '正文深处独有检索词' },
   { id: '4', title: '阶段记录', description: '设计取舍', href: '/posts/4/', date: '2026-08-04', category: '随笔', tags: ['记录'] },
   { id: '5', title: '搜索设计', description: '键盘可访问', href: '/posts/5/', date: '2026-08-03', category: '工程', tags: ['测试'] },
   { id: '6', title: '内容模型', description: '集合与索引', href: '/posts/6/', date: '2026-08-02', category: '笔记', tags: ['知识'] },
@@ -24,6 +24,12 @@ test('post browser combines text, category, and tag filters against public entri
   assert.equal(result.totalItems, 2);
   assert.equal(result.totalPages, 1);
   assert.equal(result.page, 1);
+});
+
+test('post browser combines full-text search with category and tag filters', () => {
+  const result = browsePosts(posts, { query: '正文深处独有检索词', category: '工程', tag: '公开', page: 1 }, 6);
+  assert.deepEqual(result.items.map(({ id }) => id), ['3']);
+  assert.equal(result.totalItems, 1);
 });
 
 test('post browser returns an honest empty result without inventing a zero page', () => {

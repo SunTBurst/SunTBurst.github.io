@@ -5,7 +5,7 @@ import ReadingFootprint from '../components/ReadingFootprint.astro';
 import PortalEffects from '../components/PortalEffects.astro';
 import PortalFooter from '../components/PortalFooter.astro';
 import { PageBanner } from '../components/PageBanner';
-import { siteConfig } from '../config/site';
+import { appearanceConfig, siteConfig } from '../config/site';
 import '../index.css';
 
 interface Props {
@@ -41,13 +41,22 @@ const {
   robots,
 } = Astro.props;
 
+const colors = [appearanceConfig.backgroundColor, appearanceConfig.surfaceColor, appearanceConfig.articleColor];
+if (colors.some((value) => !/^#[0-9a-f]{6}$/i.test(value))) {
+  throw new Error('外观颜色必须填写 # 加六位十六进制颜色值');
+}
+if (appearanceConfig.homeImage && !appearanceConfig.homeImage.startsWith('/images/')) {
+  throw new Error('首页图片必须使用本站 /images/ 路径');
+}
+const appearanceStyle = `--site-background: ${colors[0]}; --site-surface: ${colors[1]}; --article-background: ${colors[2]}`;
+
 const documentTitle = title === siteConfig.title ? title : `${title} | ${siteConfig.title}`;
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site ?? siteConfig.url);
 const socialImage = image ? new URL(image, Astro.site ?? siteConfig.url) : new URL(siteConfig.avatar, Astro.site ?? siteConfig.url);
 ---
 
 <!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" style={appearanceStyle}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -62,7 +71,7 @@ const socialImage = image ? new URL(image, Astro.site ?? siteConfig.url) : new U
     <link rel="icon" href={siteConfig.avatar} type="image/svg+xml" />
     <title>{documentTitle}</title>
   </head>
-  <body class="bg-[#f8fafc] text-slate-800 dark:bg-slate-900 dark:text-slate-100">
+  <body class="site-background text-slate-800 dark:bg-slate-900 dark:text-slate-100">
     <a
       href="#main-content"
       data-skip-link
@@ -72,7 +81,7 @@ const socialImage = image ? new URL(image, Astro.site ?? siteConfig.url) : new U
     <ReadingFootprint />
     <IntentPrefetch />
     <NavBar />
-    <div class={`flex min-h-screen flex-col pt-28 xl:pt-20 ${isArticle ? 'article-paper-shell' : ''}`}>
+    <div class={`flex min-h-screen flex-col pt-16 ${isArticle ? 'article-paper-shell' : ''}`}>
       <main id="main-content" class="flex-1 px-2 py-3 sm:px-6 sm:py-6 md:px-8 md:py-8">
         <div class="mx-auto w-full max-w-[1440px]">
           {!hidePageBanner && !isPortalHome && <div class="mb-5 sm:mb-8">

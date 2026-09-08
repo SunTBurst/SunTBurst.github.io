@@ -26,7 +26,7 @@ test('production build excludes every draft collection from routes and public di
       'draft: true',
       '---',
       '',
-      'DRAFT_POST_BODY_SECRET',
+      'DRAFT_POST_BODY_SECRET DRAFT_POST_FULLTEXT_ONLY',
       '',
     ].join('\n'), 'utf8');
     await writeFile(draftTalk, [
@@ -37,7 +37,7 @@ test('production build excludes every draft collection from routes and public di
       'draft: true',
       '---',
       '',
-      'DRAFT_TALK_BODY_SECRET',
+      'DRAFT_TALK_BODY_SECRET DRAFT_TALK_FULLTEXT_ONLY',
       '',
     ].join('\n'), 'utf8');
     await writeFile(draftKnowledge, [
@@ -51,7 +51,7 @@ test('production build excludes every draft collection from routes and public di
       'draft: true',
       '---',
       '',
-      'DRAFT_KNOWLEDGE_BODY_SECRET',
+      'DRAFT_KNOWLEDGE_BODY_SECRET DRAFT_KNOWLEDGE_FULLTEXT_ONLY',
       '',
     ].join('\n'), 'utf8');
     await writeFile(draftProject, [
@@ -65,7 +65,7 @@ test('production build excludes every draft collection from routes and public di
       'draft: true',
       '---',
       '',
-      'DRAFT_PROJECT_BODY_SECRET',
+      'DRAFT_PROJECT_BODY_SECRET DRAFT_PROJECT_FULLTEXT_ONLY',
       '',
     ].join('\n'), 'utf8');
     await writeFile(draftUpdate, [
@@ -79,7 +79,7 @@ test('production build excludes every draft collection from routes and public di
       'draft: true',
       '---',
       '',
-      'DRAFT_UPDATE_BODY_SECRET',
+      'DRAFT_UPDATE_BODY_SECRET DRAFT_UPDATE_FULLTEXT_ONLY',
       '',
     ].join('\n'), 'utf8');
 
@@ -115,6 +115,12 @@ test('production build excludes every draft collection from routes and public di
     }
     const publicArtifacts = await Promise.all(publicArtifactPaths.map((relativePath) => readFile(path.join(projectRoot, 'dist', ...relativePath.split('/')), 'utf8')));
     const publishedOutput = publicArtifacts.join('\n');
+    const searchOutput = await readFile(path.join(projectRoot, 'dist', 'search', 'index.html'), 'utf8');
+    assert.doesNotMatch(
+      searchOutput,
+      /DRAFT_(?:POST|TALK|KNOWLEDGE|PROJECT|UPDATE)_FULLTEXT_ONLY/,
+      'draft body markers must not leak into the full-text search page',
+    );
     assert.doesNotMatch(
       publishedOutput,
       /DRAFT_(?:POST|TALK|KNOWLEDGE|PROJECT|UPDATE)_(?:SECRET|BODY_SECRET|SUMMARY_SECRET)|draft-(?:post|talk|knowledge|project|update)-secret/,

@@ -1,0 +1,148 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { githubAuthoringConfig } from '../config/site';
+import { calendarDate } from '../utils/dateFormat';
+import { githubAuthoringLinks } from '../utils/githubAuthoring';
+
+const links = githubAuthoringLinks(githubAuthoringConfig);
+const today = calendarDate(new Date());
+const templates = [
+  {
+    id: 'post',
+    label: '文章',
+    href: links.newPost,
+    content: `---\ntitle: 请填写文章标题\npublished: ${today}\ndescription: ""\ntags: []\ncategory: 随笔\n---\n\n从这里粘贴正文。\n\n![图片说明](/images/文件名.jpg)`,
+  },
+  {
+    id: 'talk',
+    label: '随记',
+    href: links.newTalk,
+    content: `---\ntitle: 今天的记录\npublished: ${today}\ntags: []\n---\n\n记录此刻的想法。`,
+  },
+];
+---
+
+<Layout title="写作工具" description="从博客进入 GitHub，撰写文章、管理图片并查看发布结果" hidePageBanner robots="noindex,nofollow">
+  <div class="writing-tools" data-write-tools>
+    <header>
+      <p class="eyebrow">让记录更顺手</p>
+      <h1>写作工具</h1>
+      <p class="intro">复制模板，在 GitHub 粘贴 Markdown 并保存，博客会自动发布。</p>
+      <p class="muted">这是公开的工具页。编辑和保存由 GitHub 完成，只有具备仓库写入权限的账号才能更新博客。本页不验证身份，也不保存正文或登录凭据；私密草稿请继续留在 Obsidian。</p>
+    </header>
+
+    <section aria-labelledby="writing-title">
+      <div class="section-heading">
+        <h2 id="writing-title">写作</h2>
+        <div class="text-links">
+          <a href={links.posts} target="_blank" rel="noopener noreferrer">编辑已有文章 ↗</a>
+          <a href={links.talks} target="_blank" rel="noopener noreferrer">编辑已有随记 ↗</a>
+        </div>
+      </div>
+      <p>先复制模板，再打开新建页面，填写以 <code>.md</code> 结尾的文件名，替换标题和正文后保存。文章开头的属性只保留一组，发布前核对日期。</p>
+      <p class="muted">模板日期按利雅得当天刷新。如果已有完整的 Markdown 文件，可以直接在 GitHub 编辑器中粘贴内容。</p>
+      <div class="template-grid">
+        {templates.map((template) => (
+          <div class="template-card" data-template-card>
+            <label for={`template-${template.id}`}>{template.label}模板</label>
+            <textarea id={`template-${template.id}`} readonly spellcheck="false" data-markdown-template aria-describedby={`template-status-${template.id}`}>{template.content}</textarea>
+            <div class="actions">
+              <button type="button" data-copy-template>复制{template.label}模板</button>
+              <a class="primary-action" href={template.href} target="_blank" rel="noopener noreferrer">新建{template.label} ↗</a>
+            </div>
+            <p class="copy-status muted" id={`template-status-${template.id}`} data-copy-status role="status" aria-live="polite">也可以直接选中上方文字复制。</p>
+          </div>
+        ))}
+      </div>
+      <p class="muted">需要一次修改多个文件时，可打开 <a href={links.editor} target="_blank" rel="noopener noreferrer">GitHub 网页编辑器 ↗</a>。<code>draft: true</code> 只会隐藏网页展示，公开仓库里的文件仍可被查看。</p>
+    </section>
+
+    <section aria-labelledby="assets-title">
+      <h2 id="assets-title">图片与外观</h2>
+      <p>先上传图片，再把文章里的图片地址写成 <code>/images/文件名.jpg</code>。从 Obsidian 复制正文时，本地图片不会随文字一起上传；双链请改为指向已公开页面的普通链接。</p>
+      <div class="actions">
+        <a href={links.images} target="_blank" rel="noopener noreferrer">上传图片 ↗</a>
+        <a href={links.appearance} target="_blank" rel="noopener noreferrer">修改站点与外观设置 ↗</a>
+      </div>
+      <p class="muted">外观设置在 GitHub 中编辑并保存，发布后对所有访客生效。</p>
+    </section>
+
+    <section aria-labelledby="publication-title">
+      <h2 id="publication-title">发布</h2>
+      <p>保存到主分支后，GitHub Actions 会开始构建。打开发布记录，确认构建和部署均已完成，再回到博客查看结果。</p>
+      <div class="actions">
+        <a class="primary-action" href={links.publication} target="_blank" rel="noopener noreferrer">查看发布记录 ↗</a>
+        <a href={links.currentVersion}>查看当前线上版本</a>
+      </div>
+      <p class="muted">保存成功不等于已经上线。当前版本页展示已部署的快照；正在运行或失败的发布，以 GitHub Actions 记录为准。</p>
+    </section>
+  </div>
+</Layout>
+
+<script>
+  import { calendarDate } from '../utils/dateFormat';
+
+  const refreshTemplateDates = () => {
+    const date = calendarDate(new Date());
+    document.querySelectorAll<HTMLTextAreaElement>('[data-markdown-template]').forEach((template) => {
+      template.value = template.value.replace(/^published: .*$/m, `published: ${date}`);
+    });
+  };
+
+  refreshTemplateDates();
+  window.addEventListener('pageshow', refreshTemplateDates);
+
+  document.querySelectorAll<HTMLElement>('[data-template-card]').forEach((card) => {
+    const template = card.querySelector<HTMLTextAreaElement>('[data-markdown-template]');
+    const button = card.querySelector<HTMLButtonElement>('[data-copy-template]');
+    const status = card.querySelector<HTMLElement>('[data-copy-status]');
+    if (!template || !button || !status) return;
+    button.addEventListener('click', async () => {
+      try {
+        if (!navigator.clipboard?.writeText) throw new Error('Clipboard unavailable');
+        await navigator.clipboard.writeText(template.value);
+        status.textContent = '模板已复制，可以在 GitHub 中粘贴。';
+      } catch {
+        template.focus();
+        template.select();
+        status.textContent = '已选中模板，请按 Ctrl+C 或使用设备的复制菜单。';
+      }
+    });
+  });
+</script>
+
+<style>
+  .writing-tools { max-width: 62rem; margin: 0 auto; line-height: 1.8; }
+  header { max-width: 52rem; margin-bottom: 2rem; }
+  h1 { margin: 0; font-size: clamp(1.8rem, 4vw, 2.5rem); font-weight: 750; color: #075985; line-height: 1.3; }
+  h2 { margin: 0; font-size: 1.35rem; font-weight: 700; }
+  p { margin: .75rem 0; }
+  .eyebrow { margin: 0 0 .4rem; color: #0369a1; font-size: .85rem; }
+  .intro { font-size: 1.1rem; }
+  .muted { color: #64748b; font-size: .9rem; }
+  section { background: var(--site-surface, #fff); border: 1px solid #cbd5e1; border-radius: .65rem; padding: clamp(1rem, 3vw, 1.8rem); margin-bottom: 1.25rem; }
+  .section-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem 1rem; }
+  .text-links, .actions { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem .75rem; }
+  a { color: #0369a1; text-underline-offset: .2rem; }
+  .text-links a { display: inline-flex; align-items: center; min-height: 44px; font-size: .9rem; text-decoration: underline; }
+  .template-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; margin: 1.25rem 0; }
+  .template-card { min-width: 0; }
+  label { display: block; font-weight: 650; margin-bottom: .5rem; }
+  textarea { display: block; width: 100%; height: 17rem; padding: .9rem; border: 1px solid #94a3b8; border-radius: .35rem; resize: vertical; font-family: ui-monospace, monospace; font-size: .85rem; line-height: 1.65; background: var(--site-background, #faf9f6); color: inherit; margin-bottom: .75rem; }
+  button, .actions a { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; border: 1px solid #94a3b8; border-radius: .35rem; padding: .45rem .85rem; font: inherit; font-size: .9rem; background: var(--site-surface, #fff); cursor: pointer; text-decoration: none; }
+  .actions .primary-action { border-color: #0284c7; background: #e0f2fe; color: #075985; }
+  a:hover { text-decoration: underline; }
+  button:hover { border-color: #0284c7; }
+  a:focus-visible, button:focus-visible, textarea:focus-visible { outline: 3px solid #0284c7; outline-offset: 3px; }
+  .copy-status { min-height: 1.8em; margin-bottom: 0; }
+  code { overflow-wrap: anywhere; }
+  :global(.dark) .writing-tools { --site-surface: #1e293b; --site-background: #0f172a; }
+  :global(.dark) h1, :global(.dark) .eyebrow, :global(.dark) a { color: #bae6fd; }
+  :global(.dark) .muted { color: #cbd5e1; }
+  :global(.dark) section { border-color: #475569; }
+  :global(.dark) .actions .primary-action { background: #0c4a6e; color: #e0f2fe; }
+  @media (max-width: 640px) {
+    .template-grid { grid-template-columns: 1fr; }
+    textarea { height: 15rem; }
+  }
+</style>

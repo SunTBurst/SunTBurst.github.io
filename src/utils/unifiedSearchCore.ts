@@ -1,3 +1,5 @@
+import { normalizeSearchText } from './portalIndexCore';
+
 export interface SearchKeyboardInput {
   key: string;
   isComposing?: boolean;
@@ -8,6 +10,15 @@ export type SearchKeyboardDecision = {
   action: 'none' | 'focus';
   index: number;
 };
+
+export function matchesPortalSearch(
+  entry: { title: string; description: string; kind: string; topics: string[] },
+  query: string,
+  body = '',
+): boolean {
+  return normalizeSearchText([entry.title, entry.description, entry.kind, ...entry.topics, body].join(' '))
+    .includes(normalizeSearchText(query));
+}
 
 function validResultIndex(index: number, resultCount: number): boolean {
   return Number.isInteger(index) && index >= 0 && index < resultCount;

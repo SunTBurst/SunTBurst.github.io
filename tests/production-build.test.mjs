@@ -49,11 +49,35 @@ test('production build emits the local SunTBurst portal with one consent-based w
   assert.match(home, /SunTBurst 个人门户/, 'expected the built homepage to carry the SunTBurst identity');
   assert.match(home, /https:\/\/tsun\.test\//, 'expected PUBLIC_SITE_URL to control generated absolute URLs');
   assert.match(home, /id="identity"/, 'expected the portal identity section');
-  assert.match(home, /id="portal-pulse"/, 'expected the factual portal pulse section');
-  assert.match(home, /id="portal-tools"/, 'expected the honest portal toolbox section');
+  assert.match(home, /最近文章/, 'expected real recent articles on the homepage');
+  assert.match(home, /最近随记/, 'expected an independent recent-talk section');
+  assert.doesNotMatch(home, /id="(?:portal-pulse|portal-tools|knowledge-map|project-shelf)"/, 'expected a focused homepage with secondary sections available on their own routes');
+  assert.match(home, /href="\/write\/?"/, 'expected the authoring tools to remain discoverable from the footer');
 
   const welcomePost = readDist('posts/hello-world/index.html');
   assert.match(welcomePost, /欢迎来到 SunTBurst 个人门户/, 'expected the local welcome post route under the product identity');
+  assert.equal((welcomePost.match(/<h1\b/g) ?? []).length, 1, 'expected the article title to appear in a single page heading');
+  assert.match(welcomePost, /https:\/\/github\.com\/SunTBurst\/SunTBurst\.github\.io\/edit\/main\/src\/content\/posts\/hello-world\.md/, 'expected article editing to target the existing GitHub source');
+
+  const writingTools = readDist('write/index.html');
+  assert.match(writingTools, /name="robots"\s+content="noindex(?:,[^"]*)?"/, 'expected a public noindex authoring tools page');
+  assert.match(writingTools, /https:\/\/github\.com\/SunTBurst\/SunTBurst\.github\.io\/actions\/workflows\/deploy-pages\.yml/, 'expected the existing deployment workflow link');
+  for (const destination of [
+    'new/main/src/content/posts', 'new/main/src/content/talks',
+    'tree/main/src/content/posts', 'tree/main/src/content/talks',
+    'upload/main/public/images', 'edit/main/src/config/site.ts',
+  ]) {
+    assert.ok(writingTools.includes(`href="https://github.com/SunTBurst/SunTBurst.github.io/${destination}"`), `expected rendered authoring destination ${destination}`);
+  }
+  assert.ok(writingTools.includes('href="https://github.dev/SunTBurst/SunTBurst.github.io"'));
+  const publicIndex = JSON.parse(readDist('portal-index.json'));
+  assert.equal(publicIndex.some((entry) => /^\/write\/?$/.test(entry.href)), false, 'expected authoring tools outside the shared search and exploration index');
+  for (const entry of [...publicIndex, ...JSON.parse(readDist('posts-data.json'))]) {
+    assert.equal(['body', 'content', 'searchText', 'searchTextById'].some((field) => field in entry), false, 'expected common discovery payloads to retain metadata only');
+  }
+  for (const feed of ['rss.xml', 'sitemap.xml']) {
+    assert.doesNotMatch(readDist(feed), /https:\/\/tsun\.test\/write(?:\/|<)/, `expected authoring tools outside ${feed}`);
+  }
 
   const firstTalk = readDist('talk/first-note/index.html');
   assert.match(firstTalk, /先从一条简短的记录开始/, 'expected the original local talk route');

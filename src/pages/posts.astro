@@ -3,6 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import PostBrowser from '../components/PostBrowser.svelte';
 import PostNoscriptList from '../components/PostNoscriptList.astro';
 import { getProcessedPosts } from '../utils/postsFetcher';
+import { extractSearchText } from '../utils/searchText';
 import { postPath } from '../utils/slugify';
 const posts = await getProcessedPosts();
 const publicPosts = posts.map((post) => ({
@@ -13,6 +14,7 @@ const publicPosts = posts.map((post) => ({
   date: post.date.slice(0, 10),
   category: post.category,
   tags: post.tags,
+  searchText: extractSearchText(post.content),
 }));
 ---
 

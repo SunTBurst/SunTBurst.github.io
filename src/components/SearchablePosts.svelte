@@ -143,7 +143,7 @@
     <input
       type="text"
       name="q"
-      placeholder={i18nConfig.search.placeholder}
+      placeholder="筛选标题、简介、标签或分类"
       value={searchQuery}
       on:input={handleSearchInput}
       toolparamdescription="搜索关键词，支持按文章标题、描述、标签或分类进行模糊匹配"

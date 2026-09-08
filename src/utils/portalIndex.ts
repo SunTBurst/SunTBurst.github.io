@@ -1,8 +1,10 @@
 import type { PortalIndexEntry } from '../types/portal';
 import { portalConfig } from '../config/portal';
+import { getPublishedPosts, getPublishedTalks } from './contentCollections';
 import { getProcessedPosts, getProcessedTalks, type PostItem } from './postsFetcher';
 import { getPublishedKnowledge, getPublishedProjects, getPublishedUpdates } from './portalCollections';
 import { assertUniqueLocalEntries, plainTextSummary } from './portalIndexCore';
+import { extractSearchText } from './searchText';
 import { normalizeEntrySlug, postPath, talkPath } from './slugify';
 
 const staticPages: PortalIndexEntry[] = [
@@ -34,7 +36,7 @@ const staticPages: PortalIndexEntry[] = [
   ['status', '构建状态', '查看当前部署快照与降级边界', '/status'],
   ['subscribe', '订阅中心', '使用 RSS 或 OPML 跟踪全部公开内容并查看邮件接入状态', '/subscribe'],
   ['comments-policy', '评论与审核规则', '了解 GitHub 登录、发布前 AI 审核和人工复核边界', '/comments-policy'],
-  ['talks', '说说', '浏览公开的简短记录', '/talks'],
+  ['talks', '随记', '浏览公开的简短记录', '/talks'],
   ['friends', '友链与书签', '查看真实友链、公开申请入口和精选站外资料', '/friends'],
   ['privacy', '隐私', '了解本站的数据边界', '/privacy'],
 ].map(([id, title, description, href]) => ({
@@ -137,4 +139,18 @@ export async function buildPortalIndex(): Promise<PortalIndexEntry[]> {
   ];
 
   return assertUniqueLocalEntries(entries.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt) || a.href.localeCompare(b.href)));
+}
+
+export async function buildPortalSearchText(): Promise<Record<string, string>> {
+  const collections = await Promise.all([
+    getPublishedPosts(),
+    getPublishedTalks(),
+    getPublishedKnowledge(),
+    getPublishedProjects(),
+    getPublishedUpdates(),
+  ]);
+  const prefixes = ['post', 'talk', 'knowledge', 'project', 'update'];
+  return Object.fromEntries(collections.flatMap((entries, index) =>
+    entries.map((entry) => [`${prefixes[index]}:${entry.id}`, extractSearchText(entry.body ?? '')] as const),
+  ));
 }

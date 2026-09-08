@@ -24,43 +24,26 @@ function anchorHrefs(html, touchTarget) {
     .map((tag) => tag.match(/\bhref="([^"]+)"/)?.[1]);
 }
 
-test('homepage is the nine-section SunTBurst portal with continuous two-hop paths', () => {
+test('homepage presents identity, recent articles and real talks with valid local links', () => {
   const result = buildProject(projectRoot);
   assert.equal(result.status, 0, `expected homepage portal build to succeed:\n${result.output}`);
 
   const html = readFileSync(path.join(distDir, 'index.html'), 'utf8');
-  const sectionIds = [
-    'identity',
-    'portal-pulse',
-    'start-here',
-    'knowledge-map',
-    'current-focus',
-    'project-shelf',
-    'recent-activity',
-    'random-explore',
-    'portal-tools',
-  ];
-  let previousIndex = -1;
-  for (const id of sectionIds) {
-    const index = html.indexOf(`id="${id}"`);
-    assert.ok(index > previousIndex, `expected homepage section ${id} in the prescribed order`);
-    previousIndex = index;
-  }
-
-  assert.match(html, /SunTBurst/, 'expected the unique public product identity');
-  assert.match(html, /SunTBurst 个人门户/, 'expected the factual portal project');
-  assert.deepEqual(
-    Array.from(html.matchAll(/\bdata-start-path="([^"]+)"/g), (match) => match[1]),
-    ['/start', '/knowledge', '/projects'],
-    'expected the three configured exploration paths',
-  );
-
-  const firstHops = anchorHrefs(html, 'start-current');
-  const secondHops = anchorHrefs(html, 'start-next');
-  assert.deepEqual(firstHops, ['/start', '/knowledge', '/projects'], 'expected three ordinary first-hop links');
-  assert.deepEqual(secondHops, ['/about', '/knowledge/knowledge-visibility-boundary/', '/changelog'], 'expected three ordinary second-hop links');
-  for (const href of [...firstHops, ...secondHops]) {
-    assert.ok(routeExists(href), `expected homepage hop ${href} to resolve to built HTML`);
+  const identity = html.indexOf('id="identity"');
+  const posts = html.indexOf('id="recent-posts"');
+  const talks = html.indexOf('id="recent-activity"');
+  assert.ok(identity >= 0 && posts > identity && talks > posts, 'expected identity, articles, then real talks');
+  assert.doesNotMatch(html, /id="portal-pulse"|id="portal-tools"|id="knowledge-map"|id="random-explore"/);
+  assert.match(html, /SunTBurst/);
+  assert.match(html, /最近随记/);
+  const postLinks = anchorHrefs(html, 'recent-post');
+  const talkLinks = anchorHrefs(html, 'activity-entry');
+  assert.ok(postLinks.length > 0 && postLinks.length <= 4);
+  assert.ok(talkLinks.length > 0 && talkLinks.length <= 3);
+  assert.ok(postLinks.every((href) => href.startsWith('/posts/')));
+  assert.ok(talkLinks.every((href) => href.startsWith('/talk/')), 'expected talks rather than renamed mixed activity');
+  for (const href of [...postLinks, ...talkLinks, '/posts', '/about', '/talks']) {
+    assert.ok(routeExists(href), `expected homepage link ${href} to resolve to built HTML`);
   }
 
   assert.equal((html.match(/<main\b/g) ?? []).length, 1, 'expected exactly one main landmark');

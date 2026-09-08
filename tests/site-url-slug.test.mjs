@@ -81,4 +81,9 @@ test('production build renders a post whose frontmatter slug differs from its fi
     'utf8',
   );
   assert.match(customPost, /这是自定义 slug 对应的正文标记。/);
+  assert.match(
+    customPost,
+    /github\.com\/SunTBurst\/SunTBurst\.github\.io\/edit\/main\/src\/content\/posts\/site-url-slug-fixture\.md/,
+    'the edit link must use the Markdown source filename, not the public custom slug',
+  );
 });

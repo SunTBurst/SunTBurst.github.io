@@ -5,11 +5,11 @@ import { isNavigationActive, navigationGroups } from '../config/navigation';
 import { siteConfig } from '../config/site';
 
 const { pathname } = Astro.url;
-const linkClass = (active: boolean) => `flex min-h-[44px] items-center border-2 border-[#0284c7] px-3 text-sm font-black shadow-[2px_2px_0_0_#0284c7] transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#0ea5e9]/40 motion-reduce:transition-none ${active ? 'bg-[#0369a1] text-white' : 'bg-[#fde68a] text-[#075985] hover:-translate-y-0.5 hover:bg-[#0369a1] hover:text-white motion-reduce:hover:translate-y-0'}`;
+const linkClass = (active: boolean) => `flex min-h-[44px] items-center rounded-md px-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#0ea5e9]/40 motion-reduce:transition-none ${active ? 'bg-[#0369a1] text-white' : 'text-[#075985] hover:bg-[#e0f2fe] dark:text-[#bae6fd] dark:hover:bg-slate-800'}`;
 ---
 
-<header data-portal-shell class="fixed inset-x-0 top-0 z-[100] border-b-4 border-[#0284c7] bg-white px-2 py-2 shadow-[0_4px_0_0_rgba(30,58,138,0.12)] dark:bg-slate-900 sm:px-4">
-  <div class="mx-auto flex w-full max-w-[1440px] items-center gap-2">
+<header data-portal-shell class="fixed inset-x-0 top-0 z-[100] border-b-2 border-[#0284c7] site-surface px-2 py-2 dark:bg-slate-900 sm:px-4">
+  <div class="mx-auto flex w-full max-w-6xl items-center gap-2">
     <a href="/" class="flex min-h-[44px] min-w-0 shrink items-center gap-2 font-black tracking-wide text-[#075985] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#0ea5e9]/40 dark:text-[#bae6fd]">
       <img src={siteConfig.avatar} alt="SunTBurst" class="h-9 w-9 shrink-0 border-2 border-[#0284c7] bg-[#fde68a] shadow-[2px_2px_0_0_#0284c7]" />
       <span class="max-w-[9rem] truncate text-sm sm:max-w-none sm:text-base">SunTBurst</span>
@@ -22,8 +22,8 @@ const linkClass = (active: boolean) => `flex min-h-[44px] items-center border-2 
     </nav>
 
     <details data-explore-menu class="relative hidden xl:block">
-      <summary class="flex min-h-[44px] cursor-pointer list-none items-center border-2 border-[#0284c7] bg-[#e0f2fe] px-3 text-sm font-black text-[#075985] shadow-[2px_2px_0_0_#0284c7] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#0ea5e9]/40 dark:bg-slate-800 dark:text-[#bae6fd]">探索</summary>
-      <div class="absolute right-0 top-[calc(100%+0.5rem)] z-[110] grid w-56 gap-3 border-4 border-[#0284c7] bg-white p-3 shadow-[6px_6px_0_0_#0284c7] dark:bg-slate-900">
+      <summary class="flex min-h-[44px] cursor-pointer list-none items-center rounded-md px-3 text-sm font-semibold text-[#075985] hover:bg-[#e0f2fe] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#0ea5e9]/40 dark:bg-slate-800 dark:text-[#bae6fd]">更多</summary>
+      <div class="absolute right-0 top-[calc(100%+0.5rem)] z-[110] grid max-h-[calc(100dvh-88px)] w-56 gap-2 overflow-y-auto overscroll-contain rounded-lg border border-[#0284c7]/25 site-surface p-3 shadow-lg dark:bg-slate-900">
         <nav aria-label="探索导航" class="grid gap-2">
           {navigationGroups.explore.map((item) => <a href={item.href} class={linkClass(isNavigationActive(pathname, item))}>{item.label}</a>)}
         </nav>
@@ -33,13 +33,8 @@ const linkClass = (active: boolean) => `flex min-h-[44px] items-center border-2 
       </div>
     </details>
 
-    <div data-desktop-tools class="hidden xl:block"><GlobalTools /></div>
-    <div data-mobile-shell class="ml-auto xl:hidden"><MobileNav groups={navigationGroups} client:load /></div>
+    <div data-global-tools class="ml-auto shrink-0 xl:ml-2"><GlobalTools /></div>
+    <div data-mobile-shell class="shrink-0 xl:hidden"><MobileNav groups={navigationGroups} client:load /></div>
   </div>
 
-  <nav data-mobile-quick-nav aria-label="移动快捷入口" class="mx-auto mt-2 grid w-full max-w-[1440px] grid-cols-3 gap-2 xl:hidden">
-    <a href="/search" data-mobile-quick="search" class="flex min-h-[44px] min-w-0 items-center justify-center border-2 border-[#0284c7] bg-white px-2 text-xs font-black text-[#075985] shadow-[2px_2px_0_0_#0284c7] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#0ea5e9]/40 dark:bg-slate-800 dark:text-[#bae6fd]">搜索</a>
-    <a href="/knowledge" data-mobile-quick="knowledge" class="flex min-h-[44px] min-w-0 items-center justify-center border-2 border-[#0284c7] bg-[#e0f2fe] px-2 text-xs font-black text-[#075985] shadow-[2px_2px_0_0_#0284c7] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#0ea5e9]/40 dark:bg-slate-800 dark:text-[#bae6fd]">知识地图</a>
-    <a href="/ai" data-mobile-quick="ai" class="flex min-h-[44px] min-w-0 items-center justify-center border-2 border-[#0284c7] bg-[#fce7f3] px-2 text-xs font-black text-[#075985] shadow-[2px_2px_0_0_#0284c7] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#0ea5e9]/40 dark:bg-slate-800 dark:text-[#fbcfe8]">AI 导览</a>
-  </nav>
 </header>

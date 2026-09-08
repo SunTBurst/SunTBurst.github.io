@@ -120,3 +120,12 @@ test('homepage pulse counts every published collection entry without inventing t
   assert.equal(model.pulse.find(({ label }) => label === '公开记录')?.value, '6');
   assert.equal(model.pulse.find(({ label }) => label === '建设项目')?.value, '1');
 });
+
+
+test('homepage keeps the supplied public talks separate from mixed activity', () => {
+  const talk = { ...entry('talk-real', '2026-09-04'), kind: 'talk' as const, href: '/talk/real/' as const };
+  const model = buildHomeModel({ posts: [], talks: [talk], knowledge: [entry('knowledge', '2026-09-05')], projects: [], updates: [entry('update', '2026-09-06')] });
+  assert.deepEqual(model.talks, [talk]);
+  assert.equal(model.recent[0].kind, 'update');
+  assert.deepEqual(buildHomeModel({ posts: [], talks: [], knowledge: [], projects: [], updates: [] }).talks, []);
+});

@@ -17,11 +17,11 @@ test.before(() => {
 });
 
 test('built card entrance styles reveal initially transparent content', () => {
-  const home = readFileSync(path.join(distDir, 'index.html'), 'utf8');
+  const article = readFileSync(path.join(distDir, 'posts', 'hello-world', 'index.html'), 'utf8');
   assert.match(
-    home,
+    article,
     /animate-card-entrance opacity-0/,
-    'expected the homepage fixture to exercise an initially transparent card',
+    'expected the existing article metadata to exercise an initially transparent card',
   );
 
   const css = readdirSync(path.join(distDir, '_astro'))

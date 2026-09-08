@@ -33,7 +33,7 @@
 
 /* Design tokens for layout consistency */
 :root {
-  --navbar-height: 52px;
+  --navbar-height: 62px;
   --z-back-to-top: 95;
   --z-navbar: 100;
   --z-dropdown: 110;
@@ -47,13 +47,13 @@
 }
 @media (min-width: 640px) {
   :root {
-    --navbar-height: 68px;
+    --navbar-height: 62px;
   }
 }
 
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: calc(var(--navbar-height) + 42px); /* offset for navbar */
+  scroll-padding-top: calc(var(--navbar-height) + 16px); /* offset for navbar */
 }
 
 /* Prevent horizontal overflow on mobile viewports while preserving sticky on desktop */
@@ -204,21 +204,27 @@ html {
 }
 
 /* Article prose — refined typography */
+.site-background,
 .article-paper-shell {
-  background-color: #f6eddc;
-  background-image: radial-gradient(circle, rgba(112, 82, 42, 0.14) 1px, transparent 1.2px);
-  background-size: 18px 18px;
+  background-color: var(--site-background, #f7f5ef);
+}
+
+.site-surface {
+  background-color: var(--site-surface, #fffdf8);
 }
 
 .article-paper {
-  background-color: #efe1bf;
-  background-image: radial-gradient(circle, rgba(112, 82, 42, 0.1) 0.8px, transparent 1px);
-  background-size: 14px 14px;
+  background-color: var(--article-background, #fffdf8);
 }
 
-.dark .article-paper-shell,
+.dark .site-background,
+.dark .article-paper-shell {
+  background-color: #0f172a;
+}
+
+.dark .site-surface,
 .dark .article-paper {
-  background-image: none;
+  background-color: #1e293b;
 }
 
 .prose {
@@ -329,8 +335,8 @@ html {
 .prose h2,
 .prose h3,
 .prose h4 {
-  font-weight: 900;
-  letter-spacing: 0.02em;
+  font-weight: 700;
+  letter-spacing: 0.01em;
   scroll-margin-top: calc(var(--navbar-height) + 24px);
 }
 .prose h2 {

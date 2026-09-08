@@ -97,10 +97,17 @@ test('clearLocalPortalData removes only local task keys', () => {
 
 test('reader/writer round trip and metadata normalization', () => {
   const { storage, store } = createStorageFixture();
-  const item = { href: '/valid', title: '  hello  ', kind: 'page', savedAt: Date.now() };
+  const item = {
+    href: '/valid',
+    title: '  hello  ',
+    kind: 'page',
+    savedAt: Date.now(),
+    searchText: '正文不应进入收藏',
+    content: '<p>原始正文也不应进入收藏</p>',
+  };
   assert.equal(upsertStoredItem([], item)[0].title, 'hello');
   assert.equal(writeStoredItems(storage, FAVORITES_STORAGE_KEY, [item]), true);
-  assert.deepEqual(normalizeStoredItem({ href: item.href, title: item.title, kind: item.kind, savedAt: item.savedAt }), {
+  assert.deepEqual(normalizeStoredItem(item), {
     href: '/valid',
     title: 'hello',
     kind: 'page',

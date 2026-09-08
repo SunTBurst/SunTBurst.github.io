@@ -14,17 +14,12 @@ const touchHarnessSource = path.join(projectRoot, 'src', 'pages', '__portal-home
 const touchHarnessRoute = path.join(projectRoot, 'src', 'pages', '[...portalHomeTouchTargetTest].astro');
 const touchHarnessOutput = path.join(projectRoot, 'dist', '__portal-home-touch-target-test');
 const longUnbrokenToken = 'UNBROKENHOMEPAGELINKTITLEANDPATHFORNARROWSCREENWRAPPINGCHECK';
-const sectionIds = [
-  'identity',
-  'portal-pulse',
-  'start-here',
-  'knowledge-map',
-  'current-focus',
-  'project-shelf',
-  'recent-activity',
-  'random-explore',
-  'portal-tools',
-];
+const sectionIds = ['identity', 'recent-posts'];
+const fabricatedMetric = /(?:访问|在线|用户|文章)[^<\n]{0,16}\d+/;
+const visibleText = (html) => html
+  .replace(/<(script|style)\b[^>]*>[\s\S]*?<\/\1>/gi, '')
+  .replace(/<\/(?:a|p|div|section|nav|li|h[1-6])\s*>/gi, '\n')
+  .replace(/<[^>]*>/g, ' ');
 
 function assertTouchTarget(html, marker, expectedCount) {
   const targets = [...html.matchAll(new RegExp(`<a\\b(?=[^>]*\\bdata-touch-target=(?:"${marker}"|${marker}))[^>]*>`, 'g'))].map((match) => match[0]);
@@ -93,25 +88,16 @@ export function getStaticPaths() {
     assert.deepEqual(
       [...html.matchAll(/<section\b[^>]*\bid=(?:"([^"]+)"|([^\s>]+))/g)].map((match) => match[1] ?? match[2]),
       sectionIds,
-      'expected the complete portal section sequence',
+      'expected a minimal empty homepage sequence',
     );
-    assert.equal((html.match(/data-start-path=/g) ?? []).length, 3, 'expected three start-path markers');
-    assert.match(html, /data-start-path=(?:"\/start"|\/start)/);
-    assert.match(html, /data-start-path=(?:"\/knowledge"|\/knowledge)/);
-    assert.match(html, /data-start-path=(?:"\/projects"|\/projects)/);
     assert.match(html, /SunTBurst/);
-    assert.match(html, /SunTBurst 个人门户/);
-    assert.match(html, /href=(?:"\/posts"|\/posts)/);
-    assert.match(html, /文章集合/);
-    for (const href of ['/search', '/explore', '/today', '/favorites', '/calendar', '/timeline', '/rss.xml', '/weather', '/random-image', '/github', '/ai', '/stats', '/status', '/subscribe', '/comments-policy', '/music']) {
-      assert.match(html, new RegExp(`href=(?:"${href}"|${href})`), `expected homepage tool link ${href}`);
+    assert.match(html, /暂时没有公开文章/);
+    for (const href of ['/posts', '/talks', '/about']) {
+      assert.ok(html.includes(`href="${href}"`), `expected empty-state link ${href}`);
     }
-    assert.equal((html.match(/data-knowledge-topic=/g) ?? []).length, 3, 'expected every knowledge topic to be a link');
-    assert.equal((html.match(/data-portal-tool=/g) ?? []).length, 16, 'expected all ready and preview tools to remain discoverable');
-    assert.match(html, /公开记录/);
-    assert.match(html, /可用工具/);
+    assert.doesNotMatch(html, /id="recent-activity"|id="portal-pulse"|id="portal-tools"/);
     assert.doesNotMatch(html, /预览尚未配置|尚未配置。/);
-    assert.doesNotMatch(html, /(?:访问|在线|用户|文章)[^<\n]{0,16}\d+/);
+    assert.doesNotMatch(visibleText(html), fabricatedMetric);
     assert.doesNotMatch(html, /upxuu|private|service_role/i);
     assert.doesNotMatch(html, /(?:fetch|XMLHttpRequest|WebSocket)\s*\(/);
     assert.doesNotMatch(html, /https?:\/\//);
@@ -142,7 +128,8 @@ const post = {
   updatedAt: '2026-08-31',
   topics: [],
 };
-const model = buildHomeModel({ posts: [post], talks: [], knowledge: [], projects: [], updates: [] });
+const talk = { ...post, id: 'talk:touch-target', kind: 'talk', href: '/talk/real-note' };
+const model = buildHomeModel({ posts: [post], talks: [talk], knowledge: [], projects: [], updates: [] });
 ---
 
 <PortalHome model={model} />
@@ -181,15 +168,25 @@ export function getStaticPaths() {
     assert.ok(existsSync(htmlPath), 'expected the dedicated touch-target homepage output');
     const html = readFileSync(htmlPath, 'utf8');
     assert.match(html, new RegExp(longUnbrokenToken), 'expected the long unbroken fixture title in the emitted page');
-    assertTouchTarget(html, 'start-current', 3);
-    assertTouchTarget(html, 'start-next', 3);
-    assertTouchTarget(html, 'project-primary', 1);
     assertTouchTarget(html, 'activity-entry', 1);
-    assertTouchTarget(html, 'random-entry', 1);
     assertTouchTarget(html, 'recent-post', 1);
+    assert.ok(html.indexOf('id="identity"') < html.indexOf('id="recent-posts"'));
+    assert.ok(html.indexOf('id="recent-posts"') < html.indexOf('id="recent-activity"'));
+    assert.match(html, /href="\/talk\/real-note"/);
+    assert.match(html, /最近随记/);
+    assert.doesNotMatch(html, /id="portal-pulse"|id="portal-tools"/);
+
   } finally {
     rmSync(touchHarnessSource, { force: true });
     rmSync(touchHarnessRoute, { force: true });
     rmSync(touchHarnessOutput, { recursive: true, force: true });
   }
+});
+
+
+test('homepage metric guard checks visible text without mistaking attributes for invented numbers', () => {
+  assert.doesNotMatch(visibleText('<nav aria-label="暂无文章时的入口" class="mt-2"><a>关于</a></nav>'), fabricatedMetric);
+  assert.doesNotMatch(visibleText('<a>浏览文章 <span>→</span></a><p>最近更新：<time>2026-08-31</time></p>'), fabricatedMetric);
+  assert.match(visibleText('<p>访问量 <strong>1200</strong></p>'), fabricatedMetric);
+  assert.match(visibleText('<p>在线用户 20</p>'), fabricatedMetric);
 });

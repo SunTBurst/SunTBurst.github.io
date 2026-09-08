@@ -31,7 +31,7 @@ test('today page builds a stable three-stop Riyadh trail without tracking', () =
   const labHtml = readFileSync(path.join(distDir, 'lab', 'index.html'), 'utf8');
   const startHtml = readFileSync(path.join(distDir, 'start', 'index.html'), 'utf8');
   const sitemap = readFileSync(path.join(distDir, 'sitemap.xml'), 'utf8');
-  assert.match(homeHtml, /href="\/today"/);
+  assert.match(homeHtml, /href="\/lab"/, 'expected the compact homepage to keep a route to the tool directory');
   assert.match(labHtml, /href="\/today"/);
   assert.match(startHtml, /href="\/today"/);
   assert.match(sitemap, /<loc>https:\/\/tsun\.test\/today\/<\/loc>/);

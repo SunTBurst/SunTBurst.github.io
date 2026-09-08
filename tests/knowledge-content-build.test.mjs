@@ -59,8 +59,5 @@ test('public knowledge forms a useful three-step path instead of an empty topic 
   for (const slug of knowledgeSlugs) assert.match(knowledgeJourney, new RegExp(`/knowledge/${slug}/`), `expected journey stop ${slug}`);
 
   const home = readRoute('/');
-  assert.match(home, /最近值得看/);
-  const activityHrefs = [...home.matchAll(/<a\b(?=[^>]*data-touch-target="activity-entry")(?=[^>]*href="([^"]+)")[^>]*>/g)].map((match) => match[1]);
-  assert.ok(activityHrefs.filter((href) => href.startsWith('/knowledge/')).length >= 3, 'expected the homepage to foreground reusable knowledge');
-  assert.ok(activityHrefs.filter((href) => href.startsWith('/changelog#')).length <= 2, 'expected at most two build-log entries on the homepage');
+  assert.match(home, /href="\/knowledge"/, 'expected knowledge to remain discoverable from the compact homepage navigation');
 });

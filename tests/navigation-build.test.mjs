@@ -30,11 +30,11 @@ test('portal shell exposes grouped desktop navigation, hydrated mobile links, an
   const shell = shellMatch[1];
 
   const primaryLabels = Array.from(shell.matchAll(/<a\b[^>]*data-desktop-primary[^>]*>([\s\S]*?)<\/a>/g), (match) => match[1].replace(/<[^>]+>/g, '').trim());
-  assert.deepEqual(primaryLabels, ['首页', '文章', '知识', '项目', '动态'], 'expected exactly five desktop primary links');
+  assert.deepEqual(primaryLabels, ['文章', '随记', '关于'], 'expected exactly three desktop primary links');
 
   const exploreMenu = shell.match(/<details\b[^>]*data-explore-menu[^>]*>([\s\S]*?)<\/details>/)?.[1] ?? '';
-  assert.match(exploreMenu, /<summary\b[^>]*>\s*探索\s*<\/summary>/, 'expected a native keyboard-operable Explore summary');
-  for (const label of ['说说', '主题', '更新', '实验室', '友链', '关于']) {
+  assert.match(exploreMenu, /<summary\b[^>]*>\s*更多\s*<\/summary>/, 'expected a native keyboard-operable Explore summary');
+  for (const label of ['知识', '项目', '专题', '归档', '近况', '更新记录', '收藏', '随机看看', '工具', '友链']) {
     assert.match(exploreMenu, new RegExp(`>\\s*${label}\\s*</a>`), `expected ${label} in the Explore menu`);
   }
 
@@ -42,17 +42,13 @@ test('portal shell exposes grouped desktop navigation, hydrated mobile links, an
   assert.match(shell, /<astro-island\b(?=[^>]*component-url="[^"]*MobileNav)(?=[^>]*client="load")[^>]*>/, 'expected MobileNav to hydrate with client:load');
   assert.match(shell, /<nav\b(?=[^>]*aria-label="主要导航")(?=[^>]*class="[^"]*hidden[^"]*xl:flex)[^>]*>/, 'expected desktop primary navigation to start at xl');
   assert.match(shell, /<details\b(?=[^>]*data-explore-menu)(?=[^>]*class="[^"]*hidden[^"]*xl:block)[^>]*>/, 'expected the Explore menu to use the same xl desktop boundary');
-  assert.match(shell, /<div\b(?=[^>]*data-desktop-tools)(?=[^>]*class="[^"]*hidden[^"]*xl:block)[^>]*>/, 'expected desktop tools to use the same xl boundary');
+  const sharedTools = shell.match(/<div\b(?=[^>]*data-global-tools)[^>]*>/)?.[0] ?? '';
+  assert.ok(sharedTools, 'expected a shared tool container for all viewports');
+  assert.doesNotMatch(sharedTools, /hidden/, 'expected search and theme outside the hidden desktop navigation');
   assert.match(shell, /<div\b(?=[^>]*data-mobile-shell)(?=[^>]*class="[^"]*xl:hidden)[^>]*>/, 'expected the mobile drawer to remain visible below xl');
-  assert.match(shell, /<nav\b(?=[^>]*data-mobile-quick-nav)(?=[^>]*class="[^"]*xl:hidden)[^>]*>/, 'expected mobile quick links to remain visible below xl');
+  assert.doesNotMatch(shell, /data-mobile-quick-nav/, 'expected a single row mobile header');
 
-  const expectedTools = {
-    search: '/search',
-    random: '/explore',
-    favorites: '/favorites',
-    knowledge: '/knowledge',
-    ai: '/ai',
-  };
+  const expectedTools = { search: '/search' };
   for (const [tool, href] of Object.entries(expectedTools)) {
     const tags = tagsWithAttribute(shell, `data-portal-tool="${tool}"`);
     assert.equal(tags.length, 1, `expected one ${tool} global tool`);
@@ -62,6 +58,12 @@ test('portal shell exposes grouped desktop navigation, hydrated mobile links, an
   const themeTags = tagsWithAttribute(shell, 'data-portal-tool="theme"');
   assert.equal(themeTags.length, 1, 'expected one theme global tool');
   assert.match(themeTags[0], /^<button\b/, 'expected theme to remain a real button');
+  assert.equal(tagsWithAttribute(shell, 'data-portal-tool=').length, 2);
+  for (const tag of tagsWithAttribute(shell, 'data-portal-tool=')) {
+    assert.match(tag, /min-h-\[44px\]/);
+    assert.match(tag, /min-w-\[44px\]/);
+    assert.match(tag, /aria-label=/);
+  }
 
   const localHrefs = Array.from(shell.matchAll(/<a\b[^>]*\bhref="(\/[^"#?]*)[^" ]*"[^>]*>/g), (match) => match[1]);
   assert.ok(localHrefs.length > 0, 'expected ordinary local shell links');
@@ -79,20 +81,17 @@ test('portal shell exposes grouped desktop navigation, hydrated mobile links, an
   assert.deepEqual(
     footerLinks,
     [
-      { href: '/start', label: '从这里开始' },
-      { href: '/search', label: '全站搜索' },
-      { href: '/explore', label: '随机探索' },
-      { href: '/knowledge', label: '知识地图' },
-      { href: '/projects', label: '项目台' },
-      { href: '/timeline', label: '内容时间线' },
-      { href: '/changelog', label: '更新记录' },
-      { href: '/about', label: '关于这个空间' },
-      { href: '/privacy', label: '隐私边界' },
+      { href: '/rss.xml', label: 'RSS' },
+      { href: '/about', label: '关于' },
+      { href: '/friends', label: '友链' },
+      { href: '/privacy', label: '隐私' },
+      { href: '/lab', label: '工具' },
+      { href: '/write', label: '写作工具' },
     ],
-    'expected the footer to offer nine editorial next steps',
+    'expected a compact footer with publishing access',
   );
   for (const { href } of footerLinks) {
-    assert.ok(existsSync(hrefToHtmlPath(href)), `expected footer link ${href} to resolve to built HTML`);
+    assert.ok(existsSync(href === '/rss.xml' ? path.join(distDir, 'rss.xml') : hrefToHtmlPath(href)), `expected footer link ${href} to resolve to built HTML`);
   }
 
   for (const route of ['/start', '/about', '/now', '/knowledge', '/projects', '/topics', '/lab', '/changelog', '/timeline']) {
@@ -100,4 +99,12 @@ test('portal shell exposes grouped desktop navigation, hydrated mobile links, an
     assert.doesNotMatch(landingHtml, /component-url="[^"]*PageBanner/, `expected ${route} to start with its own page content`);
     assert.match(landingHtml, /<footer\b[^>]*data-portal-footer/, `expected ${route} to end with the portal footer`);
   }
+});
+
+
+test('desktop overflow menu remains scrollable in a short viewport and footer names authoring tools', () => {
+  const navbar = readFileSync(path.join(projectRoot, 'src', 'components', 'NavBar.astro'), 'utf8');
+  const footer = readFileSync(path.join(projectRoot, 'src', 'components', 'PortalFooter.astro'), 'utf8');
+  assert.match(navbar, /max-h-\[calc\(100dvh-88px\)\][^"]*overflow-y-auto/);
+  assert.match(footer, /href: '\/write', label: '写作工具'/);
 });

@@ -1,3 +1,19 @@
+export const appearanceConfig = {
+  // 页面浅色背景、普通卡片背景、文章阅读区背景。
+  backgroundColor: '#f7f5ef',
+  surfaceColor: '#fffdf8',
+  articleColor: '#fffdf8',
+  // 首页装饰图片仅填写本站 /images/ 路径；留空不显示。
+  homeImage: '',
+} as const;
+
+export const githubAuthoringConfig = {
+  owner: 'SunTBurst',
+  name: 'SunTBurst.github.io',
+  branch: 'main',
+  workflow: 'deploy-pages.yml',
+} as const;
+
 const siteUrl = import.meta.env.PUBLIC_SITE_URL || 'https://suntburst.github.io';
 
 export const siteConfig = {
@@ -15,7 +31,7 @@ export const navigation = [
   { href: '/knowledge', label: '知识' },
   { href: '/projects', label: '项目' },
   { href: '/now', label: '动态' },
-  { href: '/talks', label: '说说' },
+  { href: '/talks', label: '随记' },
   { href: '/tags', label: '标签' },
   { href: '/about', label: '关于' },
   { href: '/friends', label: '友链' },
@@ -70,11 +86,11 @@ export const i18nConfig = {
     tocEmpty: '本文暂无目录',
   },
   talks: {
-    title: '说说',
+    title: '随记',
     description: '简短记录此刻的想法',
   },
   talk: {
-    detailFallbackTitle: '一条说说',
+    detailFallbackTitle: '一条随记',
   },
   notFound: {
     title: '页面未找到',

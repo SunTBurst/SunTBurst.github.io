@@ -106,7 +106,7 @@
   <div class="grid gap-3 border-3 border-[#0284c7] bg-[#f8fafc] p-3 dark:bg-slate-900 sm:grid-cols-3 sm:p-4">
     <label class="min-w-0 font-black text-[#075985] dark:text-[#bae6fd]">
       <span class="block text-sm">搜索文章</span>
-      <input value={query} on:input={setQuery} name="q" type="search" placeholder="标题、简介、分类或标签" class="mt-1 min-h-[44px] w-full min-w-0 border-2 border-[#0284c7] bg-white px-3 font-bold text-slate-800 focus:outline-none focus:ring-4 focus:ring-[#0ea5e9]/40 dark:bg-slate-800 dark:text-slate-100" />
+      <input value={query} on:input={setQuery} name="q" type="search" placeholder="搜索标题、正文、分类或标签" class="mt-1 min-h-[44px] w-full min-w-0 border-2 border-[#0284c7] bg-white px-3 font-bold text-slate-800 focus:outline-none focus:ring-4 focus:ring-[#0ea5e9]/40 dark:bg-slate-800 dark:text-slate-100" />
     </label>
     <label class="min-w-0 font-black text-[#075985] dark:text-[#bae6fd]">
       <span class="block text-sm">分类</span>

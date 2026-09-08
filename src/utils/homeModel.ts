@@ -30,6 +30,7 @@ export interface HomeModel {
   focus: string[];
   projects: PortalProject[];
   posts: PortalIndexEntry[];
+  talks: PortalIndexEntry[];
   recent: PortalIndexEntry[];
   exploreEntries: PortalIndexEntry[];
   pulse: HomePulseItem[];
@@ -94,6 +95,7 @@ export function buildHomeModel(input: HomeModelInput): HomeModel {
     focus: portalConfig.focus,
     projects,
     posts: input.posts,
+    talks: input.talks,
     recent,
     exploreEntries: [...input.posts, ...input.talks, ...input.knowledge, ...input.updates],
     pulse,

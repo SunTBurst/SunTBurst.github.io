@@ -6,6 +6,7 @@ export interface PublicPostBrowseEntry {
   date: string;
   category: string;
   tags: string[];
+  searchText?: string;
 }
 
 export interface PostBrowseState {
@@ -117,7 +118,7 @@ export function browsePosts(
   const tag = normalized(state.tag);
   const pageSize = Math.max(1, Math.floor(requestedPageSize));
   const filtered = posts.filter((post) => {
-    const searchable = normalized([post.title, post.description, post.category, ...post.tags].join(' '));
+    const searchable = normalized([post.title, post.description, post.category, ...post.tags, post.searchText ?? ''].join(' '));
     return (!query || searchable.includes(query))
       && (!category || normalized(post.category) === category)
       && (!tag || post.tags.some((item) => normalized(item) === tag));
