@@ -8,7 +8,8 @@ import { portalKindLabel, topicStatusLabel } from '../../utils/portalLabels';
 export function getStaticPaths() {
   return portalConfig.topics.map((topic) => ({ params: { slug: topic.slug }, props: { topic } }));
 }
-const { topic } = Astro.props;
+const topic = Astro.props.topic ?? portalConfig.topics.find((candidate) => candidate.slug === Astro.params.slug);
+if (!topic) return new Response('Not found', { status: 404 });
 const entries = (await buildPortalIndex()).filter((entry) => entry.href !== `/topics/${topic.slug}` && matchesPortalTopic(entry.topics, topic));
 ---
 

@@ -12,10 +12,12 @@ function stripInvalidXmlChars(str: string): string {
 }
 
 export async function GET(context: APIContext) {
+  const cmsSettings = (context.locals as any)?.cmsSettings?.value ?? (context.locals as any)?.cmsSettings ?? {};
   const talks = await getPublishedTalks();
 
   const siteUrl = (context.site ?? new URL(siteConfig.url)).toString().replace(/\/$/, '');
-  const author = siteConfig.author;
+  const author = cmsSettings.author || siteConfig.author;
+  const channelTitle = cmsSettings.title || siteConfig.title;
 
   const items = talks
     .map((talk) => {
@@ -41,8 +43,8 @@ export async function GET(context: APIContext) {
     });
 
   return rss({
-    title: `${siteConfig.title} - 说说`,
-    description: `${siteConfig.title} 说说 RSS`,
+    title: `${channelTitle} - 说说`,
+    description: `${channelTitle} 说说 RSS`,
     site: siteUrl,
     items,
     trailingSlash: false,

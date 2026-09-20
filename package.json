@@ -11,6 +11,10 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
+    "cms:build": "node scripts/cms-build.mjs",
+    "cms:start": "node --env-file-if-exists=.env dist/server/entry.mjs",
+    "cms:export-source": "tsx scripts/cms-export-source.ts",
+    "cms:smoke": "tsx scripts/cms-smoke.ts",
     "profile:refresh": "tsx scripts/generate-public-profiles.ts",
     "comments:scan": "tsx scripts/check-public-secrets.ts",
     "comments:sync-targets": "tsx scripts/sync-comment-targets.ts",
@@ -30,6 +34,7 @@
   },
   "dependencies": {
     "@astrojs/mdx": "^6.0.2",
+    "@astrojs/node": "10.1.4",
     "@astrojs/react": "^6.0.4",
     "@astrojs/rss": "^4.0.18",
     "@astrojs/svelte": "^8.1.2",
@@ -56,6 +61,8 @@
     "supabase": "2.116.0",
     "tailwindcss": "^4.1.14",
     "tsx": "4.20.5",
-    "typescript": "~5.8.2"
+    "typescript": "~5.8.2",
+    "vite": "7.3.6",
+    "yaml": "2.8.1"
   }
 }

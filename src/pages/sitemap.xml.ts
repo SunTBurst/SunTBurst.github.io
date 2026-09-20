@@ -1,4 +1,5 @@
 import { getPublishedPosts, getPublishedTalks } from '../utils/contentCollections';
+import { getPublishedKnowledge, getPublishedProjects } from '../utils/portalCollections';
 import { normalizeEntrySlug, postPath, talkPath } from '../utils/slugify';
 import { calendarDate } from '../utils/dateFormat';
 
@@ -18,6 +19,7 @@ function escapeXml(unsafe: string): string {
 export async function GET(context: any) {
   const rawPosts = await getPublishedPosts();
   const rawTalks = await getPublishedTalks();
+  const [knowledge, projects] = await Promise.all([getPublishedKnowledge(), getPublishedProjects()]);
   
   // Normalize domain of the site (remove trailing slash)
   const siteUrl = context.site?.toString() || new URL('/', context.url).toString();
@@ -55,6 +57,9 @@ export async function GET(context: any) {
       lastmod
     });
   });
+
+  knowledge.forEach((entry: any) => urls.push({ loc: `${domain}/knowledge/${encodeURIComponent(normalizeEntrySlug(entry))}/`, priority: '0.7', changefreq: 'weekly', lastmod: calendarDate(entry.data.updated) || null }));
+  projects.forEach((entry: any) => urls.push({ loc: `${domain}/projects/${encodeURIComponent(normalizeEntrySlug(entry))}/`, priority: '0.7', changefreq: 'weekly', lastmod: calendarDate(entry.data.updated) || null }));
 
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">

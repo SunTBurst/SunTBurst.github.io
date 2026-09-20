@@ -2,6 +2,7 @@ import { portalConfig } from '../config/portal';
 import type { KnowledgeTopic, PortalIndexEntry, PortalLink, PortalProject } from '../types/portal';
 
 export interface HomeModelInput {
+  allowProjectFallback?: boolean;
   posts: PortalIndexEntry[];
   talks: PortalIndexEntry[];
   knowledge: PortalIndexEntry[];
@@ -61,7 +62,7 @@ export const portalTools: PortalToolItem[] = [
 const dateOnly = (value: string) => value.slice(0, 10);
 
 export function buildHomeModel(input: HomeModelInput): HomeModel {
-  const projects = input.projects.length > 0 ? input.projects : portalConfig.projects;
+  const projects = input.projects.length > 0 || input.allowProjectFallback === false ? input.projects : portalConfig.projects;
   const recentEditorial = [
     ...input.knowledge.map((entry) => ({ entry, priority: 0 })),
     ...input.posts.map((entry) => ({ entry, priority: 1 })),
@@ -78,7 +79,7 @@ export function buildHomeModel(input: HomeModelInput): HomeModel {
     .map(({ entry }) => entry)
     .slice(0, 8);
   const projectUpdated = projects.map(({ updated }) => updated).sort((left, right) => right.localeCompare(left))[0];
-  const lastUpdated = dateOnly(recent[0]?.updatedAt ?? projectUpdated ?? portalConfig.projects[0]?.updated ?? '');
+  const lastUpdated = dateOnly(recent[0]?.updatedAt ?? projectUpdated ?? (input.allowProjectFallback === false ? '' : portalConfig.projects[0]?.updated) ?? '');
   const readyToolCount = portalTools.filter(({ state }) => state === 'ready').length;
   const publishedRecordCount = input.posts.length + input.talks.length + input.knowledge.length + projects.length + input.updates.length;
   const pulse: HomePulseItem[] = [

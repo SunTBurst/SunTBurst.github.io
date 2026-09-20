@@ -8,6 +8,7 @@ import { calculateReadingTime } from '../../utils/readingTime';
 import { githubContentEditUrl } from '../../utils/githubAuthoring';
 import ArticleEnhancements from '../../components/ArticleEnhancements.astro';
 import CommentsSection from '../../components/comments/CommentsSection.astro';
+import { renderCmsMarkdown } from '../../utils/cmsMarkdown';
 
 export async function getStaticPaths() {
   const posts = await getProcessedPosts();
@@ -20,21 +21,25 @@ export async function getStaticPaths() {
 }
 
 const { id } = Astro.params;
-const { post } = Astro.props;
+const suppliedPost = Astro.props.post;
+const allProcessedPosts = await getProcessedPosts();
+const post = suppliedPost ?? allProcessedPosts.find((candidate) => candidate.slug === id);
+if (!post) return new Response('Not found', { status: 404 });
 
 // Render original collection Markdown using Astro compiler
 import { render } from 'astro:content';
 const rawPosts = await getPublishedPosts();
 const articleEntry = rawPosts.find(p => p.id === post.id);
 if (!articleEntry) {
-  return Astro.redirect('/404');
+  if (!post.cms) return new Response('Not found', { status: 404 });
 }
-const { Content, headings } = await render(articleEntry);
-const editUrl = githubContentEditUrl(githubAuthoringConfig, articleEntry.filePath);
-const readTime = calculateReadingTime(articleEntry.body || "");
+const renderedCms = post.cms ? renderCmsMarkdown(post.content) : null;
+const { Content, headings } = articleEntry ? await render(articleEntry) : { Content: null, headings: renderedCms?.headings.map((item) => ({ depth: item.depth, text: item.text, slug: item.slug })) ?? [] };
+const editUrl = githubContentEditUrl(githubAuthoringConfig, articleEntry?.filePath);
+const readTime = calculateReadingTime(articleEntry?.body || post.content || "");
 
 // Calculate adjacent posts
-const allPosts = await getProcessedPosts();
+const allPosts = allProcessedPosts;
 const idx = allPosts.findIndex(p => p.slug === post.slug);
 const prevPost = idx < allPosts.length - 1 ? allPosts[idx + 1] : null;
 const nextPost = idx > 0 ? allPosts[idx - 1] : null;
@@ -127,13 +132,15 @@ const relatedPosts = (() => {
 
             {/* Prose Content block */}
             <div class="prose prose-slate dark:prose-invert prose-lg max-w-none w-full min-w-0 break-words">
-              <Content />
+              {post.cms ? <div set:html={renderedCms?.html ?? ''} /> : <Content />}
             </div>
           </article>
         <ArticleEnhancements title={post.title} description={post.description} canonicalUrl={Astro.url.href} />
         <CommentsSection kind="post" path={`/posts/${encodeURIComponent(post.slug)}/`} />
 
-        {editUrl && <a href={editUrl} target="_blank" rel="noopener noreferrer" data-post-edit class="inline-flex min-h-[44px] items-center px-1 text-sm text-[#075985] underline underline-offset-4 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#0ea5e9]/40 dark:text-[#bae6fd]">在 GitHub 编辑本文 <span aria-hidden="true" class="ml-1">↗</span></a>}
+        {post.cms
+          ? <a href={`/admin/?id=${encodeURIComponent(post.id)}`} data-post-edit class="inline-flex min-h-[44px] items-center px-1 text-sm text-[#075985] underline underline-offset-4 dark:text-[#bae6fd]">在后台编辑本文 <span aria-hidden="true" class="ml-1">↗</span></a>
+          : editUrl && <a href={editUrl} target="_blank" rel="noopener noreferrer" data-post-edit class="inline-flex min-h-[44px] items-center px-1 text-sm text-[#075985] underline underline-offset-4 dark:text-[#bae6fd]">在 GitHub 编辑本文 <span aria-hidden="true" class="ml-1">↗</span></a>}
 
         {/* Copyright Metadata block */}
         <div 

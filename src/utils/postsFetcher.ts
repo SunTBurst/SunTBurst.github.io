@@ -16,6 +16,7 @@ export interface PostItem {
   tags: string[];
   keywords: string[];
   category: string;
+  cms?: boolean;
 }
 
 export interface TalkItem {
@@ -31,6 +32,7 @@ export interface TalkItem {
   weather: string;
   mood: string;
   device: string;
+  cms?: boolean;
 }
 
 export async function getProcessedPosts(): Promise<PostItem[]> {
@@ -98,7 +100,8 @@ export async function getProcessedPosts(): Promise<PostItem[]> {
       img: data.img || data.image || data.cover || firstBodyImg || seoConfig.defaultImage,
       tags,
       keywords,
-      category
+      category,
+      cms: post.cms === true,
     };
   });
 
@@ -140,7 +143,8 @@ export async function getProcessedTalks(): Promise<TalkItem[]> {
       location: data.location || '',
       weather: data.weather || '',
       mood: data.mood || '',
-      device: data.device || ''
+      device: data.device || '',
+      cms: talk.cms === true,
     };
   });
 

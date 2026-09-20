@@ -1,5 +1,11 @@
 # SunTBurst 个人门户
 
+## 网页管理后台
+
+项目现支持两种运行模式：原有 GitHub Pages 静态版，以及带数据库的 Node 服务器版。完整版入口为 `/admin/`，包含 GitHub 登录/成员注册、在线 Markdown 写作和图片上传、草稿与发布版本、历史恢复、回收站、站点设置、成员权限、内容备份导入导出和评论审核入口。配置及上线步骤见 [CMS 运行手册](docs/operations/cms-runbook.md)。
+
+完整版必须连接 Supabase 并部署到支持 Node 的主机，不能只推送 GitHub Pages 就启用后台。`CMS_ENABLED=true` 后文章、随记、知识和项目以数据库为唯一来源；启用前可运行 `pnpm cms:export-source` 导出现有公开 Markdown，再登录后台导入并发布。生产 GitHub OAuth 和外部托管完成前，不代表网页注册和在线保存已在公网启用。
+
 这是一个使用 Astro 构建、由 GitHub Pages 免费托管的个人博客。保留原有 TS 标识和蓝黄配色，以浅色纸面承载正文。首页集中展示介绍、最近文章和随记；知识、项目、归档等原页面可从“更多”进入。
 
 站点默认公开地址为 `https://suntburst.github.io`。内容保存在当前 GitHub 仓库中，通过已有 GitHub Actions 工作流发布；日常写作不需要运行本地命令、填写访问令牌或搭建新服务器。本轮没有启用新的评论、统计、AI 或订阅服务；相关功能的说明页以实际页面状态为准。

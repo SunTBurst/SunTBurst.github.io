@@ -1,0 +1,5 @@
+---
+import CmsDashboard from './CmsDashboard.svelte';
+const { connection, defaults, initialView } = Astro.props;
+---
+<CmsDashboard client:load {connection} {defaults} {initialView} />

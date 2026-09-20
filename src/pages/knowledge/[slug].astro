@@ -5,14 +5,18 @@ import CommentsSection from '../../components/comments/CommentsSection.astro';
 import { getPublishedKnowledge } from '../../utils/portalCollections';
 import { knowledgeStatusLabel } from '../../utils/portalLabels';
 import { normalizeEntrySlug } from '../../utils/slugify';
+import { renderCmsMarkdown } from '../../utils/cmsMarkdown';
 
 export async function getStaticPaths() {
   const entries = await getPublishedKnowledge();
   return entries.map((entry) => ({ params: { slug: normalizeEntrySlug(entry) }, props: { entry } }));
 }
 
-const { entry } = Astro.props;
-const { Content } = await render(entry);
+const entries = await getPublishedKnowledge();
+const entry = Astro.props.entry ?? entries.find((candidate) => normalizeEntrySlug(candidate) === Astro.params.slug);
+if (!entry) return new Response('Not found', { status: 404 });
+const renderedCms = entry.cms ? renderCmsMarkdown(entry.body) : null;
+const { Content } = entry.cms ? { Content: null } : await render(entry);
 const entrySlug = normalizeEntrySlug(entry);
 ---
 
@@ -23,7 +27,7 @@ const entrySlug = normalizeEntrySlug(entry);
     <p>这是公开发布快照；独立私有知识平台尚未启用。</p>
     <section aria-labelledby="knowledge-body-title">
       <h2 id="knowledge-body-title" class="sr-only">知识正文</h2>
-      <Content />
+      {entry.cms ? <div set:html={renderedCms?.html ?? ''} /> : <Content />}
     </section>
     {entry.data.sources.length > 0 && <section><h2>公开来源</h2><ul>{entry.data.sources.map((source) => <li><a href={source.url} rel="noopener noreferrer">{source.title}</a></li>)}</ul></section>}
   </article>

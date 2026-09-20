@@ -3,6 +3,9 @@ import Layout from '../layouts/Layout.astro';
 import { githubAuthoringConfig } from '../config/site';
 import { calendarDate } from '../utils/dateFormat';
 import { githubAuthoringLinks } from '../utils/githubAuthoring';
+import { cmsEnvironment } from '../features/cms/config';
+
+if (cmsEnvironment().CMS_ENABLED === 'true') return Astro.redirect('/admin/');
 
 const links = githubAuthoringLinks(githubAuthoringConfig);
 const today = calendarDate(new Date());
