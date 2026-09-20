@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="430" viewBox="0 0 1200 430" role="img" aria-labelledby="title desc">
+  <title id="title">WeChat Assist 回复工作流</title>
+  <desc id="desc">从新建或接续资料，到配置模型和微信只读连接，选择联系人、模式和意图，生成并逐版修改回复，最后复制后由本人手动发送。</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2f6f59"/>
+    </marker>
+    <style>
+      .box { fill: #f6fbf8; stroke: #2f6f59; stroke-width: 2; rx: 14; }
+      .title { font: 700 21px "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; fill: #173b2e; }
+      .text { font: 16px "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; fill: #29463a; }
+      .note { font: 14px "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; fill: #49695b; }
+      .line { stroke: #2f6f59; stroke-width: 2.5; marker-end: url(#arrow); }
+    </style>
+  </defs>
+  <rect width="1200" height="430" fill="#ffffff"/>
+  <text x="60" y="46" class="title">WeChat Assist：从资料到人工发送</text>
+  <text x="60" y="75" class="note">合成流程示意 · 只读上下文 · 复制后由本人检查并手动发送</text>
+
+  <rect x="60" y="115" width="205" height="110" class="box"/>
+  <text x="162" y="151" text-anchor="middle" class="title">新建 / 接续资料</text>
+  <text x="162" y="181" text-anchor="middle" class="text">本人资料</text>
+  <text x="162" y="206" text-anchor="middle" class="text">联系人画像</text>
+
+  <rect x="330" y="115" width="205" height="110" class="box"/>
+  <text x="432" y="151" text-anchor="middle" class="title">配置连接</text>
+  <text x="432" y="181" text-anchor="middle" class="text">AI Provider</text>
+  <text x="432" y="206" text-anchor="middle" class="text">微信只读上下文</text>
+
+  <rect x="600" y="115" width="205" height="110" class="box"/>
+  <text x="702" y="151" text-anchor="middle" class="title">选择本次沟通</text>
+  <text x="702" y="181" text-anchor="middle" class="text">联系人 · 回复模式</text>
+  <text x="702" y="206" text-anchor="middle" class="text">表达意图</text>
+
+  <rect x="870" y="115" width="270" height="110" class="box"/>
+  <text x="1005" y="151" text-anchor="middle" class="title">生成与逐版修改</text>
+  <text x="1005" y="181" text-anchor="middle" class="text">候选 V1 → V2 → …</text>
+  <text x="1005" y="206" text-anchor="middle" class="text">自然语言提出修改要求</text>
+
+  <line x1="265" y1="170" x2="327" y2="170" class="line"/>
+  <line x1="535" y1="170" x2="597" y2="170" class="line"/>
+  <line x1="805" y1="170" x2="867" y2="170" class="line"/>
+
+  <rect x="365" y="285" width="470" height="104" class="box"/>
+  <text x="600" y="321" text-anchor="middle" class="title">复制候选</text>
+  <text x="600" y="350" text-anchor="middle" class="text">回到微信核对联系人、事实和承诺</text>
+  <text x="600" y="374" text-anchor="middle" class="text">由本人手动发送</text>
+  <path d="M 1005 225 L 1005 260 L 600 260 L 600 285" fill="none" class="line"/>
+</svg>

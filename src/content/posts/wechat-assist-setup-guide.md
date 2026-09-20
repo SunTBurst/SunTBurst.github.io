@@ -14,6 +14,8 @@ draft: false
 
 > **当前正式版本：1.3.0+9。** 有权限的使用者可从 [GitHub 私有 Release](https://github.com/SunTBurst/wechat-assist/releases/tag/v1.3.0) 获取。1.2.0+4 已撤回，仅保留简短历史记录。
 
+> **图文教程更新：**另有[配图的使用教程与开源准备说明](/posts/wechat-assist-open-source/)。源码快照已完成开源准备，审阅仓库目前仍为私有，尚未对外开放。准备中的源码包不包含模型、个人配置或外部微信取钥 DLL，不能把它当作本文所指的完整程序包。
+
 这篇教程适用于微信沟通助手 Windows 正式版本 1.3.0+9。软件采用“生成草稿—人工确认—复制到微信—人工发送”的方式。
 
 想了解我为什么做这款工具，以及我在 Vibe Coding 中怎样负责需求、取舍和验收，可以先读[项目介绍文章](/posts/wechat-assist-vibe-coding/)。
