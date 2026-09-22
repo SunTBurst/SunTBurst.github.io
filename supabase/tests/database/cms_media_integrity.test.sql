@@ -4,7 +4,9 @@ select plan(11);
 
 insert into auth.users (id,email) values ('91000000-0000-0000-0000-000000000001','cms-media-owner@example.invalid');
 insert into auth.identities(provider_id,user_id,identity_data,provider,last_sign_in_at,created_at,updated_at)
-values ('105589585','91000000-0000-0000-0000-000000000001','{"sub":"105589585","user_name":"cms-media-owner"}'::jsonb,'github',now(),now(),now());
+values ('910000001','91000000-0000-0000-0000-000000000001','{"sub":"910000001","user_name":"cms-media-owner"}'::jsonb,'github',now(),now(),now());
+insert into public.cms_profiles(user_id,github_id,login,role)
+values ('91000000-0000-0000-0000-000000000001','910000001','cms-media-owner','owner');
 insert into storage.objects(bucket_id,name,owner_id,metadata)
 values ('cms-media','91000000-0000-0000-0000-000000000001/91000000-0000-0000-0000-000000000011','91000000-0000-0000-0000-000000000001','{"size":1,"mimetype":"image/png"}'::jsonb),
        ('cms-media','91000000-0000-0000-0000-000000000001/91000000-0000-0000-0000-000000000012','91000000-0000-0000-0000-000000000001','{"size":1,"mimetype":"image/png"}'::jsonb);

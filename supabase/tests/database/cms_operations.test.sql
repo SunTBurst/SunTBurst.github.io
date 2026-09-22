@@ -1,6 +1,6 @@
 begin;
 
-select plan(22);
+select plan(23);
 
 insert into auth.users (id, email) values
   ('90000000-0000-0000-0000-000000000001', 'cms-owner@example.invalid'),
@@ -9,14 +9,17 @@ insert into auth.users (id, email) values
 
 insert into auth.identities (provider_id, user_id, identity_data, provider, last_sign_in_at, created_at, updated_at)
 values
-  ('105589585', '90000000-0000-0000-0000-000000000001', '{"sub":"105589585","user_name":"cms-owner","name":"CMS Owner"}'::jsonb, 'github', now(), now(), now()),
+  ('900000001', '90000000-0000-0000-0000-000000000001', '{"sub":"900000001","user_name":"cms-owner","name":"CMS Owner"}'::jsonb, 'github', now(), now(), now()),
   ('200000002', '90000000-0000-0000-0000-000000000002', '{"sub":"200000002","user_name":"cms-editor","name":"CMS Editor"}'::jsonb, 'github', now(), now(), now()),
   ('200000003', '90000000-0000-0000-0000-000000000003', '{"sub":"200000003","user_name":"cms-member","name":"CMS Member"}'::jsonb, 'github', now(), now(), now());
+
+insert into public.cms_profiles (user_id,github_id,login,display_name,role)
+values ('90000000-0000-0000-0000-000000000001','900000001','cms-owner','CMS Owner','owner');
 
 set local role authenticated;
 set local request.jwt.claim.sub = '90000000-0000-0000-0000-000000000001';
 
-select is((public.cms_bootstrap_profile() ->> 'role'), 'owner', 'the fixed GitHub identity bootstraps as owner');
+select is((public.cms_bootstrap_profile() ->> 'role'), 'owner', 'a seeded owner profile remains bound to its GitHub identity');
 
 set local request.jwt.claim.sub = '90000000-0000-0000-0000-000000000002';
 select is((public.cms_bootstrap_profile() ->> 'role'), 'member', 'other GitHub identities bootstrap as members');
@@ -35,7 +38,7 @@ select throws_ok(
 set local request.jwt.claim.sub = '90000000-0000-0000-0000-000000000001';
 select is((public.cms_set_member_role('90000000-0000-0000-0000-000000000002', 'editor', true) ->> 'role'), 'editor', 'owner can grant editor role');
 with before as materialized (select version from public.cms_settings where id),
-saved as (select public.cms_save_settings('{"title":"CMS"}'::jsonb,(select version from before)) as row)
+saved as (select public.cms_save_settings('{"title":"CMS","subtitle":"A practical site","author":"SunTBurst","avatar":"/images/avatar.svg","about":"Standard site settings body","announcement":"Welcome","defaultPalette":"paper","defaultLayout":"classic"}'::jsonb,(select version from before)) as row)
 select is((select (row->>'version')::integer from saved), (select version+1 from before), 'owner can save settings with optimistic version');
 select throws_ok(
   $$ select public.cms_save_settings('{"title":"stale"}'::jsonb, (select version - 1 from public.cms_settings where id)) $$,
@@ -52,12 +55,17 @@ select throws_ok(
   '42501', 'forbidden', 'an editor cannot grant member roles'
 );
 select is(
-  (public.cms_save_document('{"kind":"post","slug":"database-cms","title":"First","body":"private draft"}'::jsonb, null) ->> 'version')::integer,
+  public.cms_save_document('{"kind":"post","slug":"external-image","title":"External image","image":"https://example.invalid/cover.png"}'::jsonb, null) ->> 'image',
+  'https://example.invalid/cover.png',
+  'an HTTPS document image passes portable validation'
+);
+select is(
+  (public.cms_save_document('{"kind":"post","slug":"database-cms","title":"First","body":"private draft","image":"/images/cover.svg"}'::jsonb, null) ->> 'version')::integer,
   1,
   'editor saves a first private working copy'
 );
 
-select is((select count(*)::integer from public.cms_publications), 0, 'saving a draft does not create a public snapshot');
+select is((select count(*)::integer from public.cms_publications where slug='database-cms'), 0, 'saving a draft does not create a public snapshot');
 
 select is(
   (public.cms_document_action((select id from public.cms_documents where slug='database-cms'), 'publish', 1, null) ->> 'status'),
