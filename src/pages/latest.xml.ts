@@ -24,13 +24,15 @@ function stripMarkdown(md: string): string {
 }
 
 export async function GET(context: APIContext) {
+  const cmsSettings = (context.locals as any)?.cmsSettings?.value ?? (context.locals as any)?.cmsSettings ?? {};
   const [posts, talks] = await Promise.all([
     getPublishedPosts(),
     getPublishedTalks(),
   ]);
 
   const siteUrl = (context.site ?? new URL(siteConfig.url)).toString().replace(/\/$/, '');
-  const author = siteConfig.author;
+  const author = cmsSettings.author || siteConfig.author;
+  const channelTitle = cmsSettings.title || siteConfig.title;
 
   const items = [
     ...posts.map((post) => {
@@ -76,8 +78,8 @@ export async function GET(context: APIContext) {
     .slice(0, 10);
 
   return rss({
-    title: `${siteConfig.title} - 最新`,
-    description: `${siteConfig.title} 最新文章与说说 RSS`,
+    title: `${channelTitle} - 最新`,
+    description: `${channelTitle} 最新文章与说说 RSS`,
     site: siteUrl,
     items,
     trailingSlash: false,

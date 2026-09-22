@@ -23,10 +23,12 @@ function stripMarkdown(md: string): string {
 }
 
 export async function GET(context: APIContext) {
+  const cmsSettings = (context.locals as any)?.cmsSettings?.value ?? (context.locals as any)?.cmsSettings ?? {};
   const posts = await getPublishedPosts();
 
   const siteUrl = (context.site ?? new URL(siteConfig.url)).toString().replace(/\/$/, '');
-  const author = siteConfig.author;
+  const author = cmsSettings.author || siteConfig.author;
+  const channelTitle = cmsSettings.title || siteConfig.title;
 
   const items = posts
     .map((post) => {
@@ -54,8 +56,8 @@ export async function GET(context: APIContext) {
     });
 
   return rss({
-    title: `${siteConfig.title} - 文章`,
-    description: `${siteConfig.title} 博客文章 RSS`,
+    title: `${channelTitle} - 文章`,
+    description: `${channelTitle} 博客文章 RSS`,
     site: siteUrl,
     items,
     trailingSlash: false,

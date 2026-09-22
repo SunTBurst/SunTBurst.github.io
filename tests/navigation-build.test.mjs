@@ -87,6 +87,7 @@ test('portal shell exposes grouped desktop navigation, hydrated mobile links, an
       { href: '/privacy', label: '隐私' },
       { href: '/lab', label: '工具' },
       { href: '/write', label: '写作工具' },
+      { href: '/admin/', label: '管理后台' },
     ],
     'expected a compact footer with publishing access',
   );

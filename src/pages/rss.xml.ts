@@ -50,6 +50,7 @@ function renderMarkdownContent(markdown: string): string {
 }
 
 export async function GET(context: APIContext) {
+  const cmsSettings = (context.locals as any)?.cmsSettings?.value ?? (context.locals as any)?.cmsSettings ?? {};
   const [posts, talks, knowledge, projects, updates] = await Promise.all([
     getPublishedPosts(),
     getPublishedTalks(),
@@ -59,7 +60,9 @@ export async function GET(context: APIContext) {
   ]);
 
   const siteUrl = (context.site ?? new URL(siteConfig.url)).toString().replace(/\/$/, '');
-  const author = siteConfig.author;
+  const author = cmsSettings.author || siteConfig.author;
+  const channelTitle = cmsSettings.title || siteConfig.title;
+  const channelDescription = cmsSettings.subtitle || siteConfig.subtitle;
 
   const items = [
     ...posts.map((post) => {
@@ -135,9 +138,9 @@ export async function GET(context: APIContext) {
     '  xmlns:dc="http://purl.org/dc/elements/1.1/"',
     '>',
     '  <channel>',
-    `    <title>${escapeXml(siteConfig.title)}</title>`,
+    `    <title>${escapeXml(channelTitle)}</title>`,
     `    <link>${escapeXml(siteUrl)}</link>`,
-    `    <description>${escapeXml(siteConfig.subtitle || '')}</description>`,
+    `    <description>${escapeXml(channelDescription || '')}</description>`,
     `    <language>zh-CN</language>`,
     `    <lastBuildDate>${now.toUTCString()}</lastBuildDate>`,
     `    <atom:link href="${escapeXml(siteUrl)}/rss.xml" rel="self" type="application/rss+xml"/>`,

@@ -14,7 +14,7 @@ major_version = 15
 [auth]
 enabled = true
 site_url = "http://127.0.0.1:4321"
-additional_redirect_urls = ["http://127.0.0.1:4321/**"]
+additional_redirect_urls = ["http://127.0.0.1:4321/admin/", "http://127.0.0.1:3000/admin/", "http://localhost:3000/admin/"]
 enable_signup = true
 
 [auth.email]

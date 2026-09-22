@@ -1,0 +1,23 @@
+<script lang="ts">
+  import { onMount } from 'svelte';
+  import type { CmsClient } from '../../services/cms/client';
+  import type { CmsSettings, CmsSettingsRow } from '../../features/cms/types';
+  import { layoutPresets, palettePresets } from '../../config/appearance';
+  export let client: CmsClient;
+  export let defaults: CmsSettings;
+  export let onDirtyChange: (dirty: boolean) => void = () => {};
+  const palettes = palettePresets;
+  const layouts = layoutPresets;
+  let row: CmsSettingsRow | null = null; let settings: CmsSettings = defaults; let initial = ''; let loading = true; let saving = false; let error = ''; let message = '';
+  $: dirty = !loading && JSON.stringify(settings) !== initial;
+  $: onDirtyChange(dirty);
+  async function load() { loading = true; error = ''; try { row = await client.settings(); settings = { ...defaults, ...row.value }; initial = JSON.stringify(settings); } catch (cause) { error = cause instanceof Error ? cause.message : '设置读取失败'; } finally { loading = false; } }
+  async function save() { if (!row) return; saving = true; error = ''; message = ''; try { row = await client.saveSettings(settings, row.version); settings = { ...defaults, ...row.value }; initial = JSON.stringify(settings); message = '设置已保存，将用于后续页面请求。'; } catch (cause) { error = cause instanceof Error ? cause.message : '保存失败，请重试'; } finally { saving = false; } }
+  onMount(load);
+</script>
+
+<section class="panel" aria-labelledby="cms-settings-title"><div class="heading"><div><p class="eyebrow">站点设置</p><h2 id="cms-settings-title">站点信息与默认外观</h2></div><button type="button" on:click={load} disabled={loading || saving}>重新载入</button></div>{#if loading}<p class="empty">正在读取设置…</p>{:else}<form on:submit|preventDefault={save}><div class="fields"><label>站点名称<input bind:value={settings.title} required /></label><label>副标题<input bind:value={settings.subtitle} /></label><label>作者<input bind:value={settings.author} /></label><label>头像地址<input bind:value={settings.avatar} placeholder="/images/avatar.svg" /></label><label class="wide">公告<textarea bind:value={settings.announcement} rows="3" placeholder="可留空"></textarea></label><label class="wide">关于页面正文（Markdown）<textarea bind:value={settings.about} rows="9"></textarea></label><fieldset><legend>默认配色</legend><div class="choices">{#each palettes as palette}<label><input type="radio" bind:group={settings.defaultPalette} value={palette.id} />{palette.label}</label>{/each}</div></fieldset><fieldset><legend>默认版式</legend><div class="choices">{#each layouts as layout}<label><input type="radio" bind:group={settings.defaultLayout} value={layout.id} />{layout.label}</label>{/each}</div></fieldset></div>{#if error}<p role="alert" class="notice error">{error}</p>{/if}{#if message}<p role="status" class="notice success">{message}</p>{/if}<button class="primary" type="submit" disabled={saving}>{saving ? '正在保存…' : '保存站点设置'}</button></form>{/if}</section>
+
+<style>
+  .panel { padding:clamp(1rem,3vw,1.5rem); border:1px solid var(--site-border); border-radius:.7rem; background:var(--site-surface); } .heading { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:start; gap:1rem; } .eyebrow { margin:0; color:var(--site-link); font-size:.8rem; font-weight:750; } h2 { margin:.15rem 0; font-size:1.45rem; } .fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.85rem; margin:1rem 0; } label { display:grid; gap:.3rem; color:var(--site-text-muted); font-size:.83rem; font-weight:700; } label.wide,fieldset { grid-column:span 2; } input,textarea,button { border:1px solid var(--site-border); border-radius:.35rem; background:var(--site-background); color:var(--site-text); font:inherit; } input,button { min-height:44px; padding:.4rem .7rem; } textarea { padding:.55rem .65rem; resize:vertical; } button { cursor:pointer; font-weight:650; } button:disabled { opacity:.55; cursor:wait; } fieldset { margin:0; padding:.75rem; border:1px solid var(--site-border); border-radius:.4rem; } legend { padding:0 .25rem; font-weight:700; } .choices { display:flex; flex-wrap:wrap; gap:.4rem .7rem; } .choices label { display:flex; align-items:center; gap:.35rem; color:var(--site-text); } .choices input { min-height:1rem; padding:0; } .notice { padding:.6rem .75rem; border-left:4px solid currentColor; } .error { color:#b91c1c; background:#fef2f2; } .success { color:#166534; background:#f0fdf4; } .primary { background:var(--site-tint); color:var(--site-link); } .empty { color:var(--site-text-muted); } input:focus-visible,textarea:focus-visible,button:focus-visible { outline:3px solid var(--site-accent); outline-offset:2px; } @media(max-width:640px){.fields{grid-template-columns:1fr}label.wide,fieldset{grid-column:span 1;}}
+</style>

@@ -1,0 +1,5 @@
+---
+import CmsAccountPage from './CmsAccountPage.svelte';
+const { connection } = Astro.props;
+---
+<CmsAccountPage client:load {connection} />

@@ -19,14 +19,19 @@ const projects: PortalProject[] = publishedProjects.map((entry) => ({
 }));
 const byKind = (kind: 'post' | 'talk' | 'knowledge' | 'update') => portalIndex.filter((entry) => entry.kind === kind);
 const model = buildHomeModel({
+  allowProjectFallback: !Astro.locals.cmsSettings,
   posts: byKind('post'),
   talks: byKind('talk'),
   knowledge: byKind('knowledge'),
   projects,
   updates: byKind('update'),
 });
+if (Astro.locals.cmsSettings) {
+  model.identity = { ...model.identity, name: Astro.locals.cmsSettings.author, tagline: Astro.locals.cmsSettings.subtitle };
+}
 ---
 
-<Layout title="SunTBurst 个人门户" description="把学习、实践与知识连接成一张长期生长的地图" isPortalHome hidePageBanner>
+<Layout title={Astro.locals.cmsSettings?.title ?? 'SunTBurst 个人门户'} description={Astro.locals.cmsSettings?.subtitle ?? '把学习、实践与知识连接成一张长期生长的地图'} isPortalHome hidePageBanner>
+  {Astro.locals.cmsSettings?.announcement && <aside role="note" class="mx-auto mb-6 max-w-4xl rounded-lg border border-sky-300 bg-sky-50 p-4 text-sky-900 dark:bg-slate-800 dark:text-sky-100">{Astro.locals.cmsSettings.announcement}</aside>}
   <PortalHome model={model} />
 </Layout>

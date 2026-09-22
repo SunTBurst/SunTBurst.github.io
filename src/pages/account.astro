@@ -1,0 +1,15 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CmsAccountPage from 'virtual:cms-account';
+import CmsSetupState from '../components/cms/CmsSetupState.svelte';
+import { cmsEnvironment, readCmsConnection } from '../features/cms/config';
+import type { CmsConnection } from '../features/cms/types';
+
+let connection: CmsConnection | null = null;
+let setupError = '';
+try { connection = readCmsConnection(cmsEnvironment()); } catch (error) { setupError = error instanceof Error ? error.message : 'CMS 配置无效'; }
+---
+
+<Layout title="账户中心" description="使用 GitHub 登录并查看本站账户状态" hidePageBanner robots="noindex,nofollow">
+  {connection ? <CmsAccountPage {connection} /> : <CmsSetupState pageName="账户中心" error={setupError} />}
+</Layout>

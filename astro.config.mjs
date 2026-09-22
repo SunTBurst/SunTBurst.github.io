@@ -9,6 +9,7 @@ import remarkGfm from 'remark-gfm';
 import rehypeKatex from 'rehype-katex';
 import { remarkAdmonitions } from './src/plugins/remark-admonitions.mjs';
 import { rehypeShiftHeadings } from './src/plugins/rehype-shift-headings.mjs';
+import node from '@astrojs/node';
 
 try {
   process.loadEnvFile();
@@ -17,6 +18,7 @@ try {
 }
 
 const commentsEnabled = process.env.PUBLIC_COMMENTS_STATE === 'enabled';
+const cmsEnabled = process.env.CMS_ENABLED === 'true';
 const commentIsland = (enabledPath) => fileURLToPath(new URL(
   commentsEnabled ? enabledPath : './src/components/comments/DisabledClientIsland.astro',
   import.meta.url,
@@ -25,7 +27,8 @@ const commentIsland = (enabledPath) => fileURLToPath(new URL(
 // https://astro.build/config
 export default defineConfig({
   site: process.env.PUBLIC_SITE_URL || 'https://suntburst.github.io',
-  output: 'static',
+  output: cmsEnabled ? 'server' : 'static',
+  adapter: cmsEnabled ? node({ mode: 'standalone' }) : undefined,
   outDir: 'dist',
   build: {
     inlineStylesheets: 'never',
@@ -42,6 +45,8 @@ export default defineConfig({
   vite: {
     resolve: {
       alias: {
+        'virtual:cms-admin': fileURLToPath(new URL(cmsEnabled ? './src/components/cms/AdminEnabled.astro' : './src/components/comments/DisabledClientIsland.astro', import.meta.url)),
+        'virtual:cms-account': fileURLToPath(new URL(cmsEnabled ? './src/components/cms/AccountEnabled.astro' : './src/components/comments/DisabledClientIsland.astro', import.meta.url)),
         'virtual:comments-enabled-section': commentIsland('./src/components/comments/CommentsSectionEnabled.astro'),
         'virtual:comments-moderation': commentIsland('./src/components/comments/ModerationEnabled.astro'),
       },

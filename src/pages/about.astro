@@ -4,8 +4,9 @@ import sanitizeHtml from 'sanitize-html';
 import aboutSource from '../config/about.md?raw';
 import Layout from '../layouts/Layout.astro';
 import { portalConfig } from '../config/portal';
+import { renderCmsMarkdown } from '../utils/cmsMarkdown';
 
-const html = sanitizeHtml(new MarkdownIt({ html: false, linkify: false }).render(aboutSource));
+const html = Astro.locals.cmsSettings ? renderCmsMarkdown(Astro.locals.cmsSettings.about).html : sanitizeHtml(new MarkdownIt({ html: false, linkify: false }).render(aboutSource));
 ---
 
 <Layout title="关于" description="关于 SunTBurst 个人门户" hidePageBanner>

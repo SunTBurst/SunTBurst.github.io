@@ -58,7 +58,7 @@ const failures = [
     rules.filter((rule) => !rule.publicBuildOnly),
     'tracked',
   )),
-  ...publicBuildFiles(path.join(root, 'dist')).flatMap((file) => scanFile(
+  ...publicBuildFiles(path.join(root, 'dist', existsSync(path.join(root, 'dist/client')) ? 'client' : '')).flatMap((file) => scanFile(
     file,
     rules.filter((rule) => !rule.previewOnly || process.env.PUBLIC_COMMENTS_STATE !== 'enabled'),
     'dist',
