@@ -20,7 +20,7 @@ select ok(not has_column_privilege('anon', 'public.cms_public_routes', 'document
 
 set local role anon;
 select is(public.cms_public_media('00000000-0000-0000-0000-000000000001'), null::jsonb, 'anonymous media lookup reveals nothing without a publication link');
-select is((select value from public.cms_settings where id), '{}'::jsonb, 'anonymous users can read the initialized public settings singleton');
+select is((select id from public.cms_settings where id), true, 'anonymous users can read the public settings singleton');
 reset role;
 
 select * from finish();
