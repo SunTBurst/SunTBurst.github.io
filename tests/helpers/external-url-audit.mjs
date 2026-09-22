@@ -7,6 +7,8 @@ const RUNTIME_MARKUP_PATTERN = /\.(?:html|svg|xml)$/i;
 const URL_PATTERN = /(?:https?:)?\/\/[^\s"'<>`)\\\]]+/g;
 const CONTENT_LINK_PATTERN = /<a\b(?:(?!>)[\s\S])*?\bhref\s*=\s*(["'])\s*((?:https?:)?\/\/[^\s"'<>`)\\\]]+)\s*\1/gi;
 const XML_NAMESPACE_PATTERN = /\bxmlns(?::[\w.-]+)?\s*=\s*(["'])\s*(https?:\/\/[^\s"'<>`)\\\]]+)\s*\1/gi;
+const CSS_RUNTIME_URL_PATTERN = /(?:url\(\s*|@import\s+)(["']?)\s*((?:https?:)?\/\/[^\s"'<>`)\\\]]+)\s*\1/gi;
+const MARKUP_NETWORK_TAGS = new Set(['audio', 'embed', 'frame', 'iframe', 'image', 'img', 'input', 'link', 'object', 'script', 'source', 'track', 'use', 'video']);
 
 const XML_NAMESPACES = new Set([
   'http://purl.org/dc/elements/1.1/',
@@ -133,31 +135,68 @@ function captureOffset(match, captureIndex) {
   return match.index + match[0].lastIndexOf(match[captureIndex]);
 }
 
-function normalizeMarkupEntities(text) {
-  return text.replace(/&(?:lt|gt|quot|apos|#\d+|#x[\da-f]+);/gi, (entity) => {
-    const name = entity.slice(1, -1).toLowerCase();
-    let character;
-
-    if (name === 'lt') character = '<';
-    else if (name === 'gt') character = '>';
-    else if (name === 'quot') character = '"';
-    else if (name === 'apos') character = "'";
-    else {
-      const radix = name.startsWith('#x') ? 16 : 10;
-      const digits = name.slice(radix === 16 ? 2 : 1);
-      const codePoint = Number.parseInt(digits, radix);
-      if (!Number.isInteger(codePoint) || codePoint > 0x10ffff) return entity;
-      character = String.fromCodePoint(codePoint);
-    }
-
-    if (!['<', '>', '"', "'"].includes(character)) return entity;
-    return `${' '.repeat(entity.length - character.length)}${character}`;
-  });
-}
-
 function isJavaScriptVendorUrl(pathname, url) {
   if (!/\.js$/i.test(pathname)) return false;
   return XML_NAMESPACES.has(url) || JS_VENDOR_URLS.has(url);
+}
+
+function addCapturedUrlPositions(positions, text, pattern, captureIndex, offset = 0) {
+  for (const match of text.matchAll(pattern)) positions.add(offset + captureOffset(match, captureIndex));
+}
+
+function runtimeUrlPositions(artifactPath, text) {
+  if (RUNTIME_SCRIPT_PATTERN.test(artifactPath)) {
+    return new Set(Array.from(text.matchAll(URL_PATTERN), (match) => match.index));
+  }
+  if (/\.css$/i.test(artifactPath)) {
+    const positions = new Set();
+    addCapturedUrlPositions(positions, text, CSS_RUNTIME_URL_PATTERN, 2);
+    return positions;
+  }
+  if (!RUNTIME_MARKUP_PATTERN.test(artifactPath)) return new Set();
+
+  const positions = new Set();
+  for (const tagMatch of text.matchAll(/<([a-z][\w:-]*)\b[^>]*>/gi)) {
+    const tagName = tagMatch[1].toLowerCase();
+    const tag = tagMatch[0];
+    const tagOffset = tagMatch.index;
+    if (MARKUP_NETWORK_TAGS.has(tagName)) {
+      const sourceAttributes = tagName === 'object' ? ['data']
+        : tagName === 'use' ? ['href']
+          : ['src', 'href', 'poster'];
+      for (const urlMatch of tag.matchAll(URL_PATTERN)) {
+        const before = tag.slice(0, urlMatch.index);
+        const attribute = sourceAttributes.join('|');
+        if (new RegExp(`\\b(?:${attribute})\\s*=\\s*(?:["']?)$`, 'i').test(before)) {
+          positions.add(tagOffset + urlMatch.index);
+        }
+      }
+      for (const srcsetMatch of tag.matchAll(/\bsrcset\s*=\s*(?:(["'])([\s\S]*?)\1|([^\s>]+))/gi)) {
+        const value = srcsetMatch[2] ?? srcsetMatch[3] ?? '';
+        const valueOffset = tagOffset + srcsetMatch.index + srcsetMatch[0].lastIndexOf(value);
+        for (const urlMatch of value.matchAll(URL_PATTERN)) positions.add(valueOffset + urlMatch.index);
+      }
+    }
+    for (const styleMatch of tag.matchAll(/\bstyle\s*=\s*(["'])([\s\S]*?)\1/gi)) {
+      const style = styleMatch[2];
+      const styleOffset = tagOffset + styleMatch.index + styleMatch[0].lastIndexOf(style);
+      addCapturedUrlPositions(positions, style, CSS_RUNTIME_URL_PATTERN, 2, styleOffset);
+    }
+  }
+  for (const styleMatch of text.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style\s*>/gi)) {
+    const style = styleMatch[1];
+    const styleOffset = styleMatch.index + styleMatch[0].indexOf(style);
+    addCapturedUrlPositions(positions, style, CSS_RUNTIME_URL_PATTERN, 2, styleOffset);
+  }
+  for (const scriptMatch of text.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script\s*>/gi)) {
+    const body = scriptMatch[1];
+    positionsForScriptBody(positions, body, scriptMatch.index + scriptMatch[0].indexOf(body));
+  }
+  return positions;
+}
+
+function positionsForScriptBody(positions, body, offset) {
+  for (const match of body.matchAll(URL_PATTERN)) positions.add(offset + match.index);
 }
 
 export function collectTextArtifacts(directory, root = directory) {
@@ -192,8 +231,11 @@ export function findUnexpectedExternalUrls(artifacts, siteUrl) {
 
   for (const artifact of artifacts) {
     const { path: artifactPath, text } = artifact;
-    const normalizedText = normalizeMarkupEntities(text);
+    // Escaped markup appears in rendered documentation and code examples. It is
+    // text, not a browser loading instruction, so do not turn it back into tags.
+    const normalizedText = text;
     const hasRuntimeSink = findUnexpectedRuntimeSinks([artifact]).length > 0;
+    const runtimePositions = runtimeUrlPositions(artifactPath, normalizedText);
     const contentLinkPositions = new Set(
       Array.from(normalizedText.matchAll(CONTENT_LINK_PATTERN), (match) => captureOffset(match, 2)),
     );
@@ -206,6 +248,7 @@ export function findUnexpectedExternalUrls(artifacts, siteUrl) {
     for (const match of normalizedText.matchAll(URL_PATTERN)) {
       const url = trimUrl(match[0]);
       if (new URL(url, siteOrigin).origin === siteOrigin) continue;
+      if (!runtimePositions.has(match.index)) continue;
       if (contentLinkPositions.has(match.index)) continue;
       if (namespacePositions.has(match.index)) continue;
       if (!hasRuntimeSink && isJavaScriptVendorUrl(artifactPath, url)) continue;

@@ -13,7 +13,7 @@ function findRuntimeSinks(artifacts) {
   return externalUrlAudit.findUnexpectedRuntimeSinks(artifacts);
 }
 
-test('URL audit catches unsafe external URLs in every emitted text format and allows only contextual standards', () => {
+test('URL audit catches unsafe runtime-loading URLs and allows contextual standards or prose', () => {
   const findings = findUnexpectedExternalUrls([
     {
       path: 'synthetic.html',
@@ -81,8 +81,6 @@ test('URL audit catches unsafe external URLs in every emitted text format and al
     { path: 'assets/synthetic.css', url: '//fonts.example/font.woff2' },
     { path: 'assets/synthetic.css', url: 'https://images.example/hero.webp' },
     { path: 'assets/synthetic.svg', url: 'https://svg-assets.example/pixel.svg' },
-    { path: 'assets/synthetic.json', url: 'https://json-api.example/data' },
-    { path: 'assets/synthetic.txt', url: 'https://text-api.example/data' },
   ]);
 });
 
@@ -112,7 +110,7 @@ test('URL audit rejects a W3C namespace assigned to a short variable and then re
   ]);
 });
 
-test('URL audit keeps encoded anchor boundaries from swallowing a later link tag', () => {
+test('URL audit leaves encoded markup as documentation text', () => {
   const findings = findUnexpectedExternalUrls([
     {
       path: 'encoded-boundary.html',
@@ -120,9 +118,7 @@ test('URL audit keeps encoded anchor boundaries from swallowing a later link tag
     },
   ], 'https://tsun.test');
 
-  assert.deepEqual(findings, [
-    { path: 'encoded-boundary.html', url: 'https://evil.example/style.css' },
-  ]);
+  assert.deepEqual(findings, []);
 });
 
 test('URL audit rejects a full React diagnostic builder when its artifact can fetch', () => {
@@ -159,7 +155,7 @@ test('URL audit rejects namespace constants when a DOM-looking relay is backed b
   ]);
 });
 
-test('URL audit keeps numeric-entity tag boundaries from swallowing a later link tag', () => {
+test('URL audit leaves numeric-entity markup as documentation text', () => {
   const findings = findUnexpectedExternalUrls([
     {
       path: 'numeric-encoded-boundary.html',
@@ -167,9 +163,7 @@ test('URL audit keeps numeric-entity tag boundaries from swallowing a later link
     },
   ], 'https://tsun.test');
 
-  assert.deepEqual(findings, [
-    { path: 'numeric-encoded-boundary.html', url: 'https://evil.example/numeric.css' },
-  ]);
+  assert.deepEqual(findings, []);
 });
 
 test('runtime sink audit detects browser network capabilities without URL literals', () => {
@@ -240,5 +234,50 @@ test('runtime sink audit detects ordinary and optional-chained service worker re
   assert.deepEqual(findings, [
     { path: 'assets/service-worker-ordinary.js', sink: 'serviceWorker.register' },
     { path: 'assets/service-worker-optional.js', sink: 'serviceWorker.register' },
+  ]);
+});
+
+test('URL audit ignores prose endpoints while retaining executable markup, script, and stylesheet loads', () => {
+  const findings = findUnexpectedExternalUrls([
+    {
+      path: 'article.html',
+      text: [
+        '<p>本机 Gateway 地址通常为 <code>http://127.0.0.1:18789/v1</code>。</p>',
+        '<pre><code>fetch("http://127.0.0.1:18789/v1")</code></pre>',
+        '&lt;img src=&quot;https://documentation.example/not-a-request.png&quot;&gt;',
+        '<script src="https://tracker.example/collect.js"></script>',
+        '<img src="https://images.example/pixel.gif">',
+        '<img src=https://images.example/no-quotes.gif>',
+        '<img srcset="https://images.example/one.webp 1x, https://images.example/two.webp 2x">',
+        '<svg><use href="https://icons.example/sprite.svg#symbol" /></svg>',
+        '<style>.hero { background-image: url(https://inline-styles.example/block.webp); }</style>',
+        '<div style="background-image:url(https://inline-styles.example/hero.webp)"></div>',
+      ].join('\n'),
+    },
+    {
+      path: 'assets/runtime.js',
+      text: 'const endpoint = "https://api.example/data";',
+    },
+    {
+      path: 'assets/site.css',
+      text: '.hero { background-image: url("https://images.example/hero.webp"); }',
+    },
+    {
+      path: 'portal-index.json',
+      text: '{"documentationExample":"http://127.0.0.1:18789/v1"}',
+    },
+  ], 'https://tsun.test');
+
+  assert.deepEqual(findings, [
+    { path: 'article.html', url: 'https://tracker.example/collect.js' },
+    { path: 'article.html', url: 'https://images.example/pixel.gif' },
+    { path: 'article.html', url: 'https://images.example/no-quotes.gif' },
+    { path: 'article.html', url: 'https://images.example/one.webp' },
+    { path: 'article.html', url: 'https://images.example/two.webp' },
+    { path: 'article.html', url: 'https://icons.example/sprite.svg#symbol' },
+    { path: 'article.html', url: 'https://inline-styles.example/block.webp' },
+    { path: 'article.html', url: 'https://inline-styles.example/hero.webp' },
+    { path: 'assets/runtime.js', url: 'https://api.example/data' },
+    { path: 'assets/site.css', url: 'https://images.example/hero.webp' },
   ]);
 });
