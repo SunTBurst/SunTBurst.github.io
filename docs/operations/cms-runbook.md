@@ -60,6 +60,14 @@ docker run --env-file .env -e HOST=0.0.0.0 -e PORT=4321 -p 4321:4321 suntburst-b
 
 容器只需网站公开连接配置，构建不要求服务端 AI 密钥。正式域名、服务资源和 OAuth 配置未完成时，仅能称为本地可运行系统，不能称为线上登录已经验收。
 
+### Render 免费试运行
+
+仓库根目录提供 `render.yaml`，在 Render 创建 Blueprint 并选择本仓库的 `main` 分支即可读取。配置固定使用免费 Docker Web Service、新加坡区域，后续提交需 GitHub 检查通过才自动部署。首次创建时填写三个公开配置：实际网站 HTTPS 地址、Supabase 项目 URL、Supabase publishable key。如果平台分配的网址与预填地址不同，更新 `PUBLIC_SITE_URL` 后重新构建，再同步 Supabase Auth 的 Site URL 和 `/admin/` 回跳白名单。
+
+采用默认 TCP 健康检查；不要自行填写依赖数据库的 HTTP 健康检查路径。Render 的运行端口会通过 `PORT` 覆盖镜像默认值。文章和媒体全部存储在 Supabase，容器本地磁盘不用于持久保存内容。首次切换前，先执行下方内容导出、导入和发布流程，确保既有文章保留。
+
+免费方案用于试运行：[Render 免费实例](https://render.com/docs/free)闲置 15 分钟后会休眠，下一次访问需要等待唤醒；[Supabase 免费项目](https://supabase.com/docs/guides/platform/free-project-pausing)低活跃时也可能暂停。稳定运营时再自行选择常驻付费方案。配置依据：[Render Blueprint 文档](https://render.com/docs/blueprint-spec)。
+
 ## 写作与管理
 
 登录 `/admin/` 后新建文章，填写标题、地址、分类、标签和正文；图片可直接在编辑器上传/插入，预览签名地址不会写进正文。点击“保存草稿”写入数据库，再点击“发布”创建公开快照。修改已发布文章只改工作副本，点击“发布更新”后才更新公开正文。

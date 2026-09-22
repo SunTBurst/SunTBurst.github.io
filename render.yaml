@@ -1,0 +1,23 @@
+# Trial deployment. No paid resources are created by this blueprint.
+# Database, authentication, and media storage live in your Supabase project.
+services:
+  - type: web
+    name: suntburst-blog
+    runtime: docker
+    plan: free
+    region: singapore
+    branch: main
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    autoDeployTrigger: checksPass
+    envVars:
+      - key: CMS_ENABLED
+        value: "true"
+      - key: PUBLIC_COMMENTS_STATE
+        value: preview
+      - key: PUBLIC_SITE_URL
+        sync: false
+      - key: PUBLIC_SUPABASE_URL
+        sync: false
+      - key: PUBLIC_SUPABASE_PUBLISHABLE_KEY
+        sync: false
