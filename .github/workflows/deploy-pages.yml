@@ -49,6 +49,7 @@ jobs:
         run: pnpm build
         env:
           PUBLIC_SITE_URL: https://${{ github.repository_owner }}.github.io
+          PUBLIC_CMS_SITE_URL: https://suntburst-blog.onrender.com
           PUBLIC_BUILD_SHA: ${{ github.sha }}
 
       - name: Upload Pages artifact

@@ -1,15 +1,21 @@
 <script lang="ts">
   export let error = '';
   export let pageName = '内容后台';
+  export let cmsSiteUrl = '';
+  export let onlinePath = '/admin/';
+  export let onlineLabel = '进入内容后台';
 </script>
 
 <section class="setup" aria-labelledby="cms-setup-title">
-  <p class="eyebrow">CMS 未启用</p>
-  <h1 id="cms-setup-title">{pageName}暂不可用</h1>
-  <p>此站点目前仍以静态内容模式运行，尚未连接内容数据库，因此不能登录、保存草稿或上传图片。</p>
+  <p class="eyebrow">{cmsSiteUrl ? '在线写作与管理' : 'CMS 未启用'}</p>
+  <h1 id="cms-setup-title">{pageName}{cmsSiteUrl ? '已上线' : '暂不可用'}</h1>
+  {#if !cmsSiteUrl}<p>此站点目前仍以静态内容模式运行，尚未连接内容数据库，因此不能登录、保存草稿或上传图片。</p>{/if}
   {#if error}<p class="error" role="alert">配置检查：{error}</p>{/if}
-  <p class="muted">部署者需要设置 <code>CMS_ENABLED=true</code>、公开 Supabase 地址和 publishable key；OAuth、AI 和 service-role 密钥只保存在服务端。</p>
-  <a href="https://supabase.com/docs/guides/auth/social-login/auth-github" class="button">查看 GitHub 登录配置指南 ↗</a>
+  {#if cmsSiteUrl}
+    <p>在线版已经启用内容后台。保存和发布会实时生效；本静态站的现有内容不会自动同步。</p>
+    <a href={`${cmsSiteUrl}${onlinePath}`} class="button">{onlineLabel} ↗</a>
+    <a href={cmsSiteUrl} class="browse-link">浏览在线博客 ↗</a>
+  {/if}
 </section>
 
 <style>
@@ -20,5 +26,6 @@
   .muted { color: var(--site-text-muted); font-size: .92rem; }
   .error { border-left: 4px solid #b91c1c; padding: .65rem .8rem; background: #fef2f2; color: #991b1b; }
   .button { display: inline-flex; min-height: 44px; align-items: center; padding: .4rem .85rem; border: 1px solid var(--site-border); border-radius: .35rem; color: var(--site-link); font-weight: 700; }
+  .browse-link { display: inline-flex; min-height: 44px; align-items: center; margin-left: .8rem; color: var(--site-link); font-weight: 700; }
   code { overflow-wrap: anywhere; }
 </style>

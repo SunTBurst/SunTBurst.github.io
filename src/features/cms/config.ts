@@ -1,5 +1,17 @@
 import type { CmsConnection } from './types';
 
+export function readCmsSiteUrl(env: Record<string, string | undefined>): string | null {
+  const value = env.PUBLIC_CMS_SITE_URL?.trim();
+  if (!value) return null;
+  try {
+    const url = new URL(value);
+    if (url.protocol !== 'https:' || !url.hostname || url.username || url.password || url.search || url.hash || url.pathname !== '/') return null;
+    return url.origin;
+  } catch {
+    return null;
+  }
+}
+
 export function readCmsConnection(env: Record<string, string | undefined>): CmsConnection | null {
   if (env.CMS_ENABLED !== 'true') return null;
   const endpoint = env.PUBLIC_SUPABASE_URL?.trim() ?? '';

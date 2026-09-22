@@ -2,17 +2,13 @@ import { getCollection } from 'astro:content';
 import { getCmsPublications } from '../services/cms/public';
 import type { CmsPublication } from '../features/cms/types';
 import { cmsEnvironment, readCmsConnection } from '../features/cms/config';
-
-const asDate = (value: unknown, fallback = new Date(0)) => {
-  const date = new Date(String(value ?? ''));
-  return Number.isNaN(date.getTime()) ? fallback : date;
-};
+import { cmsPublishedDate } from './cmsDates';
 const cmsEntry = (row: CmsPublication) => ({
   id: row.id,
   slug: row.slug,
   body: row.body || '',
   data: {
-    title: row.title || '无标题', published: asDate(row.published_at), description: row.summary || '',
+    title: row.title || '无标题', published: cmsPublishedDate(row.metadata || {}, row.published_at), description: row.summary || '',
     summary: row.summary || '', image: row.image || undefined, tags: row.tags || [], category: row.category || undefined,
     slug: row.slug, draft: false, cms: true, metadata: row.metadata || {}, location: row.metadata?.location || '', weather: row.metadata?.weather || '', mood: row.metadata?.mood || '', device: row.metadata?.device || '',
   }, cms: true as const, filePath: undefined,

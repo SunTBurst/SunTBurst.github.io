@@ -2,14 +2,16 @@
 import Layout from '../layouts/Layout.astro';
 import CmsDashboard from 'virtual:cms-admin';
 import CmsSetupState from '../components/cms/CmsSetupState.svelte';
-import { cmsEnvironment, readCmsConnection } from '../features/cms/config';
+import { cmsEnvironment, readCmsConnection, readCmsSiteUrl } from '../features/cms/config';
 import { siteConfig, appearanceConfig } from '../config/site';
 import aboutSource from '../config/about.md?raw';
 import type { CmsConnection, CmsSettings } from '../features/cms/types';
 
 let connection: CmsConnection | null = null;
 let setupError = '';
-try { connection = readCmsConnection(cmsEnvironment()); } catch (error) { setupError = error instanceof Error ? error.message : 'CMS 配置无效'; }
+const environment = cmsEnvironment();
+try { connection = readCmsConnection(environment); } catch (error) { setupError = error instanceof Error ? error.message : 'CMS 配置无效'; }
+const cmsSiteUrl = connection ? null : readCmsSiteUrl(environment);
 const defaults: CmsSettings = {
   title: siteConfig.title,
   subtitle: siteConfig.subtitle,
@@ -24,5 +26,5 @@ const initialView = Astro.url.searchParams.get('view') ?? 'overview';
 ---
 
 <Layout title="内容后台" description="登录后管理内容、图片、成员与站点设置" hidePageBanner robots="noindex,nofollow">
-  {connection ? <CmsDashboard {connection} {defaults} {initialView} /> : <CmsSetupState pageName="内容后台" error={setupError} />}
+  {connection ? <CmsDashboard {connection} {defaults} {initialView} /> : <CmsSetupState pageName="内容后台" error={setupError} cmsSiteUrl={cmsSiteUrl ?? ''} onlinePath="/admin/" onlineLabel="进入内容后台" />}
 </Layout>

@@ -6,6 +6,8 @@
 
 默认 `CMS_ENABLED=false` 时仍可构建现有静态网站。`CMS_ENABLED=true` 时首页、文章、分类、标签、搜索、知识、项目、RSS 和 sitemap 在请求时读取公开数据库快照，发布后不需要再修改 GitHub 文件或构建网站。完整版的文章、随记、知识和项目只以数据库为准；仓库文件不会自动覆盖或恢复已撤回内容。
 
+若需让旧 GitHub Pages 站的 `/admin/` 与 `/account/` 引导访客进入已上线的完整版，可仅在静态构建中设置 `PUBLIC_CMS_SITE_URL` 为完整版的 HTTPS 根地址。它只提供入口链接；两站内容不会自动同步。
+
 ## 第一次准备
 
 1. 创建 Supabase 项目；记录 Project URL 和 publishable/anon key。网站只需要这两个公开值，不需要 service-role key。
